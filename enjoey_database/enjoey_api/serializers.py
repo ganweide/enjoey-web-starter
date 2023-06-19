@@ -6,7 +6,7 @@ class ChildTableSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(required=False)
     class Meta:
         model = ChildTable
-        fields = ['childId', 'childNameENG', 'childDOB', 'childNRIC', 'languageSpoken', 'created_at']
+        fields = ['childId', 'childNameENG', 'childDOB', 'childNRIC', 'childSex', 'childHeight', 'childWeight', 'languageSpoken', 'created_at']
 
 class FamilyTableSerializer(serializers.ModelSerializer):
     familyId = serializers.CharField(required=False)

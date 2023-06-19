@@ -54,6 +54,8 @@ const Page2 = () => {
   const [languageSpoken, setLanguageSpoken]       = useState("");
   const [childSex, setChildSex]                   = useState("");
   const [childDOB, setChildDOB]                   = useState("");
+  const [childHeight, setChildHeight]             = useState("");
+  const [childWeight, setChildWeight]             = useState("");
   const [programEnrollment, setProgramEnrollment] = useState("");
   const [fatherNRIC, setFatherNRIC]               = useState("");
   const [fatherName, setFatherName]               = useState("");
@@ -98,6 +100,8 @@ const Page2 = () => {
     setLanguageSpoken   ("");
     setChildDOB         ("");
     setChildSex         ("");
+    setChildHeight      ("");
+    setChildWeight      ("");
     setProgramEnrollment("");
     setFatherName       ("");
     setFatherNRIC       ("");
@@ -125,6 +129,9 @@ const Page2 = () => {
     childData.append("childNameENG", childName);
     childData.append("childDOB", childDOB);
     childData.append("childNRIC", childNRIC);
+    childData.append("childSex", childSex);
+    childData.append("childHeight", childHeight);
+    childData.append("childWeight", childWeight);
     childData.append("languageSpoken", languageSpoken);
   
     try {
@@ -274,6 +281,7 @@ const Page2 = () => {
                   flexDirection : "row",
                   gap           : "16px",
                   marginTop     : "8px",
+                  marginBottom  : "8px",
                 }}
               >
                 <FormControl component="fieldset">
@@ -289,27 +297,61 @@ const Page2 = () => {
                     <FormControlLabel value="male" control={<Radio />} label="Male" />
                   </RadioGroup>
                 </FormControl>
-                <FormControl fullWidth>
-                  <InputLabel id="program-select-label">Program Enrollment</InputLabel>
-                  <Select
-                    labelId ="program-select-label"
-                    id      ="program-select"
-                    value   ={programEnrollment}
-                    label   ="Program Enrollment"
-                    onChange={handleChange}
+                <div
+                  style={{
+                    display       : "flex",
+                    flexDirection : "column",
+                  }}
+                >
+                  <FormControl fullWidth>
+                    <InputLabel id="program-select-label">Program Enrollment</InputLabel>
+                    <Select
+                      labelId ="program-select-label"
+                      id      ="program-select"
+                      value   ={programEnrollment}
+                      label   ="Program Enrollment"
+                      onChange={handleChange}
+                    >
+                      {programDatas.map((programData) => {
+                        return (
+                          <MenuItem
+                            key   ={programData.programId}
+                            value ={programData.programId}
+                          >
+                            {programData.programName}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                  <div
+                    style={{
+                      display       : "flex",
+                      flexDirection : "row",
+                      gap           : "16px",
+                      marginTop     : "8px",
+                    }}
                   >
-                    {programDatas.map((programData) => {
-                      return (
-                        <MenuItem
-                          key   ={programData.programId}
-                          value ={programData.programId}
-                        >
-                          {programData.programName}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
+                    <TextField
+                      onChange  ={(e) => setChildHeight(e.target.value)}
+                      margin    ="dense"
+                      label     ="Height (CM)"
+                      type      ="string"
+                      fullWidth
+                      variant   ="outlined"
+                      value     ={childHeight}
+                    />
+                    <TextField
+                      onChange  ={(e) => setChildWeight(e.target.value)}
+                      margin    ="dense"
+                      label     ="Weight (KG)"
+                      type      ="string"
+                      fullWidth
+                      variant   ="outlined"
+                      value     ={childWeight}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <Divider variant="middle" />
@@ -513,16 +555,16 @@ const Page2 = () => {
 
               return (
                 <TableRow key={admissionData.admissionId}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{admissionData.title}</TableCell>
-                  <TableCell>{childName}</TableCell>
-                  <TableCell>{registrationDate}</TableCell>
-                  <TableCell>{admissionData.programId}</TableCell>
-                  <TableCell>
+                  <TableCell style={{textAlign: "center"}}>{index + 1}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{admissionData.title}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{childName}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{registrationDate}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{admissionData.programId}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>
                     <Switch
-                      checked={admissionData.status}
+                      checked ={admissionData.status}
                       onChange={handleStatusChange}
-                      color="primary"
+                      color   ="primary"
                     />
                     {admissionData.status ? 'Enrolled' : 'Pending'}
                   </TableCell>
