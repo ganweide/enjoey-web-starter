@@ -60,12 +60,31 @@ class AdmissionView(viewsets.ModelViewSet):
         serializer = AdmissionTableSerializer(queryset, many=True)
         return Response(serializer.data)
     
+    def create(self, request):
+        serializer = AdmissionTableSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def update(self, request, pk=None):
+        try:
+            user = AdmissionTable.objects.get(admissionId=pk)
+        except AdmissionTable.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AdmissionTableSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class ProgramView(viewsets.ModelViewSet):
     queryset = ProgramTable.objects.all().order_by('-created_at')
     serializer_class = ProgramTableSerializer
     #all
     def list(self, request):
-        queryset = ProgramTable.objects.all().order_by('-created_at')
+        queryset = ProgramTable.objects.all()
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = ProgramTableSerializer(page, many=True)
