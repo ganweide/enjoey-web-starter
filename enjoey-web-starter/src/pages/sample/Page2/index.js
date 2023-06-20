@@ -1,6 +1,8 @@
 // React Imports
 import React, { useEffect, useState } from "react";
 
+import { differenceInMonths, parseISO } from 'date-fns';
+
 // Axios Import
 import Axios from "axios";
 
@@ -31,8 +33,22 @@ import {
   Switch,
 } from "@mui/material";
 
+// Recharts Imports
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+  Dot,
+} from 'recharts';
+
 // Local Imports
 import Styles from "./style";
+import Data from "./data";
 
 // Global Constants
 const useStyles = makeStyles(Styles);
@@ -43,12 +59,13 @@ const admissionUrl = "http://127.0.0.1:8000/api/admission/";
 
 const Page2 = () => {
   const classes   = useStyles();
-  const tableHead = [" ", "Title", "Child's Name", "Registration Date", "Program Enrollment", "Status"];
+  const tableHead = [" ", "Title", "Child's Name", "Registration Date", "Program Enrollment", "Status", "Growth Graph"];
   const [admissionDatas, setAdmissionDatas]       = useState([]);
   const [childDatas, setChildDatas]               = useState([]);
   const [programDatas, setProgramDatas]           = useState([]);
   const [refreshData, setRefreshData]             = useState([]);
   const [open, setOpen]                           = useState(false);
+  const [show, setShow]                           = useState(false);
   const [childName, setChildName]                 = useState("");
   const [childNRIC, setChildNRIC]                 = useState("");
   const [languageSpoken, setLanguageSpoken]       = useState("");
@@ -77,6 +94,9 @@ const Page2 = () => {
     } catch (error) {
       console.log(error);
     }
+  }, [refreshData]);
+  
+  useEffect(() => {
     try {
       Axios.get(childUrl).then((response) => {
         setChildDatas(response.data);
@@ -84,6 +104,9 @@ const Page2 = () => {
     } catch (error) {
       console.log(error);
     }
+  }, []);
+
+  useEffect(() => {
     try {
       Axios.get(programUrl).then((response) => {
         setProgramDatas(response.data);
@@ -91,7 +114,7 @@ const Page2 = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [refreshData]);
+  }, []);
 
   const openDialog = async () => {
     setOpen             (true);
@@ -187,6 +210,22 @@ const Page2 = () => {
   
     setOpen(false);
   };
+
+  const showGraph = async (prop) => {
+    setShow(true);
+    try {
+      const { data } = await Axios.get(`${childUrl}${prop.childId}`);
+      setChildSex(data.childSex);
+      setChildHeight(data.childHeight);
+      setChildWeight(data.childWeight);
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
+  const hideGraph = async () => {
+    setShow (false);
+  }
 
   return (
     <div>
@@ -531,9 +570,12 @@ const Page2 = () => {
           </TableHead>
           <TableBody>
             {admissionDatas.map((admissionData, index) => {
-              const child = childDatas.find((childData) => admissionData.childId === childData.childId);
-              const registrationDate = new Date(admissionData.registrationDate).toLocaleDateString();
-              const childName = child ? child.childNameENG : "";
+              const child             = childDatas.find((childData) => admissionData.childId === childData.childId);
+              const program           = programDatas.find((programData) => admissionData.programId === programData.programId);
+              const childName         = child ? child.childNameENG : "";
+              const programName       = program ? program.programName : "";
+              const childInfo         = [{"Month": "1 month", "Height": child.childHeight}]
+              const registrationDate  = new Date(admissionData.registrationDate).toLocaleDateString();
 
               const handleStatusChange = async (event) => {
                 const newStatus = event.target.checked;
@@ -559,7 +601,7 @@ const Page2 = () => {
                   <TableCell style={{textAlign: "center"}}>{admissionData.title}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{childName}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{registrationDate}</TableCell>
-                  <TableCell style={{textAlign: "center"}}>{admissionData.programId}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{programName}</TableCell>
                   <TableCell style={{textAlign: "center"}}>
                     <Switch
                       checked ={admissionData.status}
@@ -567,6 +609,61 @@ const Page2 = () => {
                       color   ="primary"
                     />
                     {admissionData.status ? 'Enrolled' : 'Pending'}
+                  </TableCell>
+                  <TableCell style={{textAlign: "center"}}>
+                    <Button variant ="contained" onClick ={() => showGraph(admissionData)}>
+                      Show Graph
+                    </Button>
+                    <Dialog
+                      fullWidth
+                      maxWidth="xl"
+                      open={show}
+                      onClose={hideGraph}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle>
+                        Length-for-age {childSex === "female" ? "GIRLS" : "BOYS"}
+                      </DialogTitle>
+                      <DialogContent>
+                        {childSex === "female" ? 
+                          <ResponsiveContainer width="100%" height={450}>
+                            <LineChart data={Data.girls}>
+                              <XAxis dataKey="Month" />
+                              <YAxis unit="cm" />
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <Tooltip />
+                              <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="cm" />
+                              <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="cm" />
+                              <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="cm" />
+                              <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="cm" />
+                              <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="cm" />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        : 
+                          <ResponsiveContainer width="100%" height={450}>
+                            <LineChart data={Data.boys}>
+                              <XAxis dataKey="Month" />
+                              <YAxis unit="cm" />
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <Tooltip />
+                              <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="cm" />
+                              <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="cm" />
+                              <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="cm" />
+                              <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="cm" />
+                              <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="cm" />
+                              <Line
+                                dataKey="Height"
+                                data={childInfo}
+                                name="Child"
+                                unit="cm"
+                                dot={<Dot r={4} strokeWidth={2} />}
+                              />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        }
+                      </DialogContent>
+                    </Dialog>
                   </TableCell>
                 </TableRow>
               );
