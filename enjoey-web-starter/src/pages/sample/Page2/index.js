@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 
 import { differenceInMonths, parseISO } from 'date-fns';
 
+import PropTypes from "prop-types";
+
 // Axios Import
 import Axios from "axios";
 
@@ -15,6 +17,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Typography,
   Table,
   TableBody,
   TableCell,
@@ -31,19 +34,18 @@ import {
   MenuItem,
   Divider,
   Switch,
+  Grid,
 } from "@mui/material";
 
 // Recharts Imports
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
-  Dot,
 } from 'recharts';
 
 // Local Imports
@@ -66,6 +68,7 @@ const Page2 = () => {
   const [refreshData, setRefreshData]             = useState([]);
   const [open, setOpen]                           = useState(false);
   const [show, setShow]                           = useState(false);
+  const [switchChart, setSwitchChart]             = useState(true);
   const [childName, setChildName]                 = useState("");
   const [childNRIC, setChildNRIC]                 = useState("");
   const [languageSpoken, setLanguageSpoken]       = useState("");
@@ -94,9 +97,6 @@ const Page2 = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [refreshData]);
-  
-  useEffect(() => {
     try {
       Axios.get(childUrl).then((response) => {
         setChildDatas(response.data);
@@ -104,9 +104,6 @@ const Page2 = () => {
     } catch (error) {
       console.log(error);
     }
-  }, []);
-
-  useEffect(() => {
     try {
       Axios.get(programUrl).then((response) => {
         setProgramDatas(response.data);
@@ -114,7 +111,7 @@ const Page2 = () => {
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [refreshData]);
 
   const openDialog = async () => {
     setOpen             (true);
@@ -213,6 +210,7 @@ const Page2 = () => {
 
   const showGraph = async (prop) => {
     setShow(true);
+    setSwitchChart(true);
     try {
       const { data } = await Axios.get(`${childUrl}${prop.childId}`);
       setChildSex(data.childSex);
@@ -221,6 +219,10 @@ const Page2 = () => {
     } catch (error) {
       console.log("error", error);
     }
+  }
+
+  const handleSwitch = () => {
+    setSwitchChart(!switchChart);
   }
 
   const hideGraph = async () => {
@@ -256,17 +258,13 @@ const Page2 = () => {
           <DialogTitle>
             <h2>Admission Form</h2>
           </DialogTitle>
-          <DialogContent>
-            <Divider variant="middle" />
-            <h3>Child Info</h3>
-            <div>
-              <div
-                style={{
-                  display       : "flex",
-                  flexDirection : "row",
-                  gap           : "16px",
-                }}
-              >
+          <DialogContent dividers>
+            <Grid container spacing={2}>
+              <Grid item xs={6} md={12}>
+                <h3>Child&apos;s Info</h3>
+                <Divider variant="middle" />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setChildName(e.target.value)}
                   autoFocus
@@ -277,6 +275,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={childName}
                 />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setChildNRIC(e.target.value)}
                   margin    ="dense"
@@ -286,14 +286,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={childNRIC}
                 />
-              </div>
-              <div
-                style={{
-                  display       : "flex",
-                  flexDirection : "row",
-                  gap           : "16px",
-                }}
-              >
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setLanguageSpoken(e.target.value)}
                   margin    ="dense"
@@ -303,6 +297,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={languageSpoken}
                 />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange        ={(e) => setChildDOB(e.target.value)}
                   InputLabelProps ={{ shrink: true }}
@@ -313,16 +309,8 @@ const Page2 = () => {
                   variant         ="outlined"
                   value           ={childDOB}
                 />
-              </div>
-              <div
-                style={{
-                  display       : "flex",
-                  flexDirection : "row",
-                  gap           : "16px",
-                  marginTop     : "8px",
-                  marginBottom  : "8px",
-                }}
-              >
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <FormControl component="fieldset">
                   <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
                   <RadioGroup
@@ -336,77 +324,57 @@ const Page2 = () => {
                     <FormControlLabel value="male" control={<Radio />} label="Male" />
                   </RadioGroup>
                 </FormControl>
-                <div
-                  style={{
-                    display       : "flex",
-                    flexDirection : "column",
-                  }}
-                >
-                  <FormControl fullWidth>
-                    <InputLabel id="program-select-label">Program Enrollment</InputLabel>
-                    <Select
-                      labelId ="program-select-label"
-                      id      ="program-select"
-                      value   ={programEnrollment}
-                      label   ="Program Enrollment"
-                      onChange={handleChange}
-                    >
-                      {programDatas.map((programData) => {
-                        return (
-                          <MenuItem
-                            key   ={programData.programId}
-                            value ={programData.programId}
-                          >
-                            {programData.programName}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </FormControl>
-                  <div
-                    style={{
-                      display       : "flex",
-                      flexDirection : "row",
-                      gap           : "16px",
-                      marginTop     : "8px",
-                    }}
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <TextField
+                  onChange  ={(e) => setChildHeight(e.target.value)}
+                  margin    ="dense"
+                  label     ="Height (CM)"
+                  type      ="string"
+                  fullWidth
+                  variant   ="outlined"
+                  value     ={childHeight}
+                />
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <TextField
+                  onChange  ={(e) => setChildWeight(e.target.value)}
+                  margin    ="dense"
+                  label     ="Weight (KG)"
+                  type      ="string"
+                  fullWidth
+                  variant   ="outlined"
+                  value     ={childWeight}
+                />
+              </Grid>
+              <Grid item xs={6} md={12}>
+                <FormControl fullWidth>
+                  <InputLabel id="program-select-label">Program Enrollment</InputLabel>
+                  <Select
+                    labelId ="program-select-label"
+                    id      ="program-select"
+                    value   ={programEnrollment}
+                    label   ="Program Enrollment"
+                    onChange={handleChange}
                   >
-                    <TextField
-                      onChange  ={(e) => setChildHeight(e.target.value)}
-                      margin    ="dense"
-                      label     ="Height (CM)"
-                      type      ="string"
-                      fullWidth
-                      variant   ="outlined"
-                      value     ={childHeight}
-                    />
-                    <TextField
-                      onChange  ={(e) => setChildWeight(e.target.value)}
-                      margin    ="dense"
-                      label     ="Weight (KG)"
-                      type      ="string"
-                      fullWidth
-                      variant   ="outlined"
-                      value     ={childWeight}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <Divider variant="middle" />
-            <h3>Father Info</h3>
-            <div
-              style={{
-                marginBottom: "8px",
-              }}
-            >
-              <div
-                style={{
-                  display       : "flex",
-                  flexDirection : "row",
-                  gap           : "16px",
-                }}
-              >
+                    {programDatas.map((programData) => {
+                      return (
+                        <MenuItem
+                          key   ={programData.programId}
+                          value ={programData.programId}
+                        >
+                          {programData.programName}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6} md={12}>
+                <h3>Father&apos;s Info</h3>
+                <Divider variant="middle" />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setFatherName(e.target.value)}
                   margin    ="dense"
@@ -416,6 +384,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={fatherName}
                 />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setFatherNRIC(e.target.value)}
                   margin    ="dense"
@@ -425,14 +395,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={fatherNRIC}
                 />
-              </div>
-              <div
-                style={{
-                  display       : "flex",
-                  flexDirection : "row",
-                  gap           : "16px",
-                }}
-              >
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setFatherEmail(e.target.value)}
                   margin    ="dense"
@@ -442,6 +406,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={fatherEmail}
                 />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setFatherPhone(e.target.value)}
                   margin    ="dense"
@@ -451,36 +417,34 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={fatherPhone}
                 />
-              </div>
-              <TextField
-                onChange  ={(e) => setFatherOccupation(e.target.value)}
-                margin    ="dense"
-                label     ="Father's Occupation"
-                type      ="string"
-                fullWidth
-                variant   ="outlined"
-                value     ={fatherOccupation}
-              />
-              <TextField
-                onChange  ={(e) => setHomeAddress(e.target.value)}
-                margin    ="dense"
-                label     ="Home Address"
-                type      ="string"
-                fullWidth
-                variant   ="outlined"
-                value     ={homeAddress}
-              />
-            </div>
-            <Divider variant="middle" />
-            <h3>Mother Info</h3>
-            <div>
-              <div
-                style={{
-                  display       : "flex",
-                  flexDirection : "row",
-                  gap           : "16px",
-                }}
-              >
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <TextField
+                  onChange  ={(e) => setFatherOccupation(e.target.value)}
+                  margin    ="dense"
+                  label     ="Father's Occupation"
+                  type      ="string"
+                  fullWidth
+                  variant   ="outlined"
+                  value     ={fatherOccupation}
+                />
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <TextField
+                  onChange  ={(e) => setHomeAddress(e.target.value)}
+                  margin    ="dense"
+                  label     ="Home Address"
+                  type      ="string"
+                  fullWidth
+                  variant   ="outlined"
+                  value     ={homeAddress}
+                />
+              </Grid>
+              <Grid item xs={6} md={12}>
+                <h3>Mother&apos;s Info</h3>
+                <Divider variant="middle" />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setMotherName(e.target.value)}
                   margin    ="dense"
@@ -490,6 +454,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={motherName}
                 />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setMotherNRIC(e.target.value)}
                   margin    ="dense"
@@ -499,14 +465,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={motherNRIC}
                 />
-              </div>
-              <div
-                style={{
-                  display       : "flex",
-                  flexDirection : "row",
-                  gap           : "16px",
-                }}
-              >
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setMotherEmail(e.target.value)}
                   margin    ="dense"
@@ -516,6 +476,8 @@ const Page2 = () => {
                   variant   ="outlined"
                   value      ={motherEmail}
                 />
+              </Grid>
+              <Grid item xs={6} md={6}>
                 <TextField
                   onChange  ={(e) => setMotherPhone(e.target.value)}
                   margin    ="dense"
@@ -525,26 +487,30 @@ const Page2 = () => {
                   variant   ="outlined"
                   value     ={motherPhone}
                 />
-              </div>
-              <TextField
-                onChange  ={(e) => setMotherOccupation(e.target.value)}
-                margin    ="dense"
-                label     ="Mother's Occupation"
-                type      ="string"
-                fullWidth
-                variant   ="outlined"
-                value     ={motherOccupation}
-              />
-            </div>
-            <TextField
-              onChange  ={(e) => setHomeAddress(e.target.value)}
-              margin    ="dense"
-              label     ="Home Address"
-              type      ="string"
-              fullWidth
-              variant   ="outlined"
-              value     ={homeAddress}
-            />
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <TextField
+                  onChange  ={(e) => setMotherOccupation(e.target.value)}
+                  margin    ="dense"
+                  label     ="Mother's Occupation"
+                  type      ="string"
+                  fullWidth
+                  variant   ="outlined"
+                  value     ={motherOccupation}
+                />
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <TextField
+                  onChange  ={(e) => setHomeAddress(e.target.value)}
+                  margin    ="dense"
+                  label     ="Home Address"
+                  type      ="string"
+                  fullWidth
+                  variant   ="outlined"
+                  value     ={homeAddress}
+                />
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button onClick={newAdmission}>Create</Button>
@@ -574,8 +540,11 @@ const Page2 = () => {
               const program           = programDatas.find((programData) => admissionData.programId === programData.programId);
               const childName         = child ? child.childNameENG : "";
               const programName       = program ? program.programName : "";
-              const childInfo         = [{"Month": "1 month", "Height": child.childHeight}]
               const registrationDate  = new Date(admissionData.registrationDate).toLocaleDateString();
+              const heightDataGirls    = [...Data.girlsHeight, {"Month": "1 month", "Height": childHeight}];
+              const heightDataBoys     = [...Data.boysHeight, {"Month": "1 month", "Height": childHeight}];
+              const weightDataGirls    = [...Data.girlsWeight, {"Month": "1 month", "Weight": childWeight}];
+              const weightDataBoys     = [...Data.boysWeight, {"Month": "1 month", "Weight": childWeight}];
 
               const handleStatusChange = async (event) => {
                 const newStatus = event.target.checked;
@@ -593,6 +562,34 @@ const Page2 = () => {
                 } catch (error) {
                   console.log(error);
                 }
+              };
+
+              const ReChartComponent = ({ data, unit }) => (
+                <ResponsiveContainer width="100%" height={450}>
+                  <LineChart data={data}>
+                    <XAxis dataKey="Month" />
+                    <YAxis unit={unit}/>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      name={switchChart ? 'Child Height' : 'Child Weight'}
+                      unit={unit}
+                      dataKey={switchChart ? 'Height' : 'Weight'}
+                      stroke="#8884d8"
+                    />
+                    <Line type="number" name="97th" dataKey="P97" stroke="#F04F47" unit={unit} />
+                    <Line type="number" name="85th" dataKey="P85" stroke="#FFA500" unit={unit} />
+                    <Line type="number" name="50th" dataKey="P50" stroke="#32CD32" unit={unit} />
+                    <Line type="number" name="15th" dataKey="P15" stroke="#FFA500" unit={unit} />
+                    <Line type="number" name="3rd" dataKey="P3" stroke="#F04F47" unit={unit} />
+                  </LineChart>
+                </ResponsiveContainer>
+              );
+
+              ReChartComponent.propTypes = {
+                data: PropTypes.array.isRequired,
+                unit: PropTypes.string.isRequired,
               };
 
               return (
@@ -614,7 +611,8 @@ const Page2 = () => {
                     <Button variant ="contained" onClick ={() => showGraph(admissionData)}>
                       Show Graph
                     </Button>
-                    <Dialog
+                  </TableCell>
+                  <Dialog
                       fullWidth
                       maxWidth="xl"
                       open={show}
@@ -622,49 +620,101 @@ const Page2 = () => {
                       aria-labelledby="alert-dialog-title"
                       aria-describedby="alert-dialog-description"
                     >
-                      <DialogTitle>
-                        Length-for-age {childSex === "female" ? "GIRLS" : "BOYS"}
-                      </DialogTitle>
+                      <div
+                        style={{
+                          display       : "flex",
+                          justifyContent: "space-between",
+                          margin        : "15px",
+                        }}
+                      >
+                        <div>
+                          {switchChart ? "Length-for-age" : "Weight-for-age"} {childSex === "female" ? "GIRLS" : "BOYS"}
+                        </div>
+                        <Button variant="contained" onClick={handleSwitch}>
+                          {switchChart ? 'Weight' : 'Height'}
+                        </Button>
+                      </div>
                       <DialogContent>
-                        {childSex === "female" ? 
-                          <ResponsiveContainer width="100%" height={450}>
-                            <LineChart data={Data.girls}>
-                              <XAxis dataKey="Month" />
-                              <YAxis unit="cm" />
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <Tooltip />
-                              <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="cm" />
-                              <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="cm" />
-                              <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="cm" />
-                              <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="cm" />
-                              <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="cm" />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        : 
-                          <ResponsiveContainer width="100%" height={450}>
-                            <LineChart data={Data.boys}>
-                              <XAxis dataKey="Month" />
-                              <YAxis unit="cm" />
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <Tooltip />
-                              <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="cm" />
-                              <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="cm" />
-                              <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="cm" />
-                              <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="cm" />
-                              <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="cm" />
-                              <Line
-                                dataKey="Height"
-                                data={childInfo}
-                                name="Child"
-                                unit="cm"
-                                dot={<Dot r={4} strokeWidth={2} />}
-                              />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        }
+                        {childSex === 'female' ? (
+                          switchChart ? (
+                            <ReChartComponent data={heightDataGirls} unit="cm" />
+                          ) : (
+                            <ReChartComponent data={weightDataGirls} unit="kg" />
+                          )
+                        ) : (
+                          switchChart ? (
+                            <ReChartComponent data={heightDataBoys} unit="cm" />
+                          ) : (
+                            <ReChartComponent data={weightDataBoys} unit="kg" />
+                          )
+                        )}
+                        {/* {childSex === "female" ? (
+                          switchChart ? (
+                            <ResponsiveContainer width="100%" height={450}>
+                              <LineChart data={heightDataGirls}>
+                                <XAxis dataKey="Month" />
+                                <YAxis unit="cm" />
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="Height" name="Child Height" stroke="#8884d8" unit="cm" />
+                                <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="cm" />
+                                <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="cm" />
+                                <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="cm" />
+                                <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="cm" />
+                                <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="cm" />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          ) : (
+                            <ResponsiveContainer width="100%" height={450}>
+                              <LineChart data={weightDataGirls}>
+                                <XAxis dataKey="Month" />
+                                <YAxis unit="kg" />
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="Weight" name="Child Weight" stroke="#8884d8" unit="kg" />
+                                <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="kg" />
+                                <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="kg" />
+                                <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="kg" />
+                                <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="kg" />
+                                <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="kg" />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          )
+                        ) : (
+                          switchChart ? (
+                            <ResponsiveContainer width="100%" height={450}>
+                              <LineChart data={heightDataBoys}>
+                                <XAxis dataKey="Month" />
+                                <YAxis unit="cm" />
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="Height" name="Child Height" stroke="#8884d8" unit="cm" />
+                                <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="cm" />
+                                <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="cm" />
+                                <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="cm" />
+                                <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="cm" />
+                                <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="cm" />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          ) : (
+                            <ResponsiveContainer width="100%" height={450}>
+                              <LineChart data={weightDataBoys}>
+                                <XAxis dataKey="Month" />
+                                <YAxis unit="kg" />
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="Weight" name="Child Weight" stroke="#8884d8" unit="kg" />
+                                <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="kg" />
+                                <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="kg" />
+                                <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="kg" />
+                                <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="kg" />
+                                <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="kg" />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          )
+                        )} */}
                       </DialogContent>
                     </Dialog>
-                  </TableCell>
                 </TableRow>
               );
             })}
