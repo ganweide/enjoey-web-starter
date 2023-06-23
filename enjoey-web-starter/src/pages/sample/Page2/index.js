@@ -541,10 +541,10 @@ const Page2 = () => {
               const childName         = child ? child.childNameENG : "";
               const programName       = program ? program.programName : "";
               const registrationDate  = new Date(admissionData.registrationDate).toLocaleDateString();
-              const heightDataGirls    = [...Data.girlsHeight, {"Month": "1 month", "Height": childHeight}];
-              const heightDataBoys     = [...Data.boysHeight, {"Month": "1 month", "Height": childHeight}];
-              const weightDataGirls    = [...Data.girlsWeight, {"Month": "1 month", "Weight": childWeight}];
-              const weightDataBoys     = [...Data.boysWeight, {"Month": "1 month", "Weight": childWeight}];
+              // const heightDataGirls    = [...Data.girlsHeight, {"Month": "1 month", "Height": childHeight}];
+              // const heightDataBoys     = [...Data.boysHeight, {"Month": "1 month", "Height": childHeight}];
+              // const weightDataGirls    = [...Data.girlsWeight, {"Month": "1 month", "Weight": childWeight}];
+              // const weightDataBoys     = [...Data.boysWeight, {"Month": "1 month", "Weight": childWeight}];
 
               const handleStatusChange = async (event) => {
                 const newStatus = event.target.checked;
@@ -571,6 +571,14 @@ const Page2 = () => {
                     <YAxis unit={unit}/>
                     <CartesianGrid strokeDasharray="3 3" />
                     <Tooltip />
+                    <Line
+                      type="monotone"
+                      name={switchChart ? 'Child Height' : 'Child Weight'}
+                      unit={unit}
+                      dataKey={switchChart ? 'Height' : 'Weight'}
+                      stroke="#8884d8"
+                      dot={{ r: 6 }}  // Increase the dot size for the first line
+                    />
                     <Line
                       type="monotone"
                       name={switchChart ? 'Child Height' : 'Child Weight'}
@@ -643,76 +651,11 @@ const Page2 = () => {
                           )
                         ) : (
                           switchChart ? (
-                            <ReChartComponent data={heightDataBoys} unit="cm" />
+                            <ReChartComponent data={Data.boysHeight} unit="cm" />
                           ) : (
                             <ReChartComponent data={weightDataBoys} unit="kg" />
                           )
                         )}
-                        {/* {childSex === "female" ? (
-                          switchChart ? (
-                            <ResponsiveContainer width="100%" height={450}>
-                              <LineChart data={heightDataGirls}>
-                                <XAxis dataKey="Month" />
-                                <YAxis unit="cm" />
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="Height" name="Child Height" stroke="#8884d8" unit="cm" />
-                                <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="cm" />
-                                <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="cm" />
-                                <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="cm" />
-                                <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="cm" />
-                                <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="cm" />
-                              </LineChart>
-                            </ResponsiveContainer>
-                          ) : (
-                            <ResponsiveContainer width="100%" height={450}>
-                              <LineChart data={weightDataGirls}>
-                                <XAxis dataKey="Month" />
-                                <YAxis unit="kg" />
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="Weight" name="Child Weight" stroke="#8884d8" unit="kg" />
-                                <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="kg" />
-                                <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="kg" />
-                                <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="kg" />
-                                <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="kg" />
-                                <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="kg" />
-                              </LineChart>
-                            </ResponsiveContainer>
-                          )
-                        ) : (
-                          switchChart ? (
-                            <ResponsiveContainer width="100%" height={450}>
-                              <LineChart data={heightDataBoys}>
-                                <XAxis dataKey="Month" />
-                                <YAxis unit="cm" />
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="Height" name="Child Height" stroke="#8884d8" unit="cm" />
-                                <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="cm" />
-                                <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="cm" />
-                                <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="cm" />
-                                <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="cm" />
-                                <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="cm" />
-                              </LineChart>
-                            </ResponsiveContainer>
-                          ) : (
-                            <ResponsiveContainer width="100%" height={450}>
-                              <LineChart data={weightDataBoys}>
-                                <XAxis dataKey="Month" />
-                                <YAxis unit="kg" />
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="Weight" name="Child Weight" stroke="#8884d8" unit="kg" />
-                                <Line type="number" dataKey="P97" name="97th" stroke="#F04F47" unit="kg" />
-                                <Line type="number" dataKey="P85" name="85th" stroke="#FFA500" unit="kg" />
-                                <Line type="number" dataKey="P50" name="50th" stroke="#32CD32" unit="kg" />
-                                <Line type="number" dataKey="P15" name="15th" stroke="#FFA500" unit="kg" />
-                                <Line type="number" dataKey="P3" name="3rd" stroke="#F04F47" unit="kg" />
-                              </LineChart>
-                            </ResponsiveContainer>
-                          )
-                        )} */}
                       </DialogContent>
                     </Dialog>
                 </TableRow>
