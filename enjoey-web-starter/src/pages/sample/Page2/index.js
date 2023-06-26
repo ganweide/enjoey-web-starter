@@ -593,7 +593,7 @@ const Page2 = () => {
                 <ResponsiveContainer width="100%" height={450}>
                   <LineChart data={data}>
                     <XAxis dataKey="Month" />
-                    <YAxis unit={unit} tickCount={11}/>
+                    <YAxis unit={unit} domain={switchChart ? [45, 100] : [1, 15]} />
                     <CartesianGrid strokeDasharray="3 3" />
                     <Tooltip />
                     <Line type="number" name="97th" dataKey="P97" stroke="#F04F47" unit={unit} />
