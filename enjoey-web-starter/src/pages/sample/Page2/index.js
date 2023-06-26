@@ -17,7 +17,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Typography,
   Table,
   TableBody,
   TableCell,
@@ -638,43 +637,43 @@ const Page2 = () => {
                     </Button>
                   </TableCell>
                   <Dialog
-                      fullWidth
-                      maxWidth="xl"
-                      open={show}
-                      onClose={hideGraph}
-                      aria-labelledby="alert-dialog-title"
-                      aria-describedby="alert-dialog-description"
+                    fullWidth
+                    maxWidth="xl"
+                    open={show}
+                    onClose={hideGraph}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                  >
+                    <div
+                      style={{
+                        display       : "flex",
+                        justifyContent: "space-between",
+                        margin        : "15px",
+                      }}
                     >
-                      <div
-                        style={{
-                          display       : "flex",
-                          justifyContent: "space-between",
-                          margin        : "15px",
-                        }}
-                      >
-                        <div>
-                          {switchChart ? "Length-for-age" : "Weight-for-age"} {childSex === "female" ? "GIRLS" : "BOYS"}
-                        </div>
-                        <Button variant="contained" onClick={handleSwitch}>
-                          {switchChart ? 'Weight' : 'Height'}
-                        </Button>
+                      <div>
+                        {switchChart ? "Length-for-age" : "Weight-for-age"} {childSex === "female" ? "GIRLS" : "BOYS"}
                       </div>
-                      <DialogContent>
-                        {childSex === 'female' ? (
-                          switchChart ? (
-                            <ReChartComponent data={heightDataGirls} unit="cm" />
-                          ) : (
-                            <ReChartComponent data={weightDataGirls} unit="kg" />
-                          )
+                      <Button variant="contained" onClick={handleSwitch}>
+                        {switchChart ? 'Weight' : 'Height'}
+                      </Button>
+                    </div>
+                    <DialogContent>
+                      {childSex === 'female' ? (
+                        switchChart ? (
+                          <ReChartComponent data={heightDataGirls} unit="cm" />
                         ) : (
-                          switchChart ? (
-                            <ReChartComponent data={heightDataBoys} unit="cm" />
-                          ) : (
-                            <ReChartComponent data={weightDataBoys} unit="kg" />
-                          )
-                        )}
-                      </DialogContent>
-                    </Dialog>
+                          <ReChartComponent data={weightDataGirls} unit="kg" />
+                        )
+                      ) : (
+                        switchChart ? (
+                          <ReChartComponent data={heightDataBoys} unit="cm" />
+                        ) : (
+                          <ReChartComponent data={weightDataBoys} unit="kg" />
+                        )
+                      )}
+                    </DialogContent>
+                  </Dialog>
                 </TableRow>
               );
             })}
