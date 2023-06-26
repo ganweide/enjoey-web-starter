@@ -214,6 +214,7 @@ const Page2 = () => {
     try {
       const { data } = await Axios.get(`${childUrl}${prop.childId}`);
       setChildSex(data.childSex);
+      setChildDOB(data.childDOB);
       setChildHeight(data.childHeight);
       setChildWeight(data.childWeight);
     } catch (error) {
@@ -539,12 +540,34 @@ const Page2 = () => {
               const child             = childDatas.find((childData) => admissionData.childId === childData.childId);
               const program           = programDatas.find((programData) => admissionData.programId === programData.programId);
               const childName         = child ? child.childNameENG : "";
+              const currentDate       = new Date();
               const programName       = program ? program.programName : "";
               const registrationDate  = new Date(admissionData.registrationDate).toLocaleDateString();
-              // const heightDataGirls    = [...Data.girlsHeight, {"Month": "1 month", "Height": childHeight}];
-              // const heightDataBoys     = [...Data.boysHeight, {"Month": "1 month", "Height": childHeight}];
-              // const weightDataGirls    = [...Data.girlsWeight, {"Month": "1 month", "Weight": childWeight}];
-              // const weightDataBoys     = [...Data.boysWeight, {"Month": "1 month", "Weight": childWeight}];
+
+              const heightDataBoys    = Data.boysHeight.map(dataAdded => {
+                if (dataAdded.Month === (differenceInMonths(currentDate, parseISO(childDOB)) + " month")) {
+                  return { ...dataAdded, Height: childHeight };
+                }
+                return dataAdded;
+              });
+              const heightDataGirls   = Data.girlsHeight.map(dataAdded => {
+                if (dataAdded.Month === (differenceInMonths(currentDate, parseISO(childDOB)) + " month")) {
+                  return { ...dataAdded, Height: childHeight };
+                }
+                return dataAdded;
+              });
+              const weightDataBoys    = Data.boysWeight.map(dataAdded => {
+                if (dataAdded.Month === (differenceInMonths(currentDate, parseISO(childDOB)) + " month")) {
+                  return { ...dataAdded, Weight: childWeight };
+                }
+                return dataAdded;
+              });
+              const weightDataGirls   = Data.girlsWeight.map(dataAdded => {
+                if (dataAdded.Month === (differenceInMonths(currentDate, parseISO(childDOB)) + " month")) {
+                  return { ...dataAdded, Weight: childWeight };
+                }
+                return dataAdded;
+              });
 
               const handleStatusChange = async (event) => {
                 const newStatus = event.target.checked;
@@ -564,33 +587,27 @@ const Page2 = () => {
                 }
               };
 
+              // tickCount={11} domain={[45, 95]}
+
               const ReChartComponent = ({ data, unit }) => (
                 <ResponsiveContainer width="100%" height={450}>
                   <LineChart data={data}>
                     <XAxis dataKey="Month" />
-                    <YAxis unit={unit}/>
+                    <YAxis unit={unit} tickCount={11}/>
                     <CartesianGrid strokeDasharray="3 3" />
                     <Tooltip />
-                    <Line
-                      type="monotone"
-                      name={switchChart ? 'Child Height' : 'Child Weight'}
-                      unit={unit}
-                      dataKey={switchChart ? 'Height' : 'Weight'}
-                      stroke="#8884d8"
-                      dot={{ r: 6 }}  // Increase the dot size for the first line
-                    />
-                    <Line
-                      type="monotone"
-                      name={switchChart ? 'Child Height' : 'Child Weight'}
-                      unit={unit}
-                      dataKey={switchChart ? 'Height' : 'Weight'}
-                      stroke="#8884d8"
-                    />
                     <Line type="number" name="97th" dataKey="P97" stroke="#F04F47" unit={unit} />
                     <Line type="number" name="85th" dataKey="P85" stroke="#FFA500" unit={unit} />
                     <Line type="number" name="50th" dataKey="P50" stroke="#32CD32" unit={unit} />
                     <Line type="number" name="15th" dataKey="P15" stroke="#FFA500" unit={unit} />
                     <Line type="number" name="3rd" dataKey="P3" stroke="#F04F47" unit={unit} />
+                    <Line
+                      type="monotone"
+                      name={switchChart ? 'Child Height' : 'Child Weight'}
+                      unit={unit}
+                      dataKey={switchChart ? 'Height' : 'Weight'}
+                      stroke="#8884d8"
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               );
@@ -651,7 +668,7 @@ const Page2 = () => {
                           )
                         ) : (
                           switchChart ? (
-                            <ReChartComponent data={Data.boysHeight} unit="cm" />
+                            <ReChartComponent data={heightDataBoys} unit="cm" />
                           ) : (
                             <ReChartComponent data={weightDataBoys} unit="kg" />
                           )
