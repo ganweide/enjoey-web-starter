@@ -22,6 +22,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/page-2',
       },
+      {
+        id: 'activities-form',
+        title: 'Activities Form',
+        messageId: 'Activities Form',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/page-3',
+      },
     ],
   },
 ];
