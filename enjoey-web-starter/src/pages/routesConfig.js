@@ -30,6 +30,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/page-3',
       },
+      {
+        id: 'menu-planning',
+        title: 'Menu Planning',
+        messageId: 'Menu Planning',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/page-4',
+      },
     ],
   },
 ];

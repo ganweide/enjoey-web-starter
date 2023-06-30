@@ -78,3 +78,26 @@ class ProgramTable(models.Model):
         if not self.programId:
             self.programId = slugify(self.programName)
         super().save(*args, **kwargs)
+
+class ActivityTable(models.Model):
+    activityId = models.CharField(primary_key=True, db_index=True, max_length=250)
+    activityType = models.CharField(max_length=250)
+    student = models.CharField(max_length=250)
+    date = models.CharField(max_length=250)
+    time = models.CharField(max_length=250)
+    foodType = models.CharField(max_length=250)
+    foodQuantity = models.CharField(max_length=250)
+    mealType = models.CharField(max_length=250)
+    mealItem = models.CharField(max_length=250)
+    note = models.CharField(max_length=250, null=True)
+    created_at = models.DateTimeField("created_at", auto_now_add=True)
+    updated_at = models.DateTimeField("updated_at", auto_now=True)
+    deleted_at = models.DateTimeField("deleted_at", null=True, blank=True)
+
+    def __str__(self):
+        return self.activityId
+    
+    def save(self, *args, **kwargs):
+        if not self.activityId:
+            self.activityId = slugify(self.activityType + "-" + self.student + "-" + self.date + "-" +self.time)
+        super().save(*args, **kwargs)

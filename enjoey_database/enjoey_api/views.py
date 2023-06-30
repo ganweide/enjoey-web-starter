@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer
 from rest_framework.response import Response
 
 class ChildView(viewsets.ModelViewSet):
@@ -99,6 +99,25 @@ class ProgramView(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ActivityView(viewsets.ModelViewSet):
+    queryset = ActivityTable.objects.all().order_by('-created_at')
+    serializer_class = ActivityTableSerializer
+    #all
+    def list(self, request):
+        queryset = ActivityTable.objects.all()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ActivityTableSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
+        serializer = ActivityTableSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-# Create your views here.
+    def create(self, request):
+        serializer = ActivityTableSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

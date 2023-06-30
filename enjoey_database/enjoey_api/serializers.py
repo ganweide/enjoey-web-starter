@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable
 
 class ChildTableSerializer(serializers.ModelSerializer):
     childId = serializers.CharField(required=False)
@@ -25,3 +25,9 @@ class ProgramTableSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProgramTable
         fields = ['programId', 'programName', 'programDescription']
+
+class ActivityTableSerializer(serializers.ModelSerializer):
+    activityId = serializers.CharField(required=False)
+    class Meta:
+        model = ActivityTable
+        fields = ['activityId', 'activityType', 'student', 'date', 'time', 'foodType', 'foodQuantity', 'mealType', 'mealItem', 'note']

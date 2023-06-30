@@ -4,6 +4,7 @@ import {RoutePermittedRole} from 'shared/constants/AppConst';
 const Page1 = React.lazy(() => import('./Page1'));
 const Page2 = React.lazy(() => import('./Page2'));
 const Page3 = React.lazy(() => import('./Page3'));
+const Page4 = React.lazy(() => import('./Page4'));
 
 export const samplePagesConfigs = [
   {
@@ -18,5 +19,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/page-3',
     element: <Page3 />,
+  },
+  {
+    path: '/sample/page-4',
+    element: <Page4 />,
   },
 ];

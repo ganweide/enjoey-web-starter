@@ -37,30 +37,44 @@ import Styles from "./style";
 // Global Constants
 const useStyles = makeStyles(Styles);
 const childUrl  = "http://127.0.0.1:8000/api/child/";
+const activityUrl  = "http://127.0.0.1:8000/api/activity/";
 
 const Page2 = () => {
   const classes   = useStyles();
   const tableHead = [" ", "Student", "Date", "Time", "Activity"];
-  const [open, setOpen]                 = useState(false);
-  const [activity, setActivity]         = useState([]);
-  const [student, setStudent]           = useState([]);
-  const [date, setDate]                 = useState([]);
-  const [time, setTime]                 = useState([]);
-  const [foodType, setFoodType]         = useState([]);
-  const [foodQuantity, setFoodQuantity] = useState([]);
-  const [mealType, setMealType]         = useState([]);
-  const [mealItems, setMealItems]       = useState([]);
-  const [note, setNote]                 = useState([]);
+  const [open, setOpen]                     = useState(false);
+  const [switchActivity, setSwitchActivity] = useState(false);
+  const [child, setChild]                   = useState([]);
+  const [refreshData, setRefreshData]       = useState([]);
+  const [activity, setActivity]             = useState([]);
+  const [activityType, setActivityType]     = useState("Food");
+  const [student, setStudent]               = useState([]);
+  const [date, setDate]                     = useState([]);
+  const [time, setTime]                     = useState([]);
+  const [foodType, setFoodType]             = useState([]);
+  const [foodQuantity, setFoodQuantity]     = useState([]);
+  const [mealType, setMealType]             = useState([]);
+  const [mealItems, setMealItems]           = useState([]);
+  const [note, setNote]                     = useState([]);
 
   useEffect(() => {
     try {
-      Axios.get(childUrl).then((response) => {
+      Axios.get(activityUrl).then((response) => {
         setActivity(response.data);
       });
     } catch (error) {
       console.log(error);
     }
-  }, []);
+    try {
+      Axios.get(childUrl).then((response) => {
+        setChild(response.data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, [refreshData]);
+
+  console.log(activity);
 
   const openDialog = async () => {
     setOpen         (true);
@@ -77,6 +91,41 @@ const Page2 = () => {
   const closeDialog = async () => {
     setOpen(false);
   }
+
+  const handleSwitch = async() => {
+    if (switchActivity) {
+      setActivityType("Food");
+    } else {
+      setActivityType("Activity");
+    }
+    setSwitchActivity(!switchActivity);
+  }
+
+  const newActivity = async () => {
+    const activityData = new FormData();
+    activityData.append("student", student);
+    activityData.append("activityType", activityType);
+    activityData.append("date", date);
+    activityData.append("time", time);
+    activityData.append("foodType", foodType);
+    activityData.append("foodQuantity", foodQuantity);
+    activityData.append("mealType", mealType);
+    activityData.append("mealItem", mealItems);
+    activityData.append("note", note);
+  
+    try {
+      const response = await Axios({
+        method  : "POST",
+        url     : activityUrl,
+        data    : activityData,
+        headers : {"Content-Type": "multipart/form-data"},
+      });
+      setRefreshData(response.data)
+    } catch (error) {
+      console.log("error", error);
+    }
+    setOpen(false);
+  };
 
   return (
     <div>
@@ -105,7 +154,14 @@ const Page2 = () => {
           aria-describedby  ="alert-dialog-description"
         >
           <DialogTitle>
-            <h2>Food</h2>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={9} md={9}>
+                <h2>{switchActivity ? "Activity" : "Food"}</h2>
+              </Grid>
+              <Grid item xs={3} md={3} container justifyContent="flex-end">
+                <Button onClick={handleSwitch}>{switchActivity ? "Food" : "Activity"}</Button>
+              </Grid>
+            </Grid>
           </DialogTitle>
           <DialogContent dividers>
             <Grid container spacing={2}>
@@ -116,16 +172,20 @@ const Page2 = () => {
                     multiple
                     labelId="student-select"
                     id="student-select"
-                    value={student}
+                    value={student || []}
                     label="Student"
                     onChange={(e) => setStudent(e.target.value)}
                   >
-                    <MenuItem value="Student 1">Student 1</MenuItem>
-                    <MenuItem value="Student 2">Student 2</MenuItem>
-                    <MenuItem value="Student 3">Student 3</MenuItem>
-                    <MenuItem value="Student 4">Student 4</MenuItem>
-                    <MenuItem value="Student 5">Student 5</MenuItem>
-                    <MenuItem value="Student 6">Student 6</MenuItem>
+                    {child.map((childData) => {
+                      return (
+                        <MenuItem
+                          key   ={childData.childId}
+                          value ={childData.childNameENG}
+                        >
+                          {childData.childNameENG}
+                        </MenuItem>
+                      );
+                    })}
                   </Select>
                 </FormControl>
               </Grid>
@@ -174,7 +234,7 @@ const Page2 = () => {
               </Grid>
               <Grid item xs={12} md={12}>
                 <FormControl component="fieldset" fullWidth>
-                  <FormLabel id="food-quantity-radio-label">Food Type</FormLabel>
+                  <FormLabel id="food-quantity-radio-label">Food Quantity</FormLabel>
                   <RadioGroup
                     row
                     aria-labelledby ="food-quantity-radio-label"
@@ -251,7 +311,7 @@ const Page2 = () => {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button>Create</Button>
+            <Button onClick={newActivity}>Create</Button>
           </DialogActions>
         </Dialog>
       </div>
@@ -273,11 +333,17 @@ const Page2 = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableCell>1</TableCell>
-            <TableCell>Test</TableCell>
-            <TableCell>Test</TableCell>
-            <TableCell>Test</TableCell>
-            <TableCell>Test</TableCell>
+            {activity.map((activityData, index) => {
+              return (
+                <TableRow key={activityData.activityId}>
+                  <TableCell style={{textAlign: "center"}}>{index + 1}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{activityData.student}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{activityData.date}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{activityData.time}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{activityData.activityType}</TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </Card>
