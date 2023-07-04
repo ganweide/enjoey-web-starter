@@ -307,7 +307,7 @@ const Page2 = () => {
                   variant="outlined"
                   value={note}
                 />
-              </Grid>              
+              </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
