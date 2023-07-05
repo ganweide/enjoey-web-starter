@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 
 import {
-  makeStyles,
   Button,
   Card,
   Dialog,
@@ -31,10 +30,7 @@ import {
   Grid,
 } from "@mui/material";
 
-const useStyles = makeStyles();
-
 const Page2 = () => {
-  const classes = useStyles();
   const today = new Date().getDate();
   const [dates, setDates]                     = useState([]);
   const [excludeWeekends, setExcludeWeekends] = useState(false);
@@ -51,10 +47,13 @@ const Page2 = () => {
   const [time, setTime]                       = useState([]);
   const [note, setNote]                       = useState([]);
   const [duplicate, setDuplicate]             = useState([]);
-  const [food, setFood]                       = useState([]);
-  const [foodCategory, setFoodCategory]       = useState([]);
-  const [quantity, setQuantity]               = useState([]);
-  const [measureUnit, setMeasureUnit]         = useState([]);
+  const [rows, setRows]                       = useState([]);
+  const newRow = {
+    food: "",
+    foodCategory: "",
+    quantity: "",
+    measureUnit: "",
+  }
 
 // Exclude Weekends' Checkbox
   const handleCalendarChange = (event) => {
@@ -101,16 +100,23 @@ const Page2 = () => {
 
 // Food Dialog
   const openFoodDialog = async () => {
+    setRows(prevRows => [...prevRows, newRow]);
     setMenuOpen(false);
     setFoodOpen(true);
-    setFood("");
-    setFoodCategory("");
-    setQuantity("");
-    setMeasureUnit("");
   }
   const closeFoodDialog = async () => {
     setFoodOpen(false);
   }
+  const handleAddRow = () => {
+    setRows(prevRows => [...prevRows, newRow]);
+  };
+  const handleRowChange = (index, field, value) => {
+    setRows(prevRows => {
+      const updatedRows = [...prevRows];
+      updatedRows[index][field] = value;
+      return updatedRows;
+    });
+  };
 
 // Classroom Dialog
   const openClassrooms = async () => {
@@ -231,7 +237,7 @@ const Page2 = () => {
                 <TextField
                   onChange={(e) => setNote(e.target.value)}
                   margin="dense"
-                  label="Note"
+                  label="Description"
                   type="text"
                   fullWidth
                   multiline
@@ -304,80 +310,85 @@ const Page2 = () => {
             <h2>Add food items</h2>
           </DialogTitle>
           <DialogContent dividers>
-            <Table>
-              <TableHead>
-                <TableCell>Food Name</TableCell>
-                <TableCell>USDA Food Category</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Unit of measure</TableCell>
-              </TableHead>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <TextField
-                      onChange={(e) => setFood(e.target.value)}
-                      margin="dense"
-                      label="Food Name"
-                      type="text"
-                      fullWidth
-                      rows={4}
-                      variant="outlined"
-                      value={food}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <FormControl fullWidth>
-                      <InputLabel id="food-category-select">USDA food category</InputLabel>
-                      <Select
-                        labelId="food-category-select"
-                        id="food-category-select"
-                        value={foodCategory}
-                        label="USDA food category"
-                        onChange={(e) => {
-                          setFoodCategory(e.target.value);
-                        }}
-                      >
-                        <MenuItem value="Fruits">Fruits</MenuItem>
-                        <MenuItem value="Snacks">Snacks</MenuItem>
-                        <MenuItem value="Bread">Bread</MenuItem>
-                        <MenuItem value="Rice">Rice</MenuItem>
-                        <MenuItem value="Noodles">Noodles</MenuItem>
-                        <MenuItem value="Soup">Soup</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </TableCell>
-                  <TableCell>
-                    <TextField
-                      onChange={(e) => setQuantity(e.target.value)}
-                      margin="dense"
-                      label="Quantity"
-                      type="text"
-                      fullWidth
-                      rows={4}
-                      variant="outlined"
-                      value={quantity}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <FormControl fullWidth>
-                      <InputLabel id="measure-unit-select">Unit of measure</InputLabel>
-                      <Select
-                        labelId="measure-unit-select"
-                        id="measure-unit-select"
-                        value={measureUnit}
-                        label="Unit of measure"
-                        onChange={(e) => {
-                          setMeasureUnit(e.target.value);
-                        }}
-                      >
-                        <MenuItem value="item-each">Item (Each)</MenuItem>
-                        <MenuItem value="packet-each">Packet (Each)</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <Table>
+                  <TableHead>
+                    <TableCell>Food Name</TableCell>
+                    <TableCell>USDA Food Category</TableCell>
+                    <TableCell>Quantity</TableCell>
+                    <TableCell>Unit of measure</TableCell>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <TextField
+                            onChange={(e) => handleRowChange(index, 'food', e.target.value)}
+                            margin="dense"
+                            label="Food Name"
+                            type="text"
+                            fullWidth
+                            rows={4}
+                            variant="outlined"
+                            value={row.food}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <FormControl fullWidth>
+                            <InputLabel id="food-category-select">USDA food category</InputLabel>
+                            <Select
+                              labelId="food-category-select"
+                              id="food-category-select"
+                              value={row.foodCategory}
+                              label="USDA food category"
+                              onChange={(e) => handleRowChange(index, 'foodCategory', e.target.value)}
+                            >
+                              <MenuItem value="Fruits">Fruits</MenuItem>
+                              <MenuItem value="Snacks">Snacks</MenuItem>
+                              <MenuItem value="Bread">Bread</MenuItem>
+                              <MenuItem value="Rice">Rice</MenuItem>
+                              <MenuItem value="Noodles">Noodles</MenuItem>
+                              <MenuItem value="Soup">Soup</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            onChange={(e) => handleRowChange(index, 'quantity', e.target.value)}
+                            margin="dense"
+                            label="Quantity"
+                            type="text"
+                            fullWidth
+                            rows={4}
+                            variant="outlined"
+                            value={row.quantity}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <FormControl fullWidth>
+                            <InputLabel id="measure-unit-select">Unit of measure</InputLabel>
+                            <Select
+                              labelId="measure-unit-select"
+                              id="measure-unit-select"
+                              value={row.measureUnit}
+                              label="Unit of measure"
+                              onChange={(e) => handleRowChange(index, 'measureUnit', e.target.value)}
+                            >
+                              <MenuItem value="item-each">Item (Each)</MenuItem>
+                              <MenuItem value="packet-each">Packet (Each)</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Grid>
+              <Grid item xs={12} md={12} style={{display: 'flex', justifyContent: 'center'}}>
+                <Button onClick={handleAddRow}>Add Food</Button>
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button onClick={openClassrooms}>Assign to classrooms</Button>
@@ -515,9 +526,9 @@ const Page2 = () => {
                 <p>{day}</p>
                 <h2>{dayDate}</h2>
               </div>
-              <Card style={{margin: "10px", backgroundColor: dayDate === today ? "inherit" : classes.theme.palette.primary.main}}>
-                <p>Test Test Test</p>
-              </Card>
+            </Card>
+            <Card variant="outlined" style={{marginTop: "5px", backgroundColor: dayDate === today ? "primary" : "inherit"}}>
+              <p>Test Test Test</p>
             </Card>
           </Grid>
         ))}
