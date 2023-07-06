@@ -101,3 +101,19 @@ class ActivityTable(models.Model):
         if not self.activityId:
             self.activityId = slugify(self.activityType + "-" + self.student + "-" + self.date + "-" +self.time)
         super().save(*args, **kwargs)
+
+class MenuPlanningTable(models.Model):
+    mealType = models.CharField(max_length=250)
+    date = models.CharField(max_length=250)
+    time = models.CharField(max_length=250)
+    description = models.CharField(max_length=250, null=True)
+    duplicate = models.CharField(max_length=250)
+    upUntil = models.CharField(max_length=250)
+    foodName = models.CharField(max_length=250)
+    foodCategory = models.CharField(max_length=250)
+    quantity = models.CharField(max_length=250)
+    unitOfMeasure = models.CharField(max_length=250)
+    classroom = models.CharField(max_length=250)
+    created_at = models.DateTimeField("created_at", auto_now_add=True)
+    updated_at = models.DateTimeField("updated_at", auto_now=True)
+    deleted_at = models.DateTimeField("deleted_at", null=True, blank=True)

@@ -31,3 +31,9 @@ class ActivityTableSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityTable
         fields = ['activityId', 'activityType', 'student', 'date', 'time', 'foodType', 'foodQuantity', 'mealType', 'mealItem', 'note']
+
+class MenuPlanningTableSerializer(serializers.ModelSerializer):
+    activityId = serializers.CharField(required=False)
+    class Meta:
+        model = ActivityTable
+        fields = ['activityId', 'activityType', 'student', 'date', 'time', 'foodType', 'foodQuantity', 'mealType', 'mealItem', 'note']

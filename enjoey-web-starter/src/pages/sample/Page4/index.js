@@ -100,7 +100,7 @@ const Page2 = () => {
 
 // Food Dialog
   const openFoodDialog = async () => {
-    setRows(prevRows => [...prevRows, newRow]);
+    setRows([newRow]);
     setMenuOpen(false);
     setFoodOpen(true);
   }
