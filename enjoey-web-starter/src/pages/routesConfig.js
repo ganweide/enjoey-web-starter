@@ -38,6 +38,22 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/page-4',
       },
+      {
+        id: 'sleep-check',
+        title: 'Sleep Check',
+        messageId: 'Sleep Check',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/page-5',
+      },
+      {
+        id: 'immunization',
+        title: 'Immunization',
+        messageId: 'Immunization',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/page-6',
+      },
     ],
   },
 ];
