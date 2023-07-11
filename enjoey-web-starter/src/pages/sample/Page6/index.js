@@ -43,20 +43,26 @@ const childUrl  = "http://127.0.0.1:8000/api/child/";
 const Page2 = () => {
   const classes   = useStyles();
   const tableHead = [" ", "Student", "Hep B", "DTaP", "Hib", "PCV", "Polio", "Rotavirus", "Flu", "MMR", "VAR", "Hep A"];
+  const [checkedItems, setCheckedItems] = useState({
+    'Hep B': true,
+    'DTaP': true,
+    'Hib': true,
+    'PCV': true,
+    'Polio': true,
+    'Rotavirus': true,
+    'Flu': true,
+    'MMR': true,
+    'VAR': true,
+    'Hep A': true
+  });
   const [open, setOpen]                     = useState(false);
   const [openEdit, setOpenEdit]             = useState(false);
-  const [switchActivity, setSwitchActivity] = useState(false);
   const [child, setChild]                   = useState([]);
-  const [refreshData, setRefreshData]       = useState([]);
-  const [activity, setActivity]             = useState([]);
-  const [activityType, setActivityType]     = useState("Food");
   const [student, setStudent]               = useState([]);
   const [date, setDate]                     = useState([]);
   const [time, setTime]                     = useState([]);
   const [foodType, setFoodType]             = useState([]);
   const [foodQuantity, setFoodQuantity]     = useState([]);
-  const [mealType, setMealType]             = useState([]);
-  const [mealItems, setMealItems]           = useState([]);
   const [note, setNote]                     = useState([]);
 
   useEffect(() => {
@@ -75,17 +81,19 @@ const Page2 = () => {
   const closeEditDialog = async () => {
     setOpenEdit(false);
   }
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setCheckedItems((prevCheckedItems) => ({
+      ...prevCheckedItems,
+      [name]: checked
+    }));
+  };
 
   const openDialog = async () => {
     setOpen         (true);
     setStudent      ("");
     setDate         ("");
     setTime         ("");
-    setFoodType     ("");
-    setFoodQuantity ("");
-    setMealType     ("");
-    setMealItems    ("");
-    setNote         ("");
   };
 
   const closeDialog = async () => {
@@ -124,6 +132,7 @@ const Page2 = () => {
             Edit Table
           </Button>
         </div>
+        {/* Add Immunization Record */}
         <Dialog
           open              ={open}
           onClose           ={closeDialog}
@@ -171,105 +180,58 @@ const Page2 = () => {
                   value           ={date}
                 />
               </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange        ={(e) => setTime(e.target.value)}
-                  InputLabelProps ={{ shrink: true }}
-                  margin          ="dense"
-                  label           ="Time"
-                  type            ="time"
-                  fullWidth
-                  variant         ="outlined"
-                  value           ={time}
-                />
-              </Grid>
               <Grid item xs={12} md={12}>
                 <Divider variant="middle" />
               </Grid>
               <Grid item xs={12} md={12}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel id="food-type-radio-label">Activity</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby ="food-type-radio-label"
-                    value           ={foodType}
-                    onChange        ={(e) => setFoodType(e.target.value)}
-                    name            ="radio-buttons-group"
-                  >
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="start-nap" control={<Radio />} label="Start nap" />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="sleep-check" control={<Radio />} label="Sleep check" />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="end-nap" control={<Radio />} label="End nap" />
-                    </Grid>
-                  </RadioGroup>
-                </FormControl>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="Hep B" />
+                </FormGroup>
               </Grid>
               <Grid item xs={12} md={12}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel id="food-quantity-radio-label">Observation</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby ="food-quantity-radio-label"
-                    value           ={foodQuantity}
-                    onChange        ={(e) => setFoodQuantity(e.target.value)}
-                    name            ="radio-buttons-group"
-                  >
-                    <Grid item xs={6} md={6}>
-                      <FormControlLabel value="labored-breathing" control={<Radio />} label="Labored Breathing" />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                      <FormControlLabel value="restless" control={<Radio />} label="Restless" />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                      <FormControlLabel value="flushed" control={<Radio />} label="Flushed" />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                      <FormControlLabel value="high-body-temperature" control={<Radio />} label="High body temperature" />
-                    </Grid>
-                  </RadioGroup>
-                </FormControl>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="DTap" />
+                </FormGroup>
               </Grid>
               <Grid item xs={12} md={12}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel id="food-quantity-radio-label">Position</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby ="food-quantity-radio-label"
-                    value           ={foodQuantity}
-                    onChange        ={(e) => setFoodQuantity(e.target.value)}
-                    name            ="radio-buttons-group"
-                  >
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="back" control={<Radio />} label="Back" />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="side" control={<Radio />} label="Side" />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="stomach" control={<Radio />} label="Stomach" />
-                    </Grid>
-                  </RadioGroup>
-                </FormControl>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="Hib" />
+                </FormGroup>
               </Grid>
               <Grid item xs={12} md={12}>
-                <Divider variant="middle" />
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="PCV" />
+                </FormGroup>
               </Grid>
               <Grid item xs={12} md={12}>
-                <TextField
-                  onChange={(e) => setNote(e.target.value)}
-                  margin="dense"
-                  label="Note"
-                  type="text"
-                  fullWidth
-                  multiline
-                  rows={4}
-                  variant="outlined"
-                  value={note}
-                />
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="Polio" />
+                </FormGroup>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="Rotavirus" />
+                </FormGroup>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="Flu" />
+                </FormGroup>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="MMR" />
+                </FormGroup>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="VAR" />
+                </FormGroup>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox />} label="Hep A" />
+                </FormGroup>
               </Grid>
             </Grid>
           </DialogContent>
@@ -277,6 +239,7 @@ const Page2 = () => {
             <Button>Create</Button>
           </DialogActions>
         </Dialog>
+        {/* Edit Immunization Table */}
         <Dialog
           open              ={openEdit}
           onClose           ={closeEditDialog}
@@ -293,20 +256,50 @@ const Page2 = () => {
               </Grid>
               <Grid item xs={6} md={6}>
                 <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Hep B" />
-                  <FormControlLabel control={<Checkbox />} label="DTaP" />
-                  <FormControlLabel control={<Checkbox />} label="Hib" />
-                  <FormControlLabel control={<Checkbox />} label="PCV" />
-                  <FormControlLabel control={<Checkbox />} label="Polio" />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['Hep B']} onChange={handleCheckboxChange} name="Hep B" />}
+                    label="Hep B"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['DTaP']} onChange={handleCheckboxChange} name="DTaP" />}
+                    label="DTaP"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['Hib']} onChange={handleCheckboxChange} name="Hib" />}
+                    label="Hib"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['PCV']} onChange={handleCheckboxChange} name="PCV" />}
+                    label="PCV"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['Polio']} onChange={handleCheckboxChange} name="Polio" />}
+                    label="Polio"
+                  />
                 </FormGroup>
               </Grid>
               <Grid item xs={6} md={6}>
                 <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Rotavirus" />
-                  <FormControlLabel control={<Checkbox />} label="Flu" />
-                  <FormControlLabel control={<Checkbox />} label="Hep A" />
-                  <FormControlLabel control={<Checkbox />} label="MMR" />
-                  <FormControlLabel control={<Checkbox />} label="VAR" />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['Rotavirus']} onChange={handleCheckboxChange} name="Rotavirus" />}
+                    label="Rotavirus"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['Flu']} onChange={handleCheckboxChange} name="Flu" />}
+                    label="Flu"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['Hep A']} onChange={handleCheckboxChange} name="Hep A" />}
+                    label="Hep A"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['MMR']} onChange={handleCheckboxChange} name="MMR" />}
+                    label="MMR"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={checkedItems['VAR']} onChange={handleCheckboxChange} name="VAR" />}
+                    label="VAR"
+                  />
                 </FormGroup>
               </Grid>
             </Grid>
@@ -320,17 +313,22 @@ const Page2 = () => {
         <Table>
           <TableHead>
             <TableRow className={classes.tableHeadRow}>
-              {tableHead.map((prop) => (
-                <TableCell
-                  className ={classes.tableCell + classes.tableHeadCell}
-                  key       ={prop}
-                  style     ={{
-                    textAlign: "center",
-                  }}
-                >
-                  {prop}
-                </TableCell>
-              ))}
+              {tableHead.map((prop, index) => {
+                if (index < 2 || checkedItems[prop]) {
+                  return (
+                    <TableCell
+                      className={classes.tableCell + classes.tableHeadCell}
+                      key={prop}
+                      style={{
+                        textAlign: 'center'
+                      }}
+                    >
+                      {prop}
+                    </TableCell>
+                  );
+                }
+                return null;
+              })}
             </TableRow>
           </TableHead>
         </Table>
