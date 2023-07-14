@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer
 from rest_framework.response import Response
 
 class ChildView(viewsets.ModelViewSet):
@@ -116,6 +116,69 @@ class ActivityView(viewsets.ModelViewSet):
 
     def create(self, request):
         serializer = ActivityTableSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class MenuPlanningView(viewsets.ModelViewSet):
+    queryset = MenuPlanningTable.objects.all().order_by('-created_at')
+    serializer_class = MenuPlanningTableSerializer
+    #all
+    def list(self, request):
+        queryset = MenuPlanningTable.objects.all()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = MenuPlanningTableSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = MenuPlanningTableSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = MenuPlanningTableSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class SleepCheckView(viewsets.ModelViewSet):
+    queryset = SleepCheckTable.objects.all().order_by('-created_at')
+    serializer_class = SleepCheckTableSerializer
+    #all
+    def list(self, request):
+        queryset = SleepCheckTable.objects.all()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SleepCheckTableSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = SleepCheckTableSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = SleepCheckTableSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ImmunizationView(viewsets.ModelViewSet):
+    queryset = ImmunizationTable.objects.all().order_by('-created_at')
+    serializer_class = ImmunizationTableSerializer
+    #all
+    def list(self, request):
+        queryset = ImmunizationTable.objects.all()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ImmunizationTableSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ImmunizationTableSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = ImmunizationTableSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

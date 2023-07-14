@@ -55,15 +55,35 @@ const Page2 = () => {
     'VAR': true,
     'Hep A': true
   });
+  const [recordItems, setRecordItems] = useState({
+    'Hep B': false,
+    'DTaP': false,
+    'Hib': false,
+    'PCV': false,
+    'Polio': false,
+    'Rotavirus': false,
+    'Flu': false,
+    'MMR': false,
+    'VAR': false,
+    'Hep A': false
+  });
+  const [vacineDate, setVacineDate] = useState({
+    "Hep B": "",
+    "DTaP": "",
+    "Hib": "",
+    "PCV": "",
+    "Polio": "",
+    "Rotavirus": "",
+    "Flu": "",
+    "MMR": "",
+    "VAR": "",
+    "Hep A": ""
+  });
   const [open, setOpen]                     = useState(false);
   const [openEdit, setOpenEdit]             = useState(false);
   const [child, setChild]                   = useState([]);
   const [student, setStudent]               = useState([]);
-  const [date, setDate]                     = useState([]);
-  const [time, setTime]                     = useState([]);
-  const [foodType, setFoodType]             = useState([]);
-  const [foodQuantity, setFoodQuantity]     = useState([]);
-  const [note, setNote]                     = useState([]);
+  const [recordDate, setRecordDate]         = useState([]);
 
   useEffect(() => {
     try {
@@ -88,12 +108,30 @@ const Page2 = () => {
       [name]: checked
     }));
   };
+  const handleRecordCheckbox = (event) => {
+    const { name, checked } = event.target;
+    setRecordItems((prevRecordItems) => ({
+      ...prevRecordItems,
+      [name]: checked
+    }));
+  };
+  const handleRecordDateChange = (event) => {
+    const { name, value } = event.target;
+    setVacineDate((prevVacineDate) => ({
+      ...prevVacineDate,
+      [name]: value
+    }));
+  };
+  const handleCreate = () => {
+    console.log('vacineDate:', vacineDate);
+    console.log('recordItems:', recordItems);
+  };
 
   const openDialog = async () => {
     setOpen         (true);
     setStudent      ("");
-    setDate         ("");
-    setTime         ("");
+    setRecordDate   ("");
+    setVacineDate   ("");
   };
 
   const closeDialog = async () => {
@@ -168,75 +206,50 @@ const Page2 = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6} md={6}>
+              <Grid item xs={12} md={12}>
                 <TextField
-                  onChange        ={(e) => setDate(e.target.value)}
+                  onChange        ={(e) => setRecordDate(e.target.value)}
                   InputLabelProps ={{ shrink: true }}
                   margin          ="dense"
-                  label           ="Date"
+                  label           ="Input Date"
                   type            ="date"
                   fullWidth
                   variant         ="outlined"
-                  value           ={date}
+                  value           ={recordDate}
                 />
               </Grid>
               <Grid item xs={12} md={12}>
                 <Divider variant="middle" />
               </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Hep B" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="DTap" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Hib" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="PCV" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Polio" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Rotavirus" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Flu" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="MMR" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="VAR" />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox />} label="Hep A" />
-                </FormGroup>
-              </Grid>
+              {Object.keys(recordItems).map((key) => (
+                <Grid item xs={12} md={12} key={key}>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox checked={recordItems[key]} onChange={handleRecordCheckbox} name={key} />}
+                      label={key}
+                    />
+                  </FormGroup>
+                  {recordItems[key] && (
+                    <Grid item xs={12} md={12}>
+                      <TextField
+                        onChange={handleRecordDateChange}
+                        InputLabelProps={{ shrink: true }}
+                        margin="dense"
+                        label="Taken Date"
+                        type="date"
+                        fullWidth
+                        variant="outlined"
+                        value={vacineDate[key]}
+                        name={key}
+                      />
+                    </Grid>
+                  )}
+                </Grid>
+              ))}
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button>Create</Button>
+            <Button onClick={handleCreate}>Create</Button>
           </DialogActions>
         </Dialog>
         {/* Edit Immunization Table */}

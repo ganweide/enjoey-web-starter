@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView
 from rest_framework import routers
 
 route1 = routers.DefaultRouter()
@@ -17,11 +17,23 @@ route4.register("", ProgramView, basename='programview')
 route5 = routers.DefaultRouter()
 route5.register("", ActivityView, basename='activityview')
 
+route6 = routers.DefaultRouter()
+route6.register("", MenuPlanningView, basename='menuplanningview')
+
+route7 = routers.DefaultRouter()
+route7.register("", SleepCheckView, basename='sleepcheckview')
+
+route8 = routers.DefaultRouter()
+route8.register("", ImmunizationView, basename='immunizationview')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
     path('admission/', include(route3.urls)),
     path('program/', include(route4.urls)),
     path('activity/', include(route5.urls)),
+    path('menu/', include(route6.urls)),
+    path('sleepc/', include(route7.urls)),
+    path('immunization/', include(route8.urls)),
 ]
 

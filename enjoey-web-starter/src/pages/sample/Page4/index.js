@@ -47,6 +47,7 @@ const Page2 = () => {
   const [time, setTime]                       = useState([]);
   const [note, setNote]                       = useState([]);
   const [duplicate, setDuplicate]             = useState([]);
+  const [upUntil, setUpUntil]                 = useState([]);
   const [rows, setRows]                       = useState([]);
   const newRow = {
     food: "",
@@ -90,6 +91,7 @@ const Page2 = () => {
     setTime("");
     setNote("");
     setDuplicate("");
+    setUpUntil("");
   }
   const handleDuplicate = (event, newDuplicate) => {
     setDuplicate(newDuplicate);
@@ -281,14 +283,14 @@ const Page2 = () => {
               </Grid>
               <Grid item xs={6} md={6}>
                 <TextField
-                  onChange        ={(e) => setDate(e.target.value)}
+                  onChange        ={(e) => setUpUntil(e.target.value)}
                   InputLabelProps ={{ shrink: true }}
                   margin          ="dense"
                   label           ="Up until"
                   type            ="date"
                   fullWidth
                   variant         ="outlined"
-                  value           ={date}
+                  value           ={upUntil}
                 />
               </Grid>
             </Grid>
@@ -481,8 +483,14 @@ const Page2 = () => {
               <h3>Details & Schedule</h3>
               <Grid item xs={12} md={12}>
                 <h4>Meal type:</h4>
+                <p>{mealType}</p>
                 <h4>Meal is served:</h4>
+                <p>Weekly on {date} at {time}</p>
+                <p>starting from {date} and ending at {upUntil}</p>
                 <h4>Assigned classrooms:</h4>
+                {hibiscusChecked && <p>Hibiscus Classroom</p>}
+                {bananaChecked && <p>Banana Classroom</p>}
+                {kittyChecked && <p>Kitty Classroom</p>}
               </Grid>
               <Grid item xs={12} md={12}>
                 <Table>
@@ -493,12 +501,16 @@ const Page2 = () => {
                     <TableCell>Unit of measure</TableCell>
                   </TableHead>
                   <TableBody>
-                    <TableRow>
-                      <TableCell>Example Food</TableCell>
-                      <TableCell>Example Type</TableCell>
-                      <TableCell>Example Quantity</TableCell>
-                      <TableCell>Example Unit</TableCell>
-                    </TableRow>
+                    {rows.map((rowData, index) => {
+                      return (
+                        <TableRow key={index}>
+                          <TableCell>{rowData.food}</TableCell>
+                          <TableCell>{rowData.foodCategory}</TableCell>
+                          <TableCell>{rowData.quantity}</TableCell>
+                          <TableCell>{rowData.measureUnit}</TableCell>
+                        </TableRow>
+                      )
+                    })}
                   </TableBody>
                 </Table>
               </Grid>
