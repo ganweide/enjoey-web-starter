@@ -35,6 +35,7 @@ import {
 
 // Local Imports
 import Styles from "./style";
+import { parseTwoDigitYear } from "moment";
 
 // Global Constants
 const useStyles = makeStyles(Styles);
@@ -52,6 +53,10 @@ const Page2 = () => {
   const [location, setLocation]   = useState([]);
   const [other, setOther]         = useState(false);
   const [equipment, setEquipment] = useState([]);
+  const [cause, setCause]         = useState([]);
+  const [parts, setParts]         = useState([]);
+  const [type, setType]           = useState([]);
+  const [treatment, setTreatment] = useState([]);
 
   useEffect(() => {
     try {
@@ -69,12 +74,16 @@ const Page2 = () => {
     setDate     ("");
     setTime     ("");
     setLocation ("");
+    setOther    (false);
     setEquipment("");
+    setParts    ("");
+    setType     ("");
+    setTreatment("");
   };
 
   const handleRadioChange = (event) => {
     const value = event.target.value;
-    {value==="other" ? setOther(true) : console.log(value)};
+    value==="other" ? setOther(true) : setOther(false);
   };
 
   const closeDialog = async () => {
@@ -146,7 +155,7 @@ const Page2 = () => {
                 onChange        ={(e) => setDate(e.target.value)}
                 InputLabelProps ={{ shrink: true }}
                 margin          ="dense"
-                label           ="Input Date"
+                label           ="Incident Date"
                 type            ="date"
                 fullWidth
                 variant         ="outlined"
@@ -159,7 +168,7 @@ const Page2 = () => {
                 onChange        ={(e) => setTime(e.target.value)}
                 InputLabelProps ={{ shrink: true }}
                 margin          ="dense"
-                label           ="Input Time"
+                label           ="Incident Time"
                 type            ="time"
                 fullWidth
                 variant         ="outlined"
@@ -259,12 +268,12 @@ const Page2 = () => {
             {/* Equipment Radio Field */}
             <Grid item xs={12} md={12}>
               <FormControl component="fieldset" fullWidth>
-                <FormLabel id="equipment-label">Equipment / Product Involved</FormLabel>
+                <FormLabel id="equipment-label">Equipment / Product involved</FormLabel>
                 <RadioGroup
                   row
                   aria-labelledby ="equipment-label"
-                  value           ={location}
-                  onChange        ={(e) => setLocation(e.target.value)}
+                  value           ={equipment}
+                  onChange        ={(e) => setEquipment(e.target.value)}
                   name            ="radio-buttons-group"
                 >
                   <Grid item xs={3} md={3}>
@@ -305,6 +314,258 @@ const Page2 = () => {
                   </Grid>
                 </RadioGroup>
               </FormControl>
+            </Grid>
+            {/* Cause Radio Field */}
+            <Grid item xs={12} md={12}>
+              <FormControl component="fieldset" fullWidth>
+                <FormLabel id="cause-label">Cause of injury</FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby ="cause-label"
+                  value           ={cause}
+                  onChange        ={(e) => setCause(e.target.value)}
+                  name            ="radio-buttons-group"
+                >
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="fall-to-surface"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="fall to surface" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="carpet"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="carpet" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="wood"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="wood" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="stone"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="stone" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="tile"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="tile" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="fall-from-running-or-tripping"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="fall from running or tripping" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="bitten-by-child"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="bitten by child" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="hit-or-pushed-by-child"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="hit or pushed by child" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="injured-by-object"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="injured by object" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="eating-or-choking"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="eating or choking" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="insect-sting-bite"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="insect sting / bite" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="other"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="other (specify)" />
+                  </Grid>
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            {/* Injured Parts Radio Field */}
+            <Grid item xs={12} md={12}>
+              <FormControl component="fieldset" fullWidth>
+                <FormLabel id="parts-label">Parts of body injured</FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby ="parts-label"
+                  value           ={parts}
+                  onChange        ={(e) => setParts(e.target.value)}
+                  name            ="radio-buttons-group"
+                >
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="eye"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="eye" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="ear"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="ear" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="nose"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="nose" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="mouth"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="mouth" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="part-of-face"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="part of face" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="neck"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="neck" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="arm-wrist-hand"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="arm/wrist/hand" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="leg-ankle-foot"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="leg/ankle/foot" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="other"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="other (specify)" />
+                  </Grid>
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            {/* Type Radio Field */}
+            <Grid item xs={12} md={12}>
+              <FormControl component="fieldset" fullWidth>
+                <FormLabel id="type-label">Type of Injury</FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby ="type-label"
+                  value           ={type}
+                  onChange        ={(e) => setType(e.target.value)}
+                  name            ="radio-buttons-group"
+                >
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="cut"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="cut" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="bruise-or-swelling"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="bruise or swelling" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="puncture"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="puncture" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="scrape"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="scrape" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="broken-bone-or-dislocation"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="broken bone or dislocation" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="sprain"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="sprain" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="arm-wrist-hand"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="arm/wrist/hand" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="crushing-injury"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="crushing injury" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="burn"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="burn" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="loss-of-consciousness"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="loss of consciousness" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="unknown"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="unknown" />
+                  </Grid>
+                  <Grid item xs={3} md={3}>
+                    <FormControlLabel
+                      value="other"
+                      control={<Radio onChange={handleRadioChange} />}
+                      label="other (specify)" />
+                  </Grid>
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            {/* Treatment Text Field */}
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange={(e) => setTreatment(e.target.value)}
+                margin="dense"
+                label="First aide given at the facility (eg. comfort, pressure, elevation, cold pack, washing, bandage)"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={treatment}
+              />
             </Grid>
           </Grid>
         </DialogContent>
