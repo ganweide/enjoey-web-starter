@@ -31,6 +31,7 @@ import {
   MenuItem,
   Divider,
   Grid,
+  Chip,
 } from "@mui/material";
 
 // Local Imports
@@ -149,7 +150,7 @@ const Page2 = () => {
         }}
       >
         <h2>Immunizations Table</h2>
-        <div>
+        <div className="button-group">
           <Button
             variant ="contained"
             onClick ={openDialog}
@@ -172,6 +173,7 @@ const Page2 = () => {
         </div>
         {/* Add Immunization Record */}
         <Dialog
+          fullWidth
           open              ={open}
           onClose           ={closeDialog}
           aria-labelledby   ="alert-dialog-title"
@@ -254,6 +256,7 @@ const Page2 = () => {
         </Dialog>
         {/* Edit Immunization Table */}
         <Dialog
+          fullWidth
           open              ={openEdit}
           onClose           ={closeEditDialog}
           aria-labelledby   ="alert-dialog-title"
@@ -344,6 +347,22 @@ const Page2 = () => {
               })}
             </TableRow>
           </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell style={{textAlign: "center"}}>1</TableCell>
+              <TableCell style={{textAlign: "center"}}>Student 1</TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="not taken" color="warning" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="not taken" color="warning" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="not taken" color="warning" /></TableCell>
+              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
+            </TableRow>
+          </TableBody>
         </Table>
       </Card>
     </div>

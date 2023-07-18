@@ -539,7 +539,7 @@ const Page2 = () => {
                 <h2>{dayDate}</h2>
               </div>
             </Card>
-            <Card variant="outlined" style={{marginTop: "5px", backgroundColor: dayDate === today ? "primary" : "inherit"}}>
+            <Card style={{marginTop: "5px", backgroundColor: dayDate === today ? "primary" : "inherit"}}>
               <p>Test Test Test</p>
             </Card>
           </Grid>

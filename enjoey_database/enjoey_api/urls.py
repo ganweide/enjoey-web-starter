@@ -33,7 +33,7 @@ urlpatterns = [
     path('program/', include(route4.urls)),
     path('activity/', include(route5.urls)),
     path('menu/', include(route6.urls)),
-    path('sleepc/', include(route7.urls)),
+    path('sleep/', include(route7.urls)),
     path('immunization/', include(route8.urls)),
 ]
 

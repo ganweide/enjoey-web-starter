@@ -145,7 +145,7 @@ const Page2 = () => {
             height: "40px",
           }}
         >
-          New Admission
+          + Add Record
         </Button>
         <Dialog
           open              ={open}

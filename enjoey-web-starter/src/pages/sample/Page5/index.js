@@ -100,7 +100,7 @@ const Page2 = () => {
             height: "40px",
           }}
         >
-          + Add Activity
+          + Add Record
         </Button>
         <Dialog
           open              ={open}
@@ -273,6 +273,17 @@ const Page2 = () => {
               ))}
             </TableRow>
           </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell style={{textAlign: "center"}}>1</TableCell>
+              <TableCell style={{textAlign: "center"}}>Student 1</TableCell>
+              <TableCell style={{textAlign: "center"}}>2022/01/03</TableCell>
+              <TableCell style={{textAlign: "center"}}>13:00</TableCell>
+              <TableCell style={{textAlign: "center"}}>Sleep Check</TableCell>
+              <TableCell style={{textAlign: "center"}}>Laboured Breathing</TableCell>
+              <TableCell style={{textAlign: "center"}}>Back</TableCell>
+            </TableRow>
+          </TableBody>
         </Table>
       </Card>
     </div>
