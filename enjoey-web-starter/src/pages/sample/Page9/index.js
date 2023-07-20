@@ -45,18 +45,21 @@ const Page2 = () => {
   const classes   = useStyles();
   const tableHead = [" ", "Student", "Date", "Time", "Type"];
 
-  const [open, setOpen]           = useState(false);
-  const [child, setChild]         = useState([]);
-  const [student, setStudent]     = useState([]);
-  const [date, setDate]           = useState([]);
-  const [time, setTime]           = useState([]);
-  const [location, setLocation]   = useState([]);
-  const [other, setOther]         = useState(false);
-  const [equipment, setEquipment] = useState([]);
-  const [cause, setCause]         = useState([]);
-  const [parts, setParts]         = useState([]);
-  const [type, setType]           = useState([]);
-  const [treatment, setTreatment] = useState([]);
+  const [open, setOpen]             = useState(false);
+  const [child, setChild]           = useState([]);
+  const [student, setStudent]       = useState([]);
+  const [date, setDate]             = useState([]);
+  const [time, setTime]             = useState([]);
+  const [location, setLocation]     = useState([]);
+  const [other, setOther]           = useState(false);
+  const [equipment, setEquipment]   = useState([]);
+  const [cause, setCause]           = useState([]);
+  const [parts, setParts]           = useState([]);
+  const [type, setType]             = useState([]);
+  const [treatment, setTreatment]   = useState([]);
+  const [provide, setProvide]       = useState([]);
+  const [corrective, setCorrective] = useState([]);
+  const [management, setManagement] = useState([]);
 
   useEffect(() => {
     try {
@@ -69,16 +72,19 @@ const Page2 = () => {
   }, []);
 
   const openDialog = async () => {
-    setOpen     (true);
-    setStudent  ("");
-    setDate     ("");
-    setTime     ("");
-    setLocation ("");
-    setOther    (false);
-    setEquipment("");
-    setParts    ("");
-    setType     ("");
-    setTreatment("");
+    setOpen       (true);
+    setStudent    ("");
+    setDate       ("");
+    setTime       ("");
+    setLocation   ("");
+    setOther      (false);
+    setEquipment  ("");
+    setParts      ("");
+    setType       ("");
+    setTreatment  ("");
+    setProvide    ("");
+    setCorrective ("");
+    setManagement ("");
   };
 
   const handleRadioChange = (event) => {
@@ -565,6 +571,42 @@ const Page2 = () => {
                 fullWidth
                 variant="outlined"
                 value={treatment}
+              />
+            </Grid>
+            {/* Provided Text Field */}
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange={(e) => setProvide(e.target.value)}
+                margin="dense"
+                label="Treatment provided by"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={provide}
+              />
+            </Grid>
+            {/* Corrective Text Field */}
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange={(e) => setCorrective(e.target.value)}
+                margin="dense"
+                label="Corrective action needed to prevent reoccurence"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={corrective}
+              />
+            </Grid>
+            {/* Management Text Field */}
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange={(e) => setManagement(e.target.value)}
+                margin="dense"
+                label="Name of management notified"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={management}
               />
             </Grid>
           </Grid>
