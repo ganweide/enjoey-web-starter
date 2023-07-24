@@ -25,9 +25,10 @@ import {
   MenuItem,
   Divider,
   Grid,
-  Chip,
   ToggleButtonGroup,
   ToggleButton,
+  Box,
+  Typography,
 } from "@mui/material";
 
 // Local Imports
@@ -76,134 +77,130 @@ const Page2 = () => {
 
   return (
     <div>
-      <div 
-        style={{
-          display       : "flex",
-          flexDirection : "row",
-          justifyContent: "space-between",
-          alignItems    : "center",
+      <Box 
+        sx={{
+          p: 2,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between"
         }}
       >
-        <h2>Health Table</h2>
-        <div className="button-group">
-          <Button
-            variant ="contained"
-            onClick ={openDialog}
-            style   ={{
-              height: "40px",
-              marginRight: "10px",
-            }}
-          >
+        <Typography variant="h1" component="div" gutterBottom>
+          Health Table
+        </Typography>
+        <Button variant ="contained" onClick ={openDialog}>
+          <Typography variant="button" component="div">
             + Add Record
-          </Button>
-        </div>
-        {/* Add Health Record */}
-        <Dialog
-          fullWidth
-          open              ={open}
-          onClose           ={closeDialog}
-          aria-labelledby   ="alert-dialog-title"
-          aria-describedby  ="alert-dialog-description"
-        >
-          <DialogTitle>
-            <h2>Health Check</h2>
-          </DialogTitle>
-          <DialogContent dividers>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="student-select">Student</InputLabel>
-                  <Select
-                    multiple
-                    labelId="student-select"
-                    id="student-select"
-                    value={student || []}
-                    label="Student"
-                    onChange={(e) => setStudent(e.target.value)}
-                  >
-                    {child.map((childData) => {
-                      return (
-                        <MenuItem
-                          key   ={childData.childId}
-                          value ={childData.childNameENG}
-                        >
-                          {childData.childNameENG}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange        ={(e) => setDate(e.target.value)}
-                  InputLabelProps ={{ shrink: true }}
-                  margin          ="dense"
-                  label           ="Input Date"
-                  type            ="date"
-                  fullWidth
-                  variant         ="outlined"
-                  value           ={date}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange        ={(e) => setTime(e.target.value)}
-                  InputLabelProps ={{ shrink: true }}
-                  margin          ="dense"
-                  label           ="Input Time"
-                  type            ="time"
-                  fullWidth
-                  variant         ="outlined"
-                  value           ={time}
-                />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Divider variant="middle" />
-              </Grid>
-              <Grid item xs={8} md={8} container alignItems="center">
-                <TextField
-                  onChange        ={(e) => setTemperature(e.target.value)}
-                  margin          ="dense"
-                  label           ="Temperature"
-                  type            ="text"
-                  fullWidth
-                  variant         ="outlined"
-                  value           ={temperature}
-                />
-              </Grid>
-              <Grid item xs={4} md={4} container alignItems="center">
-                <ToggleButtonGroup
-                  color="primary"
-                  value={unit}
-                  exclusive
-                  fullWidth
-                  onChange={(e) => setUnit(e.target.value)}
+          </Typography>
+        </Button>
+      </Box>
+      {/* Add Health Record */}
+      <Dialog
+        fullWidth
+        open              ={open}
+        onClose           ={closeDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Health Check</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth>
+                <InputLabel id="student-select">Student</InputLabel>
+                <Select
+                  multiple
+                  labelId="student-select"
+                  id="student-select"
+                  value={student || []}
+                  label="Student"
+                  onChange={(e) => setStudent(e.target.value)}
                 >
-                  <ToggleButton value="fahrenheit">F</ToggleButton>
-                  <ToggleButton value="celsius">C</ToggleButton>
-                </ToggleButtonGroup>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <TextField
-                  onChange        ={(e) => setNote(e.target.value)}
-                  margin          ="dense"
-                  label           ="Note"
-                  type            ="text"
-                  fullWidth
-                  multiline
-                  rows            ={4}
-                  variant         ="outlined"
-                  value           ={note}
-                />
-              </Grid>
+                  {child.map((childData) => {
+                    return (
+                      <MenuItem
+                        key   ={childData.childId}
+                        value ={childData.childNameENG}
+                      >
+                        {childData.childNameENG}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button>Create</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setDate(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="Input Date"
+                type            ="date"
+                fullWidth
+                variant         ="outlined"
+                value           ={date}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setTime(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="Input Time"
+                type            ="time"
+                fullWidth
+                variant         ="outlined"
+                value           ={time}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Divider variant="middle" />
+            </Grid>
+            <Grid item xs={8} md={8} container alignItems="center">
+              <TextField
+                onChange        ={(e) => setTemperature(e.target.value)}
+                margin          ="dense"
+                label           ="Temperature"
+                type            ="text"
+                fullWidth
+                variant         ="outlined"
+                value           ={temperature}
+              />
+            </Grid>
+            <Grid item xs={4} md={4} container alignItems="center">
+              <ToggleButtonGroup
+                color="primary"
+                value={unit}
+                exclusive
+                fullWidth
+                onChange={(e) => setUnit(e.target.value)}
+              >
+                <ToggleButton value="fahrenheit">F</ToggleButton>
+                <ToggleButton value="celsius">C</ToggleButton>
+              </ToggleButtonGroup>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange        ={(e) => setNote(e.target.value)}
+                margin          ="dense"
+                label           ="Note"
+                type            ="text"
+                fullWidth
+                multiline
+                rows            ={4}
+                variant         ="outlined"
+                value           ={note}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button>Create</Button>
+        </DialogActions>
+      </Dialog>
       <Card>
         <Table>
           <TableHead>

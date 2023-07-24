@@ -34,6 +34,8 @@ import {
   Divider,
   Switch,
   Grid,
+  Box,
+  Typography,
 } from "@mui/material";
 
 // Recharts Imports
@@ -231,292 +233,291 @@ const Page2 = () => {
 
   return (
     <div>
-      <div 
-        style={{
-          display       : "flex",
-          flexDirection : "row",
-          justifyContent: "space-between",
-          alignItems    : "center",
+      <Box 
+        sx={{
+          p: 2,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between"
         }}
       >
-        <h2>Admission Table</h2>
-        <Button
-          variant ="contained"
-          onClick ={openDialog}
-          style   ={{
-            height: "40px",
-          }}
-        >
-          + Add Admission
+        <Typography variant="h1" component="div" gutterBottom>
+          Admission Table
+        </Typography>
+        <Button variant ="contained" onClick ={openDialog}>
+          <Typography variant="button" component="div">
+            + Add Admission
+          </Typography>
         </Button>
-        <Dialog
-          open              ={open}
-          onClose           ={closeDialog}
-          aria-labelledby   ="alert-dialog-title"
-          aria-describedby  ="alert-dialog-description"
-        >
-          <DialogTitle>
-            <h2>Admission Form</h2>
-          </DialogTitle>
-          <DialogContent dividers>
-            <Grid container spacing={2}>
-              <Grid item xs={6} md={12}>
-                <h3>Child&apos;s Info</h3>
-                <Divider variant="middle" />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setChildName(e.target.value)}
-                  autoFocus
-                  margin    ="dense"
-                  label     ="Child's Name"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={childName}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setChildNRIC(e.target.value)}
-                  margin    ="dense"
-                  label     ="Child's NRIC"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={childNRIC}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setLanguageSpoken(e.target.value)}
-                  margin    ="dense"
-                  label     ="Language Spoken At Home"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={languageSpoken}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange        ={(e) => setChildDOB(e.target.value)}
-                  InputLabelProps ={{ shrink: true }}
-                  margin          ="dense"
-                  label           ="Child's Date Of Birth"
-                  type            ="date"
-                  fullWidth
-                  variant         ="outlined"
-                  value           ={childDOB}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <FormControl component="fieldset">
-                  <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
-                  <RadioGroup
-                    aria-labelledby ="demo-radio-buttons-group-label"
-                    value           ={childSex}
-                    onChange        ={(e) => setChildSex(e.target.value)}
-                    name            ="radio-buttons-group"
-                    style           ={{ flexDirection: "row" }}
-                  >
-                    <FormControlLabel value="female" control={<Radio />} label="Female" />
-                    <FormControlLabel value="male" control={<Radio />} label="Male" />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <TextField
-                  onChange  ={(e) => setChildHeight(e.target.value)}
-                  margin    ="dense"
-                  label     ="Height (CM)"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={childHeight}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <TextField
-                  onChange  ={(e) => setChildWeight(e.target.value)}
-                  margin    ="dense"
-                  label     ="Weight (KG)"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={childWeight}
-                />
-              </Grid>
-              <Grid item xs={6} md={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="program-select-label">Program Enrollment</InputLabel>
-                  <Select
-                    labelId ="program-select-label"
-                    id      ="program-select"
-                    value   ={programEnrollment}
-                    label   ="Program Enrollment"
-                    onChange={handleChange}
-                  >
-                    {programDatas.map((programData) => {
-                      return (
-                        <MenuItem
-                          key   ={programData.programId}
-                          value ={programData.programId}
-                        >
-                          {programData.programName}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} md={12}>
-                <h3>Father&apos;s Info</h3>
-                <Divider variant="middle" />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setFatherName(e.target.value)}
-                  margin    ="dense"
-                  label     ="Father's Name"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={fatherName}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setFatherNRIC(e.target.value)}
-                  margin    ="dense"
-                  label     ="Father's NRIC"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={fatherNRIC}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setFatherEmail(e.target.value)}
-                  margin    ="dense"
-                  label     ="Father's Email"
-                  type      ="email"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={fatherEmail}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setFatherPhone(e.target.value)}
-                  margin    ="dense"
-                  label     ="Father's Phone"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={fatherPhone}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setFatherOccupation(e.target.value)}
-                  margin    ="dense"
-                  label     ="Father's Occupation"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={fatherOccupation}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setHomeAddress(e.target.value)}
-                  margin    ="dense"
-                  label     ="Home Address"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={homeAddress}
-                />
-              </Grid>
-              <Grid item xs={6} md={12}>
-                <h3>Mother&apos;s Info</h3>
-                <Divider variant="middle" />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setMotherName(e.target.value)}
-                  margin    ="dense"
-                  label     ="Mother's Name"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={motherName}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setMotherNRIC(e.target.value)}
-                  margin    ="dense"
-                  label     ="Mother's NRIC"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={motherNRIC}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setMotherEmail(e.target.value)}
-                  margin    ="dense"
-                  label     ="Mother's Email"
-                  type      ="email"
-                  fullWidth
-                  variant   ="outlined"
-                  value      ={motherEmail}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setMotherPhone(e.target.value)}
-                  margin    ="dense"
-                  label     ="Mother's Phone"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={motherPhone}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setMotherOccupation(e.target.value)}
-                  margin    ="dense"
-                  label     ="Mother's Occupation"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={motherOccupation}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange  ={(e) => setHomeAddress(e.target.value)}
-                  margin    ="dense"
-                  label     ="Home Address"
-                  type      ="string"
-                  fullWidth
-                  variant   ="outlined"
-                  value     ={homeAddress}
-                />
-              </Grid>
+      </Box>
+      <Dialog
+        open              ={open}
+        onClose           ={closeDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Admission Form</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={6} md={12}>
+              <h3>Child&apos;s Info</h3>
+              <Divider variant="middle" />
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={newAdmission}>Create</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setChildName(e.target.value)}
+                autoFocus
+                margin    ="dense"
+                label     ="Child's Name"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={childName}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setChildNRIC(e.target.value)}
+                margin    ="dense"
+                label     ="Child's NRIC"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={childNRIC}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setLanguageSpoken(e.target.value)}
+                margin    ="dense"
+                label     ="Language Spoken At Home"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={languageSpoken}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setChildDOB(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="Child's Date Of Birth"
+                type            ="date"
+                fullWidth
+                variant         ="outlined"
+                value           ={childDOB}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <FormControl component="fieldset">
+                <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
+                <RadioGroup
+                  aria-labelledby ="demo-radio-buttons-group-label"
+                  value           ={childSex}
+                  onChange        ={(e) => setChildSex(e.target.value)}
+                  name            ="radio-buttons-group"
+                  style           ={{ flexDirection: "row" }}
+                >
+                  <FormControlLabel value="female" control={<Radio />} label="Female" />
+                  <FormControlLabel value="male" control={<Radio />} label="Male" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6} md={3}>
+              <TextField
+                onChange  ={(e) => setChildHeight(e.target.value)}
+                margin    ="dense"
+                label     ="Height (CM)"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={childHeight}
+              />
+            </Grid>
+            <Grid item xs={6} md={3}>
+              <TextField
+                onChange  ={(e) => setChildWeight(e.target.value)}
+                margin    ="dense"
+                label     ="Weight (KG)"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={childWeight}
+              />
+            </Grid>
+            <Grid item xs={6} md={12}>
+              <FormControl fullWidth>
+                <InputLabel id="program-select-label">Program Enrollment</InputLabel>
+                <Select
+                  labelId ="program-select-label"
+                  id      ="program-select"
+                  value   ={programEnrollment}
+                  label   ="Program Enrollment"
+                  onChange={handleChange}
+                >
+                  {programDatas.map((programData) => {
+                    return (
+                      <MenuItem
+                        key   ={programData.programId}
+                        value ={programData.programId}
+                      >
+                        {programData.programName}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6} md={12}>
+              <h3>Father&apos;s Info</h3>
+              <Divider variant="middle" />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setFatherName(e.target.value)}
+                margin    ="dense"
+                label     ="Father's Name"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={fatherName}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setFatherNRIC(e.target.value)}
+                margin    ="dense"
+                label     ="Father's NRIC"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={fatherNRIC}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setFatherEmail(e.target.value)}
+                margin    ="dense"
+                label     ="Father's Email"
+                type      ="email"
+                fullWidth
+                variant   ="outlined"
+                value     ={fatherEmail}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setFatherPhone(e.target.value)}
+                margin    ="dense"
+                label     ="Father's Phone"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={fatherPhone}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setFatherOccupation(e.target.value)}
+                margin    ="dense"
+                label     ="Father's Occupation"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={fatherOccupation}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setHomeAddress(e.target.value)}
+                margin    ="dense"
+                label     ="Home Address"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={homeAddress}
+              />
+            </Grid>
+            <Grid item xs={6} md={12}>
+              <h3>Mother&apos;s Info</h3>
+              <Divider variant="middle" />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setMotherName(e.target.value)}
+                margin    ="dense"
+                label     ="Mother's Name"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={motherName}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setMotherNRIC(e.target.value)}
+                margin    ="dense"
+                label     ="Mother's NRIC"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={motherNRIC}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setMotherEmail(e.target.value)}
+                margin    ="dense"
+                label     ="Mother's Email"
+                type      ="email"
+                fullWidth
+                variant   ="outlined"
+                value      ={motherEmail}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setMotherPhone(e.target.value)}
+                margin    ="dense"
+                label     ="Mother's Phone"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={motherPhone}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setMotherOccupation(e.target.value)}
+                margin    ="dense"
+                label     ="Mother's Occupation"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={motherOccupation}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange  ={(e) => setHomeAddress(e.target.value)}
+                margin    ="dense"
+                label     ="Home Address"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={homeAddress}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={newAdmission}>Create</Button>
+        </DialogActions>
+      </Dialog>
       <Card>
         <Table>
           <TableHead>

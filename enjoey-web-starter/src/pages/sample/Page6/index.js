@@ -20,18 +20,17 @@ import {
   TableRow,
   TextField,
   FormControl,
-  FormLabel,
-  RadioGroup,
   FormControlLabel,
   FormGroup,
   Checkbox,
-  Radio,
   InputLabel,
   Select,
   MenuItem,
   Divider,
   Grid,
   Chip,
+  Box,
+  Typography,
 } from "@mui/material";
 
 // Local Imports
@@ -141,190 +140,184 @@ const Page2 = () => {
 
   return (
     <div>
-      <div 
-        style={{
-          display       : "flex",
-          flexDirection : "row",
-          justifyContent: "space-between",
-          alignItems    : "center",
+      <Box 
+        sx={{
+          p: 2,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between"
         }}
       >
-        <h2>Immunizations Table</h2>
-        <div className="button-group">
-          <Button
-            variant ="contained"
-            onClick ={openDialog}
-            style   ={{
-              height: "40px",
-              marginRight: "10px",
-            }}
-          >
-            + Add Record
+        <Typography variant="h1" component="div" gutterBottom>
+          Immunizations Table
+        </Typography>
+        <div>
+          <Button variant ="contained" onClick ={openDialog} sx={{ mr: 2 }}>
+            <Typography variant="button" component="div">
+              + Add Record
+            </Typography>
           </Button>
-          <Button
-            variant ="contained"
-            onClick ={openEditDialog}
-            style   ={{
-              height: "40px",
-            }}
-          >
-            Edit Table
+          <Button variant ="contained" onClick ={openEditDialog}>
+            <Typography variant="button" component="div">
+              Edit Table
+            </Typography>
           </Button>
         </div>
-        {/* Add Immunization Record */}
-        <Dialog
-          fullWidth
-          open              ={open}
-          onClose           ={closeDialog}
-          aria-labelledby   ="alert-dialog-title"
-          aria-describedby  ="alert-dialog-description"
-        >
-          <DialogTitle>
-            <h2>Immunizations Record</h2>
-          </DialogTitle>
-          <DialogContent dividers>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="student-select">Student</InputLabel>
-                  <Select
-                    multiple
-                    labelId="student-select"
-                    id="student-select"
-                    value={student || []}
-                    label="Student"
-                    onChange={(e) => setStudent(e.target.value)}
-                  >
-                    {child.map((childData) => {
-                      return (
-                        <MenuItem
-                          key   ={childData.childId}
-                          value ={childData.childNameENG}
-                        >
-                          {childData.childNameENG}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <TextField
-                  onChange        ={(e) => setRecordDate(e.target.value)}
-                  InputLabelProps ={{ shrink: true }}
-                  margin          ="dense"
-                  label           ="Input Date"
-                  type            ="date"
-                  fullWidth
-                  variant         ="outlined"
-                  value           ={recordDate}
-                />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Divider variant="middle" />
-              </Grid>
-              {Object.keys(recordItems).map((key) => (
-                <Grid item xs={12} md={12} key={key}>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={<Checkbox checked={recordItems[key]} onChange={handleRecordCheckbox} name={key} />}
-                      label={key}
+      </Box>
+      {/* Add Immunization Record */}
+      <Dialog
+        fullWidth
+        open              ={open}
+        onClose           ={closeDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Immunizations Record</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth>
+                <InputLabel id="student-select">Student</InputLabel>
+                <Select
+                  multiple
+                  labelId="student-select"
+                  id="student-select"
+                  value={student || []}
+                  label="Student"
+                  onChange={(e) => setStudent(e.target.value)}
+                >
+                  {child.map((childData) => {
+                    return (
+                      <MenuItem
+                        key   ={childData.childId}
+                        value ={childData.childNameENG}
+                      >
+                        {childData.childNameENG}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange        ={(e) => setRecordDate(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="Input Date"
+                type            ="date"
+                fullWidth
+                variant         ="outlined"
+                value           ={recordDate}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Divider variant="middle" />
+            </Grid>
+            {Object.keys(recordItems).map((key) => (
+              <Grid item xs={12} md={12} key={key}>
+                <FormGroup>
+                  <FormControlLabel
+                    control={<Checkbox checked={recordItems[key]} onChange={handleRecordCheckbox} name={key} />}
+                    label={key}
+                  />
+                </FormGroup>
+                {recordItems[key] && (
+                  <Grid item xs={12} md={12}>
+                    <TextField
+                      onChange={handleRecordDateChange}
+                      InputLabelProps={{ shrink: true }}
+                      margin="dense"
+                      label="Taken Date"
+                      type="date"
+                      fullWidth
+                      variant="outlined"
+                      value={vacineDate[key]}
+                      name={key}
                     />
-                  </FormGroup>
-                  {recordItems[key] && (
-                    <Grid item xs={12} md={12}>
-                      <TextField
-                        onChange={handleRecordDateChange}
-                        InputLabelProps={{ shrink: true }}
-                        margin="dense"
-                        label="Taken Date"
-                        type="date"
-                        fullWidth
-                        variant="outlined"
-                        value={vacineDate[key]}
-                        name={key}
-                      />
-                    </Grid>
-                  )}
-                </Grid>
-              ))}
+                  </Grid>
+                )}
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCreate}>Create</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Edit Immunization Table */}
+      <Dialog
+        fullWidth
+        open              ={openEdit}
+        onClose           ={closeEditDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Immunizations Settings</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <h4>Edit the table columns</h4>
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCreate}>Create</Button>
-          </DialogActions>
-        </Dialog>
-        {/* Edit Immunization Table */}
-        <Dialog
-          fullWidth
-          open              ={openEdit}
-          onClose           ={closeEditDialog}
-          aria-labelledby   ="alert-dialog-title"
-          aria-describedby  ="alert-dialog-description"
-        >
-          <DialogTitle>
-            <h2>Immunizations Settings</h2>
-          </DialogTitle>
-          <DialogContent dividers>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={12}>
-                <h4>Edit the table columns</h4>
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['Hep B']} onChange={handleCheckboxChange} name="Hep B" />}
-                    label="Hep B"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['DTaP']} onChange={handleCheckboxChange} name="DTaP" />}
-                    label="DTaP"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['Hib']} onChange={handleCheckboxChange} name="Hib" />}
-                    label="Hib"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['PCV']} onChange={handleCheckboxChange} name="PCV" />}
-                    label="PCV"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['Polio']} onChange={handleCheckboxChange} name="Polio" />}
-                    label="Polio"
-                  />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['Rotavirus']} onChange={handleCheckboxChange} name="Rotavirus" />}
-                    label="Rotavirus"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['Flu']} onChange={handleCheckboxChange} name="Flu" />}
-                    label="Flu"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['Hep A']} onChange={handleCheckboxChange} name="Hep A" />}
-                    label="Hep A"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['MMR']} onChange={handleCheckboxChange} name="MMR" />}
-                    label="MMR"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={checkedItems['VAR']} onChange={handleCheckboxChange} name="VAR" />}
-                    label="VAR"
-                  />
-                </FormGroup>
-              </Grid>
+            <Grid item xs={6} md={6}>
+              <FormGroup>
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['Hep B']} onChange={handleCheckboxChange} name="Hep B" />}
+                  label="Hep B"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['DTaP']} onChange={handleCheckboxChange} name="DTaP" />}
+                  label="DTaP"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['Hib']} onChange={handleCheckboxChange} name="Hib" />}
+                  label="Hib"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['PCV']} onChange={handleCheckboxChange} name="PCV" />}
+                  label="PCV"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['Polio']} onChange={handleCheckboxChange} name="Polio" />}
+                  label="Polio"
+                />
+              </FormGroup>
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button>Apply</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+            <Grid item xs={6} md={6}>
+              <FormGroup>
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['Rotavirus']} onChange={handleCheckboxChange} name="Rotavirus" />}
+                  label="Rotavirus"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['Flu']} onChange={handleCheckboxChange} name="Flu" />}
+                  label="Flu"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['Hep A']} onChange={handleCheckboxChange} name="Hep A" />}
+                  label="Hep A"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['MMR']} onChange={handleCheckboxChange} name="MMR" />}
+                  label="MMR"
+                />
+                <FormControlLabel
+                  control={<Checkbox checked={checkedItems['VAR']} onChange={handleCheckboxChange} name="VAR" />}
+                  label="VAR"
+                />
+              </FormGroup>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button>Apply</Button>
+        </DialogActions>
+      </Dialog>
       <Card>
         <Table>
           <TableHead>

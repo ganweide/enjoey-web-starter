@@ -29,6 +29,8 @@ import {
   MenuItem,
   Divider,
   Grid,
+  Box,
+  Typography,
 } from "@mui/material";
 
 // Local Imports
@@ -84,178 +86,177 @@ const Page2 = () => {
 
   return (
     <div>
-      <div 
-        style={{
-          display       : "flex",
-          flexDirection : "row",
-          justifyContent: "space-between",
-          alignItems    : "center",
+      <Box 
+        sx={{
+          p: 2,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between"
         }}
       >
-        <h2>Sleep Table</h2>
-        <Button
-          variant ="contained"
-          onClick ={openDialog}
-          style   ={{
-            height: "40px",
-          }}
-        >
-          + Add Record
+        <Typography variant="h1" component="div" gutterBottom>
+          Sleep Table
+        </Typography>
+        <Button variant ="contained" onClick ={openDialog}>
+          <Typography variant="button" component="div">
+            + Add Record
+          </Typography>
         </Button>
-        <Dialog
-          open              ={open}
-          onClose           ={closeDialog}
-          aria-labelledby   ="alert-dialog-title"
-          aria-describedby  ="alert-dialog-description"
-        >
-          <DialogTitle>
-            <h2>Nap</h2>
-          </DialogTitle>
-          <DialogContent dividers>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="student-select">Student</InputLabel>
-                  <Select
-                    multiple
-                    labelId="student-select"
-                    id="student-select"
-                    value={student || []}
-                    label="Student"
-                    onChange={(e) => setStudent(e.target.value)}
-                  >
-                    {child.map((childData) => {
-                      return (
-                        <MenuItem
-                          key   ={childData.childId}
-                          value ={childData.childNameENG}
-                        >
-                          {childData.childNameENG}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange        ={(e) => setDate(e.target.value)}
-                  InputLabelProps ={{ shrink: true }}
-                  margin          ="dense"
-                  label           ="Date"
-                  type            ="date"
-                  fullWidth
-                  variant         ="outlined"
-                  value           ={date}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  onChange        ={(e) => setTime(e.target.value)}
-                  InputLabelProps ={{ shrink: true }}
-                  margin          ="dense"
-                  label           ="Time"
-                  type            ="time"
-                  fullWidth
-                  variant         ="outlined"
-                  value           ={time}
-                />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Divider variant="middle" />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel id="food-type-radio-label">Activity</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby ="food-type-radio-label"
-                    value           ={foodType}
-                    onChange        ={(e) => setFoodType(e.target.value)}
-                    name            ="radio-buttons-group"
-                  >
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="start-nap" control={<Radio />} label="Start nap" />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="sleep-check" control={<Radio />} label="Sleep check" />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="end-nap" control={<Radio />} label="End nap" />
-                    </Grid>
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel id="food-quantity-radio-label">Observation</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby ="food-quantity-radio-label"
-                    value           ={foodQuantity}
-                    onChange        ={(e) => setFoodQuantity(e.target.value)}
-                    name            ="radio-buttons-group"
-                  >
-                    <Grid item xs={6} md={6}>
-                      <FormControlLabel value="labored-breathing" control={<Radio />} label="Labored Breathing" />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                      <FormControlLabel value="restless" control={<Radio />} label="Restless" />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                      <FormControlLabel value="flushed" control={<Radio />} label="Flushed" />
-                    </Grid>
-                    <Grid item xs={6} md={6}>
-                      <FormControlLabel value="high-body-temperature" control={<Radio />} label="High body temperature" />
-                    </Grid>
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <FormControl component="fieldset" fullWidth>
-                  <FormLabel id="food-quantity-radio-label">Position</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby ="food-quantity-radio-label"
-                    value           ={foodQuantity}
-                    onChange        ={(e) => setFoodQuantity(e.target.value)}
-                    name            ="radio-buttons-group"
-                  >
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="back" control={<Radio />} label="Back" />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="side" control={<Radio />} label="Side" />
-                    </Grid>
-                    <Grid item xs={4} md={4}>
-                      <FormControlLabel value="stomach" control={<Radio />} label="Stomach" />
-                    </Grid>
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Divider variant="middle" />
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <TextField
-                  onChange={(e) => setNote(e.target.value)}
-                  margin="dense"
-                  label="Note"
-                  type="text"
-                  fullWidth
-                  multiline
-                  rows={4}
-                  variant="outlined"
-                  value={note}
-                />
-              </Grid>
+      </Box>
+      <Dialog
+        open              ={open}
+        onClose           ={closeDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Nap</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth>
+                <InputLabel id="student-select">Student</InputLabel>
+                <Select
+                  multiple
+                  labelId="student-select"
+                  id="student-select"
+                  value={student || []}
+                  label="Student"
+                  onChange={(e) => setStudent(e.target.value)}
+                >
+                  {child.map((childData) => {
+                    return (
+                      <MenuItem
+                        key   ={childData.childId}
+                        value ={childData.childNameENG}
+                      >
+                        {childData.childNameENG}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button>Create</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setDate(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="Date"
+                type            ="date"
+                fullWidth
+                variant         ="outlined"
+                value           ={date}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setTime(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="Time"
+                type            ="time"
+                fullWidth
+                variant         ="outlined"
+                value           ={time}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Divider variant="middle" />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <FormControl component="fieldset" fullWidth>
+                <FormLabel id="food-type-radio-label">Activity</FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby ="food-type-radio-label"
+                  value           ={foodType}
+                  onChange        ={(e) => setFoodType(e.target.value)}
+                  name            ="radio-buttons-group"
+                >
+                  <Grid item xs={4} md={4}>
+                    <FormControlLabel value="start-nap" control={<Radio />} label="Start nap" />
+                  </Grid>
+                  <Grid item xs={4} md={4}>
+                    <FormControlLabel value="sleep-check" control={<Radio />} label="Sleep check" />
+                  </Grid>
+                  <Grid item xs={4} md={4}>
+                    <FormControlLabel value="end-nap" control={<Radio />} label="End nap" />
+                  </Grid>
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <FormControl component="fieldset" fullWidth>
+                <FormLabel id="food-quantity-radio-label">Observation</FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby ="food-quantity-radio-label"
+                  value           ={foodQuantity}
+                  onChange        ={(e) => setFoodQuantity(e.target.value)}
+                  name            ="radio-buttons-group"
+                >
+                  <Grid item xs={6} md={6}>
+                    <FormControlLabel value="labored-breathing" control={<Radio />} label="Labored Breathing" />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <FormControlLabel value="restless" control={<Radio />} label="Restless" />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <FormControlLabel value="flushed" control={<Radio />} label="Flushed" />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <FormControlLabel value="high-body-temperature" control={<Radio />} label="High body temperature" />
+                  </Grid>
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <FormControl component="fieldset" fullWidth>
+                <FormLabel id="food-quantity-radio-label">Position</FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby ="food-quantity-radio-label"
+                  value           ={foodQuantity}
+                  onChange        ={(e) => setFoodQuantity(e.target.value)}
+                  name            ="radio-buttons-group"
+                >
+                  <Grid item xs={4} md={4}>
+                    <FormControlLabel value="back" control={<Radio />} label="Back" />
+                  </Grid>
+                  <Grid item xs={4} md={4}>
+                    <FormControlLabel value="side" control={<Radio />} label="Side" />
+                  </Grid>
+                  <Grid item xs={4} md={4}>
+                    <FormControlLabel value="stomach" control={<Radio />} label="Stomach" />
+                  </Grid>
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Divider variant="middle" />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange={(e) => setNote(e.target.value)}
+                margin="dense"
+                label="Note"
+                type="text"
+                fullWidth
+                multiline
+                rows={4}
+                variant="outlined"
+                value={note}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button>Create</Button>
+        </DialogActions>
+      </Dialog>
       <Card>
         <Table>
           <TableHead>
