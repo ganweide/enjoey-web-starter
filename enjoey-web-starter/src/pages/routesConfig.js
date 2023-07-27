@@ -78,6 +78,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/page-9',
       },
+      {
+        id: 'injuries-form',
+        title: 'Charges Form',
+        messageId: 'Charges Form',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/page-10',
+      },
     ],
   },
 ];

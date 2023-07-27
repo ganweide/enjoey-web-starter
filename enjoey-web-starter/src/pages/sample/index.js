@@ -10,6 +10,7 @@ const Page6 = React.lazy(() => import('./Page6'));
 const Page7 = React.lazy(() => import('./Page7'));
 const Page8 = React.lazy(() => import('./Page8'));
 const Page9 = React.lazy(() => import('./Page9'));
+const Page10 = React.lazy(() => import('./Page10'));
 
 export const samplePagesConfigs = [
   {
@@ -48,5 +49,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/page-9',
     element: <Page9 />,
+  },
+  {
+    path: '/sample/page-10',
+    element: <Page10 />,
   },
 ];
