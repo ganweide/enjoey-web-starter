@@ -43,7 +43,7 @@ const childUrl  = "http://127.0.0.1:8000/api/child/";
 
 const Page2 = () => {
   const classes   = useStyles();
-  const tableHead = [" ", "Student", "Incident Date", "Incident Time", "Location", "Injured Parts", "Type"];
+  const tableHead = [" ", "Student", "Category", "Description", "Amount", "Due Date"];
 
   const [open, setOpen]                     = useState(false);
   const [schedule, setSchedule]             = useState(false);
@@ -503,11 +503,10 @@ const Page2 = () => {
             <TableRow>
               <TableCell style={{textAlign: "center"}}>1</TableCell>
               <TableCell style={{textAlign: "center"}}>Student 1</TableCell>
-              <TableCell style={{textAlign: "center"}}>2023-07-18</TableCell>
-              <TableCell style={{textAlign: "center"}}>12:11</TableCell>
-              <TableCell style={{textAlign: "center"}}>Playground</TableCell>
-              <TableCell style={{textAlign: "center"}}>Arm/wrist/hand</TableCell>
-              <TableCell style={{textAlign: "center"}}>Broken bone or dislocation</TableCell>
+              <TableCell style={{textAlign: "center"}}>Registration Fee</TableCell>
+              <TableCell style={{textAlign: "center"}}>application for preschool program</TableCell>
+              <TableCell style={{textAlign: "center"}}>100</TableCell>
+              <TableCell style={{textAlign: "center"}}>2023-07-28</TableCell>
             </TableRow>
           </TableBody>
         </Table>
