@@ -1,57 +1,57 @@
 import React from 'react';
 import {RoutePermittedRole} from 'shared/constants/AppConst';
 
-const Page1 = React.lazy(() => import('./Page1'));
-const Page2 = React.lazy(() => import('./Page2'));
-const Page3 = React.lazy(() => import('./Page3'));
-const Page4 = React.lazy(() => import('./Page4'));
-const Page5 = React.lazy(() => import('./Page5'));
-const Page6 = React.lazy(() => import('./Page6'));
-const Page7 = React.lazy(() => import('./Page7'));
-const Page8 = React.lazy(() => import('./Page8'));
-const Page9 = React.lazy(() => import('./Page9'));
-const Page10 = React.lazy(() => import('./Page10'));
+const Page1 = React.lazy(() => import('./SurveyEditor'));
+const Page2 = React.lazy(() => import('./SurveyForm'));
+const Page3 = React.lazy(() => import('./ActivitiesForm'));
+const Page4 = React.lazy(() => import('./MenuPlanning'));
+const Page5 = React.lazy(() => import('./SleepCheck'));
+const Page6 = React.lazy(() => import('./Immunization'));
+const Page7 = React.lazy(() => import('./HealthCheck'));
+const Page8 = React.lazy(() => import('./ToiletCheck'));
+const Page9 = React.lazy(() => import('./InjuriesForm'));
+const Page10 = React.lazy(() => import('./ChargesForm'));
 
 export const samplePagesConfigs = [
   {
-    path: '/sample/page-1',
+    path: '/sample/SurveyEditor',
     element: <Page1 />,
     permittedRole: [RoutePermittedRole.Admin, RoutePermittedRole.Teacher],
   },
   {
-    path: '/sample/page-2',
+    path: '/sample/SurveyForm',
     element: <Page2 />,
   },
   {
-    path: '/sample/page-3',
+    path: '/sample/ActivitiesForm',
     element: <Page3 />,
   },
   {
-    path: '/sample/page-4',
+    path: '/sample/MenuPlanning',
     element: <Page4 />,
   },
   {
-    path: '/sample/page-5',
+    path: '/sample/SleepCheck',
     element: <Page5 />,
   },
   {
-    path: '/sample/page-6',
+    path: '/sample/Immunization',
     element: <Page6 />,
   },
   {
-    path: '/sample/page-7',
+    path: '/sample/HealthCheck',
     element: <Page7 />,
   },
   {
-    path: '/sample/page-8',
+    path: '/sample/ToiletCheck',
     element: <Page8 />,
   },
   {
-    path: '/sample/page-9',
+    path: '/sample/InjuriesForm',
     element: <Page9 />,
   },
   {
-    path: '/sample/page-10',
+    path: '/sample/ChargesForm',
     element: <Page10 />,
   },
 ];

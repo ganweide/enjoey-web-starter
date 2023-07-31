@@ -12,7 +12,7 @@ const routesConfig = [
         messageId: 'Survey Editor',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-1',
+        url: '/sample/SurveyEditor',
       },
       {
         id: 'survey-form',
@@ -20,7 +20,7 @@ const routesConfig = [
         messageId: 'Survey Form',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-2',
+        url: '/sample/SurveyForm',
       },
       {
         id: 'activities-form',
@@ -28,7 +28,7 @@ const routesConfig = [
         messageId: 'Activities Form',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-3',
+        url: '/sample/ActivitiesForm',
       },
       {
         id: 'menu-planning',
@@ -36,7 +36,7 @@ const routesConfig = [
         messageId: 'Menu Planning',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-4',
+        url: '/sample/MenuPlanning',
       },
       {
         id: 'sleep-check',
@@ -44,7 +44,7 @@ const routesConfig = [
         messageId: 'Sleep Check',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-5',
+        url: '/sample/SleepCheck',
       },
       {
         id: 'immunization',
@@ -52,7 +52,7 @@ const routesConfig = [
         messageId: 'Immunization',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-6',
+        url: '/sample/Immunization',
       },
       {
         id: 'health-check',
@@ -60,7 +60,7 @@ const routesConfig = [
         messageId: 'Health Check',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-7',
+        url: '/sample/HealthCheck',
       },
       {
         id: 'toilet-check',
@@ -68,7 +68,7 @@ const routesConfig = [
         messageId: 'Toilet Check',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-8',
+        url: '/sample/ToiletCheck',
       },
       {
         id: 'injuries-form',
@@ -76,7 +76,7 @@ const routesConfig = [
         messageId: 'Injuries Form',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-9',
+        url: '/sample/InjuriesForm',
       },
       {
         id: 'injuries-form',
@@ -84,7 +84,7 @@ const routesConfig = [
         messageId: 'Charges Form',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/page-10',
+        url: '/sample/ChargesForm',
       },
     ],
   },
