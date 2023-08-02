@@ -86,6 +86,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/ChargesForm',
       },
+      {
+        id: 'survey-settings',
+        title: 'Survey Settings',
+        messageId: 'Survey Settings',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/SurveySettings',
+      },
     ],
   },
 ];

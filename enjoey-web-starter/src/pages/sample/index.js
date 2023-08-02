@@ -11,6 +11,7 @@ const Page7 = React.lazy(() => import('./HealthCheck'));
 const Page8 = React.lazy(() => import('./ToiletCheck'));
 const Page9 = React.lazy(() => import('./InjuriesForm'));
 const Page10 = React.lazy(() => import('./ChargesForm'));
+const Page11 = React.lazy(() => import('./SurveySettings'));
 
 export const samplePagesConfigs = [
   {
@@ -53,5 +54,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/ChargesForm',
     element: <Page10 />,
+  },
+  {
+    path: '/sample/SurveySettings',
+    element: <Page11 />,
   },
 ];
