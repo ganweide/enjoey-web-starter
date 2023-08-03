@@ -8,30 +8,20 @@ import Axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
-  Card,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   InputLabel,
   Select,
   MenuItem,
-  Divider,
   Grid,
   Box,
   Typography,
 } from "@mui/material";
+import SettingsIcon from '@mui/icons-material/Settings';
 
 // Local Imports
 import Styles from "./style";
@@ -49,6 +39,11 @@ const Page2 = () => {
   const [schoolName, setSchoolName]         = useState([]);
   const [child, setChild]                   = useState([]);
   const [student, setStudent]               = useState([]);
+  const [surveyTitle, setSurveyTitle]       = useState([]);
+  const [description, setDescription]       = useState([]);
+  const [surveyType, setSurveyType]         = useState([]);
+  const [startDate, setStartDate]           = useState([]);
+  const [endDate, setEndDate]               = useState([]);
 
   useEffect(() => {
     try {
@@ -182,7 +177,16 @@ const Page2 = () => {
         aria-describedby  ="alert-dialog-description"
       >
         <DialogTitle>
-          <h2>Surveys</h2>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={8} md={8}>
+              <h2>Surveys</h2>
+            </Grid>
+            <Grid item xs={4} md={4} container justifyContent="flex-end">
+              <Button endIcon={<SettingsIcon />}>
+                Survey Settings
+              </Button>
+            </Grid>
+          </Grid>
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
@@ -218,10 +222,71 @@ const Page2 = () => {
               </FormControl>
             </Grid>
             {renderGrid()}
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange  ={(e) => setSurveyTitle(e.target.value)}
+                margin    ="dense"
+                label     ="Survey Title"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={surveyTitle}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange  ={(e) => setDescription(e.target.value)}
+                margin    ="dense"
+                label     ="Description"
+                type      ="string"
+                fullWidth
+                variant   ="outlined"
+                value     ={description}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth>
+                <InputLabel id="survey-type-select">Survey Type</InputLabel>
+                <Select
+                  labelId="survey-type-select"
+                  id="survey-type-select"
+                  value={surveyType}
+                  label="Survey Type"
+                  onChange={(e) => setSurveyType(e.target.value)}
+                >
+                  <MenuItem value ="class">One-Time Survey</MenuItem>
+                  <MenuItem value ="school">Campaign</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setStartDate(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="Start Date"
+                type            ="date"
+                fullWidth
+                variant         ="outlined"
+                value           ={startDate}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setEndDate(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="End Date"
+                type            ="date"
+                fullWidth
+                variant         ="outlined"
+                value           ={endDate}
+              />
+            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button>Create</Button>
+          <Button>Next</Button>
         </DialogActions>
       </Dialog>
     </div>
