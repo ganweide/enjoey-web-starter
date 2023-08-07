@@ -14,6 +14,9 @@ import {
   DialogTitle,
   TextField,
   FormControl,
+  FormControlLabel,
+  FormGroup,
+  Checkbox,
   InputLabel,
   Select,
   MenuItem,
@@ -33,6 +36,8 @@ const childUrl  = "http://127.0.0.1:8000/api/child/";
 const Page2 = () => {
   const classes   = useStyles();
   const [open, setOpen]                     = useState(false);
+  const [settings, setSettings]             = useState(false);
+  const [showResult, setShowResult]        = useState([]);
   const [recipientType, setRecipientType]   = useState([]);
   const [sendTo, setSendTo]                 = useState([]);
   const [selectClass, setSelectClass]       = useState([]);
@@ -61,6 +66,15 @@ const Page2 = () => {
     setSendTo       ("");
     setSelectClass  ("");
   };
+
+  const openSettings = async () => {
+    setSettings   (true);
+    setShowResult ("");
+  }
+
+  const closeSettings = async () => {
+    setSettings(false);
+  }
 
   const renderGrid = () => {
     if (sendTo === "class") {
@@ -182,7 +196,7 @@ const Page2 = () => {
               <h2>Surveys</h2>
             </Grid>
             <Grid item xs={4} md={4} container justifyContent="flex-end">
-              <Button endIcon={<SettingsIcon />}>
+              <Button endIcon={<SettingsIcon />} onClick={openSettings}>
                 Survey Settings
               </Button>
             </Grid>
@@ -287,6 +301,56 @@ const Page2 = () => {
         </DialogContent>
         <DialogActions>
           <Button>Next</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        fullWidth
+        open              ={settings}
+        onClose           ={closeSettings}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2">Survey Settings</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <FormGroup>
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="Include withdrawn students"
+                />
+              </FormGroup>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <FormGroup>
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="This survey will be anonymouse"
+                />
+              </FormGroup>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth>
+                <InputLabel id="show-result-select">Show survey result to</InputLabel>
+                <Select
+                  labelId="show-result-select"
+                  id="show-result-select"
+                  value={showResult}
+                  label="Show surevey result to"
+                  onChange={(e) => setShowResult(e.target.value)}
+                >
+                  <MenuItem value ="all">All</MenuItem>
+                  <MenuItem value ="hq admins & school admins">HQ Admins & School Admins</MenuItem>
+                  <MenuItem value ="hq admins only">HQ Admins Only</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeSettings}>Save</Button>
         </DialogActions>
       </Dialog>
     </div>
