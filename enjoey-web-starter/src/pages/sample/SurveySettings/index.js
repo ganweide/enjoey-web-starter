@@ -23,21 +23,18 @@ import {
   Grid,
   Box,
   Typography,
+  Divider,
 } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 
-// Local Imports
-import Styles from "./style";
-
 // Global Constants
-const useStyles = makeStyles(Styles);
 const childUrl  = "http://127.0.0.1:8000/api/child/";
 
 const Page2 = () => {
-  const classes   = useStyles();
   const [open, setOpen]                     = useState(false);
   const [settings, setSettings]             = useState(false);
-  const [showResult, setShowResult]        = useState([]);
+  const [create, setCreate]                 = useState(false);
+  const [showResult, setShowResult]         = useState([]);
   const [recipientType, setRecipientType]   = useState([]);
   const [sendTo, setSendTo]                 = useState([]);
   const [selectClass, setSelectClass]       = useState([]);
@@ -163,6 +160,36 @@ const Page2 = () => {
     setOpen(false);
   }
 
+  const openCreate = async () => {
+    setOpen(false);
+    setCreate(true);
+  }
+
+  const addQuestion = () => {
+    return (
+      <Grid item xs={12} md={12}>
+        <FormControl fullWidth>
+          <InputLabel id="class-select">Select Class</InputLabel>
+          <Select
+            labelId="class-select"
+            id="class-select"
+            value={selectClass}
+            label="Select Class"
+            onChange={(e) => setSelectClass(e.target.value)}
+          >
+            <MenuItem value ="hibiscus">Hibiscus Room</MenuItem>
+            <MenuItem value ="banana">Banana Room</MenuItem>
+            <MenuItem value ="kitty">Kitty Room</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  const closeCreate = async () => {
+    setCreate(false);
+  }
+
   return (
     <div>
       <Box 
@@ -183,6 +210,7 @@ const Page2 = () => {
           </Typography>
         </Button>
       </Box>
+      {/* Initialise Survey */}
       <Dialog
         fullWidth
         open              ={open}
@@ -300,9 +328,10 @@ const Page2 = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button>Next</Button>
+          <Button onClick={openCreate}>Next</Button>
         </DialogActions>
       </Dialog>
+      {/* Survey Settings */}
       <Dialog
         fullWidth
         open              ={settings}
@@ -351,6 +380,91 @@ const Page2 = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeSettings}>Save</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Survey Questions */}
+      <Dialog
+        maxWidth          ="xl"
+        fullWidth
+        open              ={create}
+        onClose           ={closeCreate}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2" gutterBottom>Create Questions</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid container xs={2} md={2}>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Radio Button Group</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Rating Scale</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Checkboxes</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Dropdown</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Multi-Select Dropdown</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Yes/No Boolean</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Date</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Time</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Short Answers</Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button style={{ width:"100%", height:"100%" }}>Paragraph</Button>
+              </Grid>
+            </Grid>
+            <Grid item xs={10} md={10}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  onChange  ={(e) => setSurveyTitle(e.target.value)}
+                  margin    ="dense"
+                  label     ="Survey Title"
+                  type      ="string"
+                  fullWidth
+                  variant   ="outlined"
+                  value     ={surveyTitle}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  onChange  ={(e) => setDescription(e.target.value)}
+                  margin    ="dense"
+                  label     ="Description"
+                  type      ="string"
+                  fullWidth
+                  variant   ="outlined"
+                  value     ={description}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Divider variant="middle" />
+              </Grid>
+              {addQuestion()}
+              <Grid item xs={12} md={12}>
+                <Button variant="contained" style={{ width:"100%", height:"100%" }} onClick={addQuestion}>
+                  Add Question
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={openCreate}>Next</Button>
         </DialogActions>
       </Dialog>
     </div>
