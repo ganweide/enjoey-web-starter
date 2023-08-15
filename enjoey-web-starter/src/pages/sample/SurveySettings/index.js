@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 // Axios Import
 import Axios from "axios";
 
+// React Beautiful Dnd
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 // Material UI Imports
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
   Dialog,
@@ -23,9 +25,11 @@ import {
   Grid,
   Box,
   Typography,
-  Divider,
+  Card,
+  IconButton,
 } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // Global Constants
 const childUrl  = "http://127.0.0.1:8000/api/child/";
@@ -46,6 +50,8 @@ const Page2 = () => {
   const [surveyType, setSurveyType]         = useState([]);
   const [startDate, setStartDate]           = useState([]);
   const [endDate, setEndDate]               = useState([]);
+  const [questions, setQuestions]           = useState([]);
+  const [radioItems, setRadioItems]         = useState([]);
 
   useEffect(() => {
     try {
@@ -57,22 +63,31 @@ const Page2 = () => {
     }
   }, []);
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+  
+    const reorderedQuestions = Array.from(questions);
+    const [reorderedQuestion] = reorderedQuestions.splice(result.source.index, 1);
+    reorderedQuestions.splice(result.destination.index, 0, reorderedQuestion);
+  
+    setQuestions(reorderedQuestions);
+  };
+
   const openDialog = async () => {
     setOpen         (true);
     setRecipientType("");
     setSendTo       ("");
     setSelectClass  ("");
   };
-
   const openSettings = async () => {
     setSettings   (true);
     setShowResult ("");
   }
-
   const closeSettings = async () => {
     setSettings(false);
   }
-
   const renderGrid = () => {
     if (sendTo === "class") {
       return (
@@ -155,7 +170,6 @@ const Page2 = () => {
     }
     return null;
   }
-
   const closeDialog = async () => {
     setOpen(false);
   }
@@ -163,32 +177,53 @@ const Page2 = () => {
   const openCreate = async () => {
     setOpen(false);
     setCreate(true);
+    setQuestions([]);
   }
-
-  const addQuestion = () => {
-    return (
-      <Grid item xs={12} md={12}>
-        <FormControl fullWidth>
-          <InputLabel id="class-select">Select Class</InputLabel>
-          <Select
-            labelId="class-select"
-            id="class-select"
-            value={selectClass}
-            label="Select Class"
-            onChange={(e) => setSelectClass(e.target.value)}
-          >
-            <MenuItem value ="hibiscus">Hibiscus Room</MenuItem>
-            <MenuItem value ="banana">Banana Room</MenuItem>
-            <MenuItem value ="kitty">Kitty Room</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-    )
-  }
-
+  const addQuestion = (type) => {
+    const newQuestion = {
+      id: questions.length,
+      title: '',
+      type: type,
+    };
+    setQuestions([...questions, newQuestion]);
+  };
+  const handleDeleteQuestion = (questionId) => {
+    const updatedQuestions = questions.filter(question => question.id !== questionId);
+    setQuestions(updatedQuestions);
+  };
+  const handleQuestionTitleChange = (id, value) => {
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, title: value } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+  const handleQuestionTypeChange = (id, value) => {
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, type: value } : question
+    );
+    setQuestions(updatedQuestions);
+  };
   const closeCreate = async () => {
     setCreate(false);
   }
+
+  const addRadioItems = () => {
+    const newRadioItems = {
+      id: radioItems.length,
+      item: '',
+    };
+    setRadioItems([...radioItems, newRadioItems]);
+  };
+  const handleRadioItemChange = (id, value) => {
+    const updatedRadioItems = radioItems.map(item =>
+      item.id === id ? { ...item, item: value } : item
+    );
+    setRadioItems(updatedRadioItems);
+  };
+  const handleDeleteRadioItem = (itemId) => {
+    const updatedRadioItems = radioItems.filter(item => item.id !== itemId);
+    setRadioItems(updatedRadioItems);
+  };
 
   return (
     <div>
@@ -396,37 +431,69 @@ const Page2 = () => {
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid container xs={2} md={2}>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Radio Button Group</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Rating Scale</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Checkboxes</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Dropdown</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Multi-Select Dropdown</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Yes/No Boolean</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Date</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Time</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Short Answers</Button>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Button style={{ width:"100%", height:"100%" }}>Paragraph</Button>
-              </Grid>
+            <Grid item xs={2} md={2}>
+              <Box height="400px" display="flex" flexDirection="column">
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("radio button group")}
+                >
+                  Radio Button Group
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("rating scale")}
+                >
+                  Rating Scale
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("checkboxes")}
+                >
+                  Checkboxes
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("dropdown")}
+                >
+                  Dropdown
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("multi-select dropdown")}
+                >
+                  Multi-Select Dropdown
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("yes/no boolean")}
+                >
+                  Yes/No Boolean
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("date")}
+                >
+                  Date
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("time")}
+                >
+                  Time
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("short answers")}
+                >
+                  Short Answers
+                </Button>
+                <Button
+                  style={{ width:"100%", height:"100%" }}
+                  onClick={() => addQuestion("paragraph")}
+                >
+                  Paragraph
+                </Button>
+              </Box>
             </Grid>
             <Grid item xs={10} md={10}>
               <Grid item xs={12} md={12}>
@@ -451,12 +518,102 @@ const Page2 = () => {
                   value     ={description}
                 />
               </Grid>
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable droppableId="questions-list" direction="vertical">
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      // eslint-disable-next-line
+                      {...provided.droppableProps}
+                    >
+                      {questions.map((question, index) => (
+                        <Draggable key={question.id.toString()} draggableId={question.id.toString()} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              // eslint-disable-next-line
+                              {...provided.draggableProps}
+                              // eslint-disable-next-line
+                              {...provided.dragHandleProps}
+                            >
+                              <Card key={question.id} style={{ margin: '10px', padding: '10px' }}>
+                                <IconButton aria-label='delete' onClick={() => handleDeleteQuestion(question.id)}>
+                                  <DeleteIcon />
+                                </IconButton>
+                                <Grid container spacing={2}>
+                                  <Grid item xs={12} md={12}>
+                                    <TextField
+                                      onChange={(e) => handleQuestionTitleChange(question.id, e.target.value)}
+                                      margin="dense"
+                                      label="Question Title"
+                                      type="string"
+                                      fullWidth
+                                      variant="outlined"
+                                      value={question.title}
+                                    />
+                                  </Grid>
+                                  {question.type === 'radio button group' && (
+                                    <>
+                                      {radioItems.map((item, index) => (
+                                        <>
+                                          <Grid key={item.id} item xs={11} md={11}>
+                                            <TextField
+                                              onChange={(e) => handleRadioItemChange(item.id, e.target.value)}
+                                              margin="dense"
+                                              label={`Item ${index + 1}`}
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={item.item}
+                                            />
+                                          </Grid>
+                                          <Grid item xs={1} md={1}>
+                                            <IconButton aria-label='delete' onClick={() => handleDeleteRadioItem(item.id)}>
+                                              <DeleteIcon />
+                                            </IconButton>
+                                          </Grid>
+                                        </>
+                                      ))}
+                                      <Grid item xs={3} md={3}>
+                                        <Button variant="contained" onClick={addRadioItems}>Add Items</Button>
+                                      </Grid>
+                                    </>
+                                  )}
+                                  <Grid item xs={12} md={12}>
+                                    <FormControl fullWidth>
+                                      <InputLabel id={`question-type-select-${question.id}`}>Type</InputLabel>
+                                      <Select
+                                        labelId={`question-type-select-${question.id}`}
+                                        id={`question-type-select-${question.id}`}
+                                        value={question.type}
+                                        label="Type"
+                                        onChange={(e) => handleQuestionTypeChange(question.id, e.target.value)}
+                                      >
+                                        <MenuItem value ="radio button group">Radio Button Group</MenuItem>
+                                        <MenuItem value ="rating scale">Rating Scale</MenuItem>
+                                        <MenuItem value ="checkboxes">Checkboxes</MenuItem>
+                                        <MenuItem value ="multi-select dropdown">Multi-Select Dropdown</MenuItem>
+                                        <MenuItem value ="yes/no boolean">Yes/No Boolean</MenuItem>
+                                        <MenuItem value ="date">Date</MenuItem>
+                                        <MenuItem value ="time">Time</MenuItem>
+                                        <MenuItem value ="short answers">Short Answers</MenuItem>
+                                        <MenuItem value ="paragraph">Paragraph</MenuItem>
+                                      </Select>
+                                    </FormControl>
+                                  </Grid>
+                                </Grid>
+                              </Card>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
               <Grid item xs={12} md={12}>
-                <Divider variant="middle" />
-              </Grid>
-              {addQuestion()}
-              <Grid item xs={12} md={12}>
-                <Button variant="contained" style={{ width:"100%", height:"100%" }} onClick={addQuestion}>
+                <Button variant="contained" style={{ width:"100%", height:"100%" }} onClick={() => addQuestion("short answers")}>
                   Add Question
                 </Button>
               </Grid>
