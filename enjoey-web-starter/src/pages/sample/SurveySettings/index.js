@@ -30,6 +30,8 @@ import {
 } from "@mui/material";
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 // Global Constants
 const childUrl  = "http://127.0.0.1:8000/api/child/";
@@ -555,7 +557,7 @@ const Page2 = () => {
                                   {question.type === 'radio button group' && (
                                     <>
                                       {radioItems.map((item, index) => (
-                                        <>
+                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                           <Grid key={item.id} item xs={11} md={11}>
                                             <TextField
                                               onChange={(e) => handleRadioItemChange(item.id, e.target.value)}
@@ -568,14 +570,52 @@ const Page2 = () => {
                                             />
                                           </Grid>
                                           <Grid item xs={1} md={1}>
-                                            <IconButton aria-label='delete' onClick={() => handleDeleteRadioItem(item.id)}>
+                                            <Button
+                                              aria-label='delete'
+                                              onClick={() => handleDeleteRadioItem(item.id)}
+                                              style={{ width: "100%", height: "100%" }}
+                                            >
                                               <DeleteIcon />
-                                            </IconButton>
+                                            </Button>
                                           </Grid>
-                                        </>
+                                        </Grid>
                                       ))}
                                       <Grid item xs={3} md={3}>
                                         <Button variant="contained" onClick={addRadioItems}>Add Items</Button>
+                                      </Grid>
+                                    </>
+                                  )}
+                                  {question.type === 'rating scale' && (
+                                    <>
+                                      {radioItems.map((item, index) => (
+                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
+                                          <Grid key={item.id} item xs={11} md={11}>
+                                            <TextField
+                                              onChange={(e) => handleRadioItemChange(item.id, e.target.value)}
+                                              margin="dense"
+                                              label={`Item ${index + 1}`}
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={item.item}
+                                            />
+                                          </Grid>
+                                          <Grid item xs={1} md={1}>
+                                            <Button
+                                              aria-label='delete'
+                                              onClick={() => handleDeleteRadioItem(item.id)}
+                                              style={{ width: "100%", height: "100%" }}
+                                            >
+                                              <DeleteIcon />
+                                            </Button>
+                                          </Grid>
+                                        </Grid>
+                                      ))}
+                                      <Grid item xs={1} md={1}>
+                                        <Button variant="contained" onClick={removeRating}><RemoveCircleIcon/></Button>
+                                      </Grid>
+                                      <Grid item xs={1} md={1}>
+                                        <Button variant="contained" onClick={addRating}><AddCircleIcon/></Button>
                                       </Grid>
                                     </>
                                   )}
