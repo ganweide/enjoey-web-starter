@@ -54,6 +54,7 @@ const Page2 = () => {
   const [endDate, setEndDate]               = useState([]);
   const [questions, setQuestions]           = useState([]);
   const [radioItems, setRadioItems]         = useState([]);
+  const [ratings, setRatings]               = useState([]);
 
   useEffect(() => {
     try {
@@ -223,6 +224,18 @@ const Page2 = () => {
     setRadioItems(updatedRadioItems);
   };
   const handleDeleteRadioItem = (itemId) => {
+    const updatedRadioItems = radioItems.filter(item => item.id !== itemId);
+    setRadioItems(updatedRadioItems);
+  };
+
+  const addRating = () => {
+    const newRating = {
+      id: ratings.length,
+      rating: '',
+    };
+    setRatings([...ratings, newRating]);
+  };
+  const removeRating = () => {
     const updatedRadioItems = radioItems.filter(item => item.id !== itemId);
     setRadioItems(updatedRadioItems);
   };
@@ -587,30 +600,88 @@ const Page2 = () => {
                                   )}
                                   {question.type === 'rating scale' && (
                                     <>
-                                      {radioItems.map((item, index) => (
-                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
-                                          <Grid key={item.id} item xs={11} md={11}>
+                                      <Grid container item spacing={2}>
+                                        <Grid item xs={1.5} md={1.5}>
+                                          <TextField
+                                            onChange={(e) => handleRadioItemChange(rating.id, e.target.value)}
+                                            margin="dense"
+                                            type="string"
+                                            label="Label"
+                                            fullWidth
+                                            variant="outlined"
+                                            value="(Most Unlikely)"
+                                          />
+                                        </Grid>
+                                        {ratings.map((rating, index) => (
+                                          <Grid key={rating.id} item xs={0.5} md={0.5}>
                                             <TextField
-                                              onChange={(e) => handleRadioItemChange(item.id, e.target.value)}
+                                              onChange={(e) => handleRadioItemChange(rating.id, e.target.value)}
                                               margin="dense"
-                                              label={`Item ${index + 1}`}
                                               type="string"
                                               fullWidth
                                               variant="outlined"
-                                              value={item.item}
+                                              value={index+1}
                                             />
                                           </Grid>
-                                          <Grid item xs={1} md={1}>
-                                            <Button
-                                              aria-label='delete'
-                                              onClick={() => handleDeleteRadioItem(item.id)}
-                                              style={{ width: "100%", height: "100%" }}
-                                            >
-                                              <DeleteIcon />
-                                            </Button>
-                                          </Grid>
+                                        ))}
+                                        <Grid item xs={1.5} md={1.5}>
+                                          <TextField
+                                            onChange={(e) => handleRadioItemChange(rating.id, e.target.value)}
+                                            margin="dense"
+                                            type="string"
+                                            label="Label"
+                                            fullWidth
+                                            variant="outlined"
+                                            value="(Most Likely)"
+                                          />
                                         </Grid>
-                                      ))}
+                                      </Grid>
+                                      <Grid item xs={1} md={1}>
+                                        <Button variant="contained" onClick={removeRating}><RemoveCircleIcon/></Button>
+                                      </Grid>
+                                      <Grid item xs={1} md={1}>
+                                        <Button variant="contained" onClick={addRating}><AddCircleIcon/></Button>
+                                      </Grid>
+                                    </>
+                                  )}
+                                  {question.type === 'checkboxes' && (
+                                    <>
+                                      <Grid container item spacing={2}>
+                                        <Grid item xs={1.5} md={1.5}>
+                                          <TextField
+                                            onChange={(e) => handleRadioItemChange(rating.id, e.target.value)}
+                                            margin="dense"
+                                            type="string"
+                                            label="Label"
+                                            fullWidth
+                                            variant="outlined"
+                                            value="(Most Unlikely)"
+                                          />
+                                        </Grid>
+                                        {ratings.map((rating, index) => (
+                                          <Grid key={rating.id} item xs={0.5} md={0.5}>
+                                            <TextField
+                                              onChange={(e) => handleRadioItemChange(rating.id, e.target.value)}
+                                              margin="dense"
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={index+1}
+                                            />
+                                          </Grid>
+                                        ))}
+                                        <Grid item xs={1.5} md={1.5}>
+                                          <TextField
+                                            onChange={(e) => handleRadioItemChange(rating.id, e.target.value)}
+                                            margin="dense"
+                                            type="string"
+                                            label="Label"
+                                            fullWidth
+                                            variant="outlined"
+                                            value="(Most Likely)"
+                                          />
+                                        </Grid>
+                                      </Grid>
                                       <Grid item xs={1} md={1}>
                                         <Button variant="contained" onClick={removeRating}><RemoveCircleIcon/></Button>
                                       </Grid>
