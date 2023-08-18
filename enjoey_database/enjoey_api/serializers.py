@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable
 
 class ChildTableSerializer(serializers.ModelSerializer):
     childId = serializers.CharField(required=False)
@@ -120,4 +120,15 @@ class ImmunizationTableSerializer(serializers.ModelSerializer):
             'mmr',
             'var',
             'hepA',
+        ]
+
+class SurveySettingsTableSerializer(serializers.ModelSerializer):
+    surveyId = serializers.CharField(required=False)
+    class Meta:
+        model = SurveySettingsTable
+        fields = [
+            'surveyId',
+            'surveyTitle',
+            'description',
+            'questions',
         ]

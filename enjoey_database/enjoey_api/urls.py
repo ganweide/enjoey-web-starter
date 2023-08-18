@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView
 from rest_framework import routers
 
 route1 = routers.DefaultRouter()
@@ -26,6 +26,9 @@ route7.register("", SleepCheckView, basename='sleepcheckview')
 route8 = routers.DefaultRouter()
 route8.register("", ImmunizationView, basename='immunizationview')
 
+route9 = routers.DefaultRouter()
+route9.register("", SurveySettingsView, basename='surveysettingsview')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -35,5 +38,6 @@ urlpatterns = [
     path('menu/', include(route6.urls)),
     path('sleep/', include(route7.urls)),
     path('immunization/', include(route8.urls)),
+    path('surveysettings/', include(route9.urls)),
 ]
 

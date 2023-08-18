@@ -36,15 +36,18 @@ import { update } from "lodash";
 
 // Global Constants
 const childUrl  = "http://127.0.0.1:8000/api/child/";
+const surveyUrl  = "http://127.0.0.1:8000/api/surveysettings/";
 
 const Page2 = () => {
   const [open, setOpen]                     = useState(false);
   const [settings, setSettings]             = useState(false);
   const [create, setCreate]                 = useState(false);
+  const [previousSurvey, setPreviousSurvey] = useState([]);
   const [showResult, setShowResult]         = useState([]);
   const [recipientType, setRecipientType]   = useState([]);
   const [sendTo, setSendTo]                 = useState([]);
   const [selectClass, setSelectClass]       = useState([]);
+  const [selectSurvey, setSelectSurvey]     = useState([]);
   const [schoolName, setSchoolName]         = useState([]);
   const [child, setChild]                   = useState([]);
   const [student, setStudent]               = useState([]);
@@ -65,11 +68,57 @@ const Page2 = () => {
   const [multiSelect, setMultiSelect]       = useState([]);
   const [firstBoolean, setFirstBoolean]     = useState(["Yes"]);
   const [secondBoolean, setSecondBoolean]   = useState(["No"]);
+  const [formData, setFormData] = useState({
+    surveyTitle: '',
+    description: '',
+    questions: [], // This should be an array to hold your question data
+  });
+
+  console.log(questions);
+
+  const handleSave = async () => {
+    const updatedFormData = {
+      ...formData,
+      surveyTitle: surveyTitle,
+      description: description,
+      questions: [...questions],
+    };
+    const questionsJson = JSON.stringify(updatedFormData.questions);
+  
+    try {
+      const response = await Axios.post(
+        surveyUrl,
+        {
+          ...updatedFormData,
+          questions: questionsJson,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json"
+          },
+        }
+      );
+      console.log("response", response);
+    } catch (error) {
+      console.log("error", error);
+    }
+    setCreate(false);
+  };
 
   useEffect(() => {
     try {
       Axios.get(childUrl).then((response) => {
         setChild(response.data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      Axios.get(surveyUrl).then((response) => {
+        setPreviousSurvey(response.data);
+        {previousSurvey.map((pre) => (
+          console.log(response.data.questions)
+        ))}
       });
     } catch (error) {
       console.log(error);
@@ -192,6 +241,9 @@ const Page2 = () => {
     setCreate(true);
     setQuestions([]);
   }
+  const handlePreviousSurveyChange = (value) => {
+    setSelectSurvey(value);
+  };
   const addQuestion = (type) => {
     const newQuestion = {
       id: questions.length,
@@ -310,10 +362,6 @@ const Page2 = () => {
     const updatedMultiDropdown = multiDropdown.filter(item => item.id !== itemId);
     setMultiDropdown(updatedMultiDropdown);
   };
-
-  const handleSave = () => {
-    
-  }
 
   return (
     <div>
@@ -586,6 +634,22 @@ const Page2 = () => {
               </Box>
             </Grid>
             <Grid item xs={10} md={10}>
+              <Grid item xs={12} md={12}>
+                <FormControl fullWidth>
+                  <InputLabel id={"survey-title-select"}>Previous Save</InputLabel>
+                  <Select
+                    labelId={'survey-title-select'}
+                    id={'survey-title-select'}
+                    value={selectSurvey}
+                    label="Previous Save"
+                    onChange={(e) => handlePreviousSurveyChange(e.target.value)}
+                  >
+                    {previousSurvey.map((pre) => (
+                      <MenuItem key={pre.surveyId}>{pre.surveyTitle}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
               <Grid item xs={12} md={12}>
                 <TextField
                   onChange  ={(e) => setSurveyTitle(e.target.value)}

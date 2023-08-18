@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer
 from rest_framework.response import Response
 
 class ChildView(viewsets.ModelViewSet):
@@ -184,3 +184,35 @@ class ImmunizationView(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class SurveySettingsView(viewsets.ModelViewSet):
+    queryset = SurveySettingsTable.objects.all().order_by('-created_at')
+    serializer_class = SurveySettingsTableSerializer
+    #all
+    def list(self, request):
+        queryset = SurveySettingsTable.objects.all().order_by('-created_at')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = SurveySettingsTableSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = SurveySettingsTableSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def create(self, request):
+        serializer = SurveySettingsTableSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def update(self, request, pk=None):
+        try:
+            user = SurveySettingsTable.objects.get(surveyId=pk)
+        except SurveySettingsTable.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = SurveySettingsTableSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
