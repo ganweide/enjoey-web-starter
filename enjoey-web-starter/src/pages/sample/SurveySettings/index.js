@@ -71,39 +71,8 @@ const Page2 = () => {
   const [formData, setFormData] = useState({
     surveyTitle: '',
     description: '',
-    questions: [], // This should be an array to hold your question data
+    questions: [],
   });
-
-  console.log(questions);
-
-  const handleSave = async () => {
-    const updatedFormData = {
-      ...formData,
-      surveyTitle: surveyTitle,
-      description: description,
-      questions: [...questions],
-    };
-    const questionsJson = JSON.stringify(updatedFormData.questions);
-  
-    try {
-      const response = await Axios.post(
-        surveyUrl,
-        {
-          ...updatedFormData,
-          questions: questionsJson,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json"
-          },
-        }
-      );
-      console.log("response", response);
-    } catch (error) {
-      console.log("error", error);
-    }
-    setCreate(false);
-  };
 
   useEffect(() => {
     try {
@@ -115,16 +84,63 @@ const Page2 = () => {
     }
     try {
       Axios.get(surveyUrl).then((response) => {
-        setPreviousSurvey(response.data);
-        {previousSurvey.map((pre) => (
-          console.log(response.data.questions)
-        ))}
+        const parsedSurveys = response.data.map((survey) => ({
+          ...survey,
+          questions: JSON.parse(survey.questions),
+        }));
+
+        setPreviousSurvey(parsedSurveys);
       });
     } catch (error) {
       console.log(error);
     }
   }, []);
 
+
+  const handleSave = async () => {
+    const updatedFormData = {
+      ...formData,
+      surveyTitle: surveyTitle,
+      description: description,
+      questions: [...questions],
+    };
+    const questionsJson = JSON.stringify(updatedFormData.questions);
+  
+    try {
+      if (selectSurvey) {
+        const response = await Axios.put(
+          `${surveyUrl}${selectSurvey}/`,
+          {
+            ...updatedFormData,
+            questions: questionsJson,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json"
+            },
+          }
+        );
+        console.log("response", response);
+      } else {
+        const response = await Axios.post(
+          surveyUrl,
+          {
+            ...updatedFormData,
+            questions: questionsJson,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json"
+            },
+          }
+        );
+        console.log("response", response);
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+    setCreate(false);
+  };
   const handleDragEnd = (result) => {
     if (!result.destination) {
       return;
@@ -136,12 +152,16 @@ const Page2 = () => {
   
     setQuestions(reorderedQuestions);
   };
-
   const openDialog = async () => {
     setOpen         (true);
     setRecipientType("");
     setSendTo       ("");
     setSelectClass  ("");
+    setSurveyTitle  ("");
+    setDescription  ("");
+    setSurveyType   ("");
+    setStartDate    ("");
+    setEndDate      ("");
   };
   const openSettings = async () => {
     setSettings   (true);
@@ -240,9 +260,19 @@ const Page2 = () => {
     setOpen(false);
     setCreate(true);
     setQuestions([]);
+    setSelectSurvey("");
   }
   const handlePreviousSurveyChange = (value) => {
     setSelectSurvey(value);
+    const selectedSurveyTitle = previousSurvey.find((survey) => survey.surveyId === value);
+
+    if (selectedSurveyTitle) {
+      setQuestions(selectedSurveyTitle.questions);
+      setSurveyTitle(selectedSurveyTitle.surveyTitle);
+      setDescription(selectedSurveyTitle.description);
+    } else {
+      setQuestions([]);
+    }
   };
   const addQuestion = (type) => {
     const newQuestion = {
@@ -645,7 +675,7 @@ const Page2 = () => {
                     onChange={(e) => handlePreviousSurveyChange(e.target.value)}
                   >
                     {previousSurvey.map((pre) => (
-                      <MenuItem key={pre.surveyId}>{pre.surveyTitle}</MenuItem>
+                      <MenuItem key={pre.surveyId} value={pre.surveyId}>{pre.surveyTitle}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
