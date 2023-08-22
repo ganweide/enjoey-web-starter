@@ -28,34 +28,35 @@ import {
   Card,
   IconButton,
 } from "@mui/material";
+
+// Material UI Icons
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import { update } from "lodash";
 
 // Global Constants
 const childUrl  = "http://127.0.0.1:8000/api/child/";
-const surveyUrl  = "http://127.0.0.1:8000/api/surveysettings/";
+const surveyUrl = "http://127.0.0.1:8000/api/surveysettings/";
 
 const Page2 = () => {
-  const [open, setOpen]                     = useState(false);
-  const [settings, setSettings]             = useState(false);
-  const [create, setCreate]                 = useState(false);
+  const [child, setChild]                   = useState([]);
   const [previousSurvey, setPreviousSurvey] = useState([]);
-  const [showResult, setShowResult]         = useState([]);
+  const [open, setOpen]                     = useState(false);
   const [recipientType, setRecipientType]   = useState([]);
   const [sendTo, setSendTo]                 = useState([]);
   const [selectClass, setSelectClass]       = useState([]);
-  const [selectSurvey, setSelectSurvey]     = useState([]);
   const [schoolName, setSchoolName]         = useState([]);
-  const [child, setChild]                   = useState([]);
   const [student, setStudent]               = useState([]);
   const [surveyTitle, setSurveyTitle]       = useState([]);
   const [description, setDescription]       = useState([]);
   const [surveyType, setSurveyType]         = useState([]);
   const [startDate, setStartDate]           = useState([]);
   const [endDate, setEndDate]               = useState([]);
+  const [settings, setSettings]             = useState(false);
+  const [showResult, setShowResult]         = useState([]);
+  const [create, setCreate]                 = useState(false);
+  const [selectSurvey, setSelectSurvey]     = useState([]);
   const [questions, setQuestions]           = useState([]);
   const [radioItems, setRadioItems]         = useState([]);
   const [ratings, setRatings]               = useState([]);
@@ -96,62 +97,7 @@ const Page2 = () => {
     }
   }, []);
 
-
-  const handleSave = async () => {
-    const updatedFormData = {
-      ...formData,
-      surveyTitle: surveyTitle,
-      description: description,
-      questions: [...questions],
-    };
-    const questionsJson = JSON.stringify(updatedFormData.questions);
-  
-    try {
-      if (selectSurvey) {
-        const response = await Axios.put(
-          `${surveyUrl}${selectSurvey}/`,
-          {
-            ...updatedFormData,
-            questions: questionsJson,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json"
-            },
-          }
-        );
-        console.log("response", response);
-      } else {
-        const response = await Axios.post(
-          surveyUrl,
-          {
-            ...updatedFormData,
-            questions: questionsJson,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json"
-            },
-          }
-        );
-        console.log("response", response);
-      }
-    } catch (error) {
-      console.log("error", error);
-    }
-    setCreate(false);
-  };
-  const handleDragEnd = (result) => {
-    if (!result.destination) {
-      return;
-    }
-  
-    const reorderedQuestions = Array.from(questions);
-    const [reorderedQuestion] = reorderedQuestions.splice(result.source.index, 1);
-    reorderedQuestions.splice(result.destination.index, 0, reorderedQuestion);
-  
-    setQuestions(reorderedQuestions);
-  };
+  // Initialise Survey
   const openDialog = async () => {
     setOpen         (true);
     setRecipientType("");
@@ -256,6 +202,7 @@ const Page2 = () => {
     setOpen(false);
   }
 
+  // Survey Questions
   const openCreate = async () => {
     setOpen(false);
     setCreate(true);
@@ -274,6 +221,17 @@ const Page2 = () => {
       setQuestions([]);
     }
   };
+  const handleDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+  
+    const reorderedQuestions = Array.from(questions);
+    const [reorderedQuestion] = reorderedQuestions.splice(result.source.index, 1);
+    reorderedQuestions.splice(result.destination.index, 0, reorderedQuestion);
+  
+    setQuestions(reorderedQuestions);
+  };
   const addQuestion = (type) => {
     const newQuestion = {
       id: questions.length,
@@ -281,10 +239,6 @@ const Page2 = () => {
       type: type,
     };
     setQuestions([...questions, newQuestion]);
-  };
-  const handleDeleteQuestion = (questionId) => {
-    const updatedQuestions = questions.filter(question => question.id !== questionId);
-    setQuestions(updatedQuestions);
   };
   const handleQuestionTitleChange = (id, value) => {
     const updatedQuestions = questions.map(question =>
@@ -298,10 +252,59 @@ const Page2 = () => {
     );
     setQuestions(updatedQuestions);
   };
+  const handleDeleteQuestion = (questionId) => {
+    const updatedQuestions = questions.filter(question => question.id !== questionId);
+    setQuestions(updatedQuestions);
+  };
+  const handleSave = async () => {
+    const updatedFormData = {
+      ...formData,
+      surveyTitle: surveyTitle,
+      description: description,
+      questions: [...questions],
+    };
+    const questionsJson = JSON.stringify(updatedFormData.questions);
+  
+    try {
+      if (selectSurvey) {
+        const response = await Axios.put(
+          `${surveyUrl}${selectSurvey}/`,
+          {
+            ...updatedFormData,
+            questions: questionsJson,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json"
+            },
+          }
+        );
+        console.log("response", response);
+      } else {
+        const response = await Axios.post(
+          surveyUrl,
+          {
+            ...updatedFormData,
+            questions: questionsJson,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json"
+            },
+          }
+        );
+        console.log("response", response);
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+    setCreate(false);
+  };
   const closeCreate = async () => {
     setCreate(false);
   }
-
+  
+  // Radio Button Group
   const addRadioItems = () => {
     const newRadioItems = {
       id: radioItems.length,
@@ -320,6 +323,7 @@ const Page2 = () => {
     setRadioItems(updatedRadioItems);
   };
 
+  // Rating Scale
   const handleRatingItemChange = (id, value) => {
     const updatedRating = ratings.map(rating =>
       rating.id === id ? { ...rating, rating: value } : rating
@@ -339,6 +343,7 @@ const Page2 = () => {
     setRatings(updatedRating);
   };
 
+  // Checkboxes
   const addCheckbox = () => {
     const newCheckbox = {
       id: checkbox.length,
@@ -357,6 +362,7 @@ const Page2 = () => {
     setCheckbox(updatedCheckbox);
   };
 
+  // Dropdown
   const addDropdown = () => {
     const newDropdown = {
       id: dropdown.length,
@@ -375,6 +381,7 @@ const Page2 = () => {
     setDropdown(updatedDropdown);
   };
 
+  // Multi-Select dropdown
   const addMultiDropdown = () => {
     const newMultiDropdown = {
       id: multiDropdown.length,
@@ -587,8 +594,8 @@ const Page2 = () => {
       </Dialog>
       {/* Survey Questions */}
       <Dialog
-        maxWidth          ="xl"
         fullWidth
+        maxWidth          ="xl"
         open              ={create}
         onClose           ={closeCreate}
         aria-labelledby   ="alert-dialog-title"
@@ -599,6 +606,7 @@ const Page2 = () => {
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
+            {/* Question Types Buttons */}
             <Grid item xs={2} md={2}>
               <Box height="400px" display="flex" flexDirection="column">
                 <Button
@@ -664,6 +672,7 @@ const Page2 = () => {
               </Box>
             </Grid>
             <Grid item xs={10} md={10}>
+              {/* Select Survey */}
               <Grid item xs={12} md={12}>
                 <FormControl fullWidth>
                   <InputLabel id={"survey-title-select"}>Previous Save</InputLabel>
@@ -680,6 +689,7 @@ const Page2 = () => {
                   </Select>
                 </FormControl>
               </Grid>
+              {/* Survey Title */}
               <Grid item xs={12} md={12}>
                 <TextField
                   onChange  ={(e) => setSurveyTitle(e.target.value)}
@@ -691,6 +701,7 @@ const Page2 = () => {
                   value     ={surveyTitle}
                 />
               </Grid>
+              {/* Survey Description */}
               <Grid item xs={12} md={12}>
                 <TextField
                   onChange  ={(e) => setDescription(e.target.value)}
@@ -702,6 +713,7 @@ const Page2 = () => {
                   value     ={description}
                 />
               </Grid>
+              {/* Survey Question with Drag and Drop */}
               <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="questions-list" direction="vertical">
                   {(provided) => (
@@ -721,10 +733,12 @@ const Page2 = () => {
                               {...provided.dragHandleProps}
                             >
                               <Card key={question.id} style={{ margin: '10px', padding: '10px' }}>
+                                {/* Delete Question Button */}
                                 <IconButton aria-label='delete' onClick={() => handleDeleteQuestion(question.id)}>
                                   <DeleteIcon />
                                 </IconButton>
                                 <Grid container spacing={2}>
+                                  {/* Question Title */}
                                   <Grid item xs={12} md={12}>
                                     <TextField
                                       onChange={(e) => handleQuestionTitleChange(question.id, e.target.value)}
@@ -736,6 +750,7 @@ const Page2 = () => {
                                       value={question.title}
                                     />
                                   </Grid>
+                                  {/* Question Type */}
                                   <Grid item xs={12} md={12}>
                                     <FormControl fullWidth>
                                       <InputLabel id={`question-type-select-${question.id}`}>Type</InputLabel>
@@ -759,6 +774,7 @@ const Page2 = () => {
                                       </Select>
                                     </FormControl>
                                   </Grid>
+                                  {/* Conditions for each question types */}
                                   {question.type === 'radio button group' && (
                                     <>
                                       {radioItems.map((item, index) => (
@@ -997,6 +1013,7 @@ const Page2 = () => {
                   )}
                 </Droppable>
               </DragDropContext>
+              {/* Add Question Button */}
               <Grid item xs={12} md={12}>
                 <Button variant="contained" style={{ width:"100%", height:"100%" }} onClick={() => addQuestion("short answers")}>
                   Add Question

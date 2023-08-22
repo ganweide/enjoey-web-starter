@@ -184,28 +184,6 @@ class InjuryTable(models.Model):
     updated_at  = models.DateTimeField("updated_at", auto_now=True)
     deleted_at  = models.DateTimeField("deleted_at", null=True, blank=True)
 
-# class ChargesTable(models.Model):
-#     student     = models.CharField(max_length=250)
-#     category    = models.CharField(max_length=250)
-#     description = models.CharField(max_length=250)
-#     notes       = models.CharField(max_length=250, null=True)
-#     amount      = models.CharField(max_length=250)
-#     date        = models.CharField(max_length=250)
-#     created_at  = models.DateTimeField("created_at", auto_now_add=True)
-#     updated_at  = models.DateTimeField("updated_at", auto_now=True)
-#     deleted_at  = models.DateTimeField("deleted_at", null=True, blank=True)
-
-# class ChargesLibraryTable(models.Model):
-#     student     = models.CharField(max_length=250)
-#     category    = models.CharField(max_length=250)
-#     description = models.CharField(max_length=250)
-#     notes       = models.CharField(max_length=250, null=True)
-#     amount      = models.CharField(max_length=250)
-#     date        = models.CharField(max_length=250)
-#     created_at  = models.DateTimeField("created_at", auto_now_add=True)
-#     updated_at  = models.DateTimeField("updated_at", auto_now=True)
-#     deleted_at  = models.DateTimeField("deleted_at", null=True, blank=True)
-
 class SurveySettingsTable(models.Model):
     surveyId            = models.CharField(primary_key=True, db_index=True, max_length=250)
     surveyTitle         = models.CharField(max_length=250)
