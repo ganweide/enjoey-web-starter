@@ -74,6 +74,7 @@ const Page2 = () => {
     description: '',
     questions: [],
   });
+  const [preview, setPreview]                 = useState(false);
 
   useEffect(() => {
     try {
@@ -219,6 +220,8 @@ const Page2 = () => {
       setDescription(selectedSurveyTitle.description);
     } else {
       setQuestions([]);
+      setSurveyTitle("");
+      setDescription("");
     }
   };
   const handleDragEnd = (result) => {
@@ -237,6 +240,7 @@ const Page2 = () => {
       id: questions.length,
       title: '',
       type: type,
+      more: [],
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -251,6 +255,111 @@ const Page2 = () => {
       question.id === id ? { ...question, type: value } : question
     );
     setQuestions(updatedQuestions);
+  };
+  // Radio Button Group
+  const addRadioItems = (id) => {
+    const newRadioItems = {
+      id: radioItems.length,
+      item: '',
+    };
+    setRadioItems([...radioItems, newRadioItems]);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, more: [...question.more, newRadioItems] } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+  const handleRadioItemChange = (questionId, radioId, value) => {
+    const updatedRadioItems = radioItems.map(item =>
+      item.id === radioId ? { ...item, item: value } : item
+    );
+    setRadioItems(updatedRadioItems);
+    const updatedQuestions = questions.map(question => {
+      if (question.id === questionId) {
+        const updatedMore = question.more.map(more =>
+          more.id === radioId ? { ...more, item: value } : more
+        );
+        return { ...question, more: updatedMore };
+      }
+      return question;
+    });
+    setQuestions(updatedQuestions);
+  };
+  const handleDeleteRadioItem = (itemId) => {
+    const updatedRadioItems = radioItems.filter(item => item.id !== itemId);
+    setRadioItems(updatedRadioItems);
+  };
+  // Rating Scale
+  const handleRatingItemChange = (id, value) => {
+    const updatedRating = ratings.map(rating =>
+      rating.id === id ? { ...rating, rating: value } : rating
+    );
+    setRatings(updatedRating);
+  };
+  const addRating = () => {
+    const newRating = {
+      id: ratings.length,
+      rating: '',
+    };
+    setRatings([...ratings, newRating]);
+  };
+  const removeRating = () => {
+    const updatedRating = [...ratings];
+    updatedRating.pop();
+    setRatings(updatedRating);
+  };
+  // Checkboxes
+  const addCheckbox = () => {
+    const newCheckbox = {
+      id: checkbox.length,
+      item: '',
+    };
+    setCheckbox([...checkbox, newCheckbox]);
+  };
+  const handleCheckboxChange = (id, value) => {
+    const updatedCheckbox = checkbox.map(item =>
+      item.id === id ? { ...item, item: value } : item
+    );
+    setCheckbox(updatedCheckbox);
+  };
+  const handleDeleteCheckbox = (itemId) => {
+    const updatedCheckbox = checkbox.filter(item => item.id !== itemId);
+    setCheckbox(updatedCheckbox);
+  };
+  // Dropdown
+  const addDropdown = () => {
+    const newDropdown = {
+      id: dropdown.length,
+      item: '',
+    };
+    setDropdown([...dropdown, newDropdown]);
+  };
+  const handleDropdownChange = (id, value) => {
+    const updatedDropdown = dropdown.map(item =>
+      item.id === id ? { ...item, item: value } : item
+    );
+    setDropdown(updatedDropdown);
+  };
+  const handleDeleteDropdown = (itemId) => {
+    const updatedDropdown = dropown.filter(item => item.id !== itemId);
+    setDropdown(updatedDropdown);
+  };
+  // Multi-Select dropdown
+  const addMultiDropdown = () => {
+    const newMultiDropdown = {
+      id: multiDropdown.length,
+      item: '',
+    };
+    setMultiDropdown([...multiDropdown, newMultiDropdown]);
+  };
+  const handleMultiDropdownChange = (id, value) => {
+    const updatedMultiDropdown = multiDropdown.map(item =>
+      item.id === id ? { ...item, item: value } : item
+    );
+    setMultiDropdown(updatedMultiDropdown);
+  };
+  const handleDeleteMultiDropdown = (itemId) => {
+    const updatedMultiDropdown = multiDropdown.filter(item => item.id !== itemId);
+    setMultiDropdown(updatedMultiDropdown);
   };
   const handleDeleteQuestion = (questionId) => {
     const updatedQuestions = questions.filter(question => question.id !== questionId);
@@ -300,105 +409,16 @@ const Page2 = () => {
     }
     setCreate(false);
   };
+  const handlePreview = async () => {
+    setPreview(true);
+  };
   const closeCreate = async () => {
     setCreate(false);
   }
-  
-  // Radio Button Group
-  const addRadioItems = () => {
-    const newRadioItems = {
-      id: radioItems.length,
-      item: '',
-    };
-    setRadioItems([...radioItems, newRadioItems]);
-  };
-  const handleRadioItemChange = (id, value) => {
-    const updatedRadioItems = radioItems.map(item =>
-      item.id === id ? { ...item, item: value } : item
-    );
-    setRadioItems(updatedRadioItems);
-  };
-  const handleDeleteRadioItem = (itemId) => {
-    const updatedRadioItems = radioItems.filter(item => item.id !== itemId);
-    setRadioItems(updatedRadioItems);
-  };
 
-  // Rating Scale
-  const handleRatingItemChange = (id, value) => {
-    const updatedRating = ratings.map(rating =>
-      rating.id === id ? { ...rating, rating: value } : rating
-    );
-    setRatings(updatedRating);
-  };
-  const addRating = () => {
-    const newRating = {
-      id: ratings.length,
-      rating: '',
-    };
-    setRatings([...ratings, newRating]);
-  };
-  const removeRating = () => {
-    const updatedRating = [...ratings];
-    updatedRating.pop();
-    setRatings(updatedRating);
-  };
-
-  // Checkboxes
-  const addCheckbox = () => {
-    const newCheckbox = {
-      id: checkbox.length,
-      item: '',
-    };
-    setCheckbox([...checkbox, newCheckbox]);
-  };
-  const handleCheckboxChange = (id, value) => {
-    const updatedCheckbox = checkbox.map(item =>
-      item.id === id ? { ...item, item: value } : item
-    );
-    setCheckbox(updatedCheckbox);
-  };
-  const handleDeleteCheckbox = (itemId) => {
-    const updatedCheckbox = checkbox.filter(item => item.id !== itemId);
-    setCheckbox(updatedCheckbox);
-  };
-
-  // Dropdown
-  const addDropdown = () => {
-    const newDropdown = {
-      id: dropdown.length,
-      item: '',
-    };
-    setDropdown([...dropdown, newDropdown]);
-  };
-  const handleDropdownChange = (id, value) => {
-    const updatedDropdown = dropdown.map(item =>
-      item.id === id ? { ...item, item: value } : item
-    );
-    setDropdown(updatedDropdown);
-  };
-  const handleDeleteDropdown = (itemId) => {
-    const updatedDropdown = dropown.filter(item => item.id !== itemId);
-    setDropdown(updatedDropdown);
-  };
-
-  // Multi-Select dropdown
-  const addMultiDropdown = () => {
-    const newMultiDropdown = {
-      id: multiDropdown.length,
-      item: '',
-    };
-    setMultiDropdown([...multiDropdown, newMultiDropdown]);
-  };
-  const handleMultiDropdownChange = (id, value) => {
-    const updatedMultiDropdown = multiDropdown.map(item =>
-      item.id === id ? { ...item, item: value } : item
-    );
-    setMultiDropdown(updatedMultiDropdown);
-  };
-  const handleDeleteMultiDropdown = (itemId) => {
-    const updatedMultiDropdown = multiDropdown.filter(item => item.id !== itemId);
-    setMultiDropdown(updatedMultiDropdown);
-  };
+  const closePreview = async () => {
+    setPreview(false);
+  }
 
   return (
     <div>
@@ -606,7 +626,7 @@ const Page2 = () => {
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            {/* Question Types Buttons */}
+            {/* Question Types Buttons (Left column) */}
             <Grid item xs={2} md={2}>
               <Box height="400px" display="flex" flexDirection="column">
                 <Button
@@ -683,6 +703,7 @@ const Page2 = () => {
                     label="Previous Save"
                     onChange={(e) => handlePreviousSurveyChange(e.target.value)}
                   >
+                    <MenuItem value=''><em>None</em></MenuItem>
                     {previousSurvey.map((pre) => (
                       <MenuItem key={pre.surveyId} value={pre.surveyId}>{pre.surveyTitle}</MenuItem>
                     ))}
@@ -781,7 +802,7 @@ const Page2 = () => {
                                         <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                           <Grid key={item.id} item xs={11} md={11}>
                                             <TextField
-                                              onChange={(e) => handleRadioItemChange(item.id, e.target.value)}
+                                              onChange={(e) => handleRadioItemChange(question.id, item.id, e.target.value)}
                                               margin="dense"
                                               label={`Item ${index + 1}`}
                                               type="string"
@@ -802,7 +823,7 @@ const Page2 = () => {
                                         </Grid>
                                       ))}
                                       <Grid item xs={3} md={3}>
-                                        <Button variant="contained" onClick={addRadioItems}>Add Items</Button>
+                                        <Button variant="contained" onClick={() => addRadioItems(question.id)}>Add Items</Button>
                                       </Grid>
                                     </>
                                   )}
@@ -1020,6 +1041,41 @@ const Page2 = () => {
                 </Button>
               </Grid>
             </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Grid container spacing={2} justifyContent="flex-end">
+            <Grid item>
+              <Button onClick={handlePreview}>Preview</Button>
+            </Grid>
+            <Grid item>
+              <Button onClick={handleSave}>Save</Button>
+            </Grid>
+          </Grid>
+        </DialogActions>
+      </Dialog>
+      {/* Survey Preview */}
+      <Dialog
+        fullWidth
+        maxWidth          ="xl"
+        open              ={preview}
+        onClose           ={closePreview}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2" gutterBottom>{surveyTitle}</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+              {questions.map((question) => {
+                console.log(question);
+                return (
+                  <Grid key={question.id} item xs={10} md={10}>
+                    banana
+                  </Grid>
+                )
+              })}
           </Grid>
         </DialogContent>
         <DialogActions>
