@@ -64,7 +64,7 @@ const Page2 = () => {
   const [endLabel, setEndLabel]             = useState(["Most Likely"]);
   const [checkbox, setCheckbox]             = useState([]);
   const [dropdown, setDropdown]             = useState([]);
-  const [singleSelect, setSingleSelect]     = useState([]);
+  const [singleSelect, setSingleSelect]     = useState("");
   const [multiDropdown, setMultiDropdown]   = useState([]);
   const [multiSelect, setMultiSelect]       = useState([]);
   const [firstBoolean, setFirstBoolean]     = useState(["Yes"]);
@@ -308,54 +308,96 @@ const Page2 = () => {
     setRatings(updatedRating);
   };
   // Checkboxes
-  const addCheckbox = () => {
+  const addCheckbox = (id) => {
     const newCheckbox = {
       id: checkbox.length,
       item: '',
     };
     setCheckbox([...checkbox, newCheckbox]);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, more: [...question.more, newCheckbox] } : question
+    );
+    setQuestions(updatedQuestions);
   };
-  const handleCheckboxChange = (id, value) => {
+  const handleCheckboxChange = (questionId, checkboxId, value) => {
     const updatedCheckbox = checkbox.map(item =>
-      item.id === id ? { ...item, item: value } : item
+      item.id === checkboxId ? { ...item, item: value } : item
     );
     setCheckbox(updatedCheckbox);
+    const updatedQuestions = questions.map(question => {
+      if (question.id === questionId) {
+        const updatedMore = question.more.map(more =>
+          more.id === checkboxId ? { ...more, item: value } : more
+        );
+        return { ...question, more: updatedMore };
+      }
+      return question;
+    });
+    setQuestions(updatedQuestions);
   };
   const handleDeleteCheckbox = (itemId) => {
     const updatedCheckbox = checkbox.filter(item => item.id !== itemId);
     setCheckbox(updatedCheckbox);
   };
   // Dropdown
-  const addDropdown = () => {
+  const addDropdown = (id) => {
     const newDropdown = {
       id: dropdown.length,
       item: '',
     };
     setDropdown([...dropdown, newDropdown]);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, more: [...question.more, newDropdown] } : question
+    );
+    setQuestions(updatedQuestions);
   };
-  const handleDropdownChange = (id, value) => {
+  const handleDropdownChange = (questionId, dropdownId, value) => {
     const updatedDropdown = dropdown.map(item =>
-      item.id === id ? { ...item, item: value } : item
+      item.id === dropdownId ? { ...item, item: value } : item
     );
     setDropdown(updatedDropdown);
+    const updatedQuestions = questions.map(question => {
+      if (question.id === questionId) {
+        const updatedMore = question.more.map(more =>
+          more.id === dropdownId ? { ...more, item: value } : more
+        );
+        return { ...question, more: updatedMore };
+      }
+      return question;
+    });
+    setQuestions(updatedQuestions);
   };
   const handleDeleteDropdown = (itemId) => {
     const updatedDropdown = dropown.filter(item => item.id !== itemId);
     setDropdown(updatedDropdown);
   };
   // Multi-Select dropdown
-  const addMultiDropdown = () => {
+  const addMultiDropdown = (id) => {
     const newMultiDropdown = {
       id: multiDropdown.length,
       item: '',
     };
     setMultiDropdown([...multiDropdown, newMultiDropdown]);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, more: [...question.more, newMultiDropdown] } : question
+    );
+    setQuestions(updatedQuestions);
   };
-  const handleMultiDropdownChange = (id, value) => {
+  const handleMultiDropdownChange = (questionId, multiDropdownId, value) => {
     const updatedMultiDropdown = multiDropdown.map(item =>
-      item.id === id ? { ...item, item: value } : item
+      item.id === multiDropdownId ? { ...item, item: value } : item
     );
     setMultiDropdown(updatedMultiDropdown);
+    const updatedQuestions = questions.map(question => {
+      if (question.id === questionId) {
+        const updatedMore = question.more.map(more =>
+          more.id === multiDropdownId ? { ...more, item: value } : more
+        );
+        return { ...question, more: updatedMore };
+      }
+      return question;
+    });
+    setQuestions(updatedQuestions);
   };
   const handleDeleteMultiDropdown = (itemId) => {
     const updatedMultiDropdown = multiDropdown.filter(item => item.id !== itemId);
@@ -879,7 +921,7 @@ const Page2 = () => {
                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                          <Grid key={item.id} item xs={11} md={11}>
                                            <TextField
-                                             onChange={(e) => handleCheckboxChange(item.id, e.target.value)}
+                                             onChange={(e) => handleCheckboxChange(question.id, item.id, e.target.value)}
                                              margin="dense"
                                              label={`Item ${index + 1}`}
                                              type="string"
@@ -900,7 +942,7 @@ const Page2 = () => {
                                        </Grid>
                                      ))}
                                      <Grid item xs={3} md={3}>
-                                       <Button variant="contained" onClick={addCheckbox}>Add Items</Button>
+                                       <Button variant="contained" onClick={() => addCheckbox(question.id)}>Add Items</Button>
                                      </Grid>
                                     </>
                                   )}
@@ -926,7 +968,7 @@ const Page2 = () => {
                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                          <Grid key={item.id} item xs={11} md={11}>
                                            <TextField
-                                             onChange={(e) => handleDropdownChange(item.id, e.target.value)}
+                                             onChange={(e) => handleDropdownChange(question.id, item.id, e.target.value)}
                                              margin="dense"
                                              label={`Item ${index + 1}`}
                                              type="string"
@@ -947,7 +989,7 @@ const Page2 = () => {
                                        </Grid>
                                      ))}
                                      <Grid item xs={3} md={3}>
-                                       <Button variant="contained" onClick={addDropdown}>Add Items</Button>
+                                       <Button variant="contained" onClick={() => addDropdown(question.id)}>Add Items</Button>
                                      </Grid>
                                     </>
                                   )}
@@ -974,7 +1016,7 @@ const Page2 = () => {
                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                          <Grid key={item.id} item xs={11} md={11}>
                                            <TextField
-                                             onChange={(e) => handleMultiDropdownChange(item.id, e.target.value)}
+                                             onChange={(e) => handleMultiDropdownChange(questions.id, item.id, e.target.value)}
                                              margin="dense"
                                              label={`Item ${index + 1}`}
                                              type="string"
@@ -995,7 +1037,7 @@ const Page2 = () => {
                                        </Grid>
                                      ))}
                                      <Grid item xs={3} md={3}>
-                                       <Button variant="contained" onClick={addMultiDropdown}>Add Items</Button>
+                                       <Button variant="contained" onClick={() => addMultiDropdown(question.id)}>Add Items</Button>
                                      </Grid>
                                     </>
                                   )}
