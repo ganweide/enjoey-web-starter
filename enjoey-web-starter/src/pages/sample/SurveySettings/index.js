@@ -27,6 +27,9 @@ import {
   Typography,
   Card,
   IconButton,
+  FormLabel,
+  RadioGroup,
+  Radio,
 } from "@mui/material";
 
 // Material UI Icons
@@ -1016,7 +1019,7 @@ const Page2 = () => {
                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                          <Grid key={item.id} item xs={11} md={11}>
                                            <TextField
-                                             onChange={(e) => handleMultiDropdownChange(questions.id, item.id, e.target.value)}
+                                             onChange={(e) => handleMultiDropdownChange(question.id, item.id, e.target.value)}
                                              margin="dense"
                                              label={`Item ${index + 1}`}
                                              type="string"
@@ -1113,8 +1116,90 @@ const Page2 = () => {
               {questions.map((question) => {
                 console.log(question);
                 return (
-                  <Grid key={question.id} item xs={10} md={10}>
-                    banana
+                  <Grid item container key={question.id} xs={12} md={12}>
+                    {question.type === "radio button group" ? (
+                      <Grid item xs={12} md={12}>
+                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                        <FormControl component="fieldset" fullWidth>
+                          <RadioGroup>
+                            {question.more.map((more) => (
+                              <Grid key={more.id} item xs={12} md={12}>
+                                <FormControlLabel
+                                  value={more.item}
+                                  control={<Radio />}
+                                  label={more.item} />
+                              </Grid>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                      </Grid>
+                    ) : question.type === "checkboxes" ? (
+                      <Grid item xs={12} md={12}>
+                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                        <FormGroup>
+                          {question.more.map((more) => (
+                            <FormControlLabel
+                              key     ={more.id}
+                              control ={<Checkbox />}
+                              label   ={more.item}
+                            />
+                          ))}
+                        </FormGroup>
+                      </Grid>
+                    ) : question.type === "dropdown" ? (
+                      <Grid item xs={12} md={12}>
+                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                        <FormControl fullWidth>
+                          <Select
+                            id="dropdown"
+                            value={singleSelect}
+                            onChange={(e) => setSingleSelect(e.target.value)}
+                          >
+                            {question.more.map((more) => (
+                              <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    ) : question.type === "multi-select dropdown" ? (
+                      <Grid item xs={12} md={12}>
+                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                        <FormControl fullWidth>
+                          <Select
+                            multiple
+                            id="multi-select-dropdown"
+                            value={multiSelect}
+                            onChange={(e) => setMultiSelect(e.target.value)}
+                          >
+                            {question.more.map((more) => (
+                              <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    ) : question.type === "short answers" ? (
+                      <Grid item xs={12} md={12}>
+                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                        <TextField
+                          margin    ="dense"
+                          type      ="string"
+                          fullWidth
+                          variant   ="outlined"
+                        />
+                      </Grid>
+                    ) : question.type === "paragraph" ? (
+                      <Grid item xs={12} md={12}>
+                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                        <TextField
+                          fullWidth
+                          multiline
+                          rows={4}
+                          margin    ="dense"
+                          type      ="text"
+                          variant   ="outlined"
+                        />
+                      </Grid>
+                    ) : null}
                   </Grid>
                 )
               })}
