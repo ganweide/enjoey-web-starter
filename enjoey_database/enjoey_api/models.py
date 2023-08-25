@@ -188,7 +188,7 @@ class SurveySettingsTable(models.Model):
     surveyId            = models.CharField(primary_key=True, db_index=True, max_length=250)
     surveyTitle         = models.CharField(max_length=250)
     description         = models.CharField(max_length=250)
-    questions           = models.CharField(max_length=250)
+    questions           = models.CharField()
     created_at          = models.DateTimeField("created_at", auto_now_add=True)
     updated_at          = models.DateTimeField("updated_at", auto_now=True)
     deleted_at          = models.DateTimeField("deleted_at", null=True, blank=True)

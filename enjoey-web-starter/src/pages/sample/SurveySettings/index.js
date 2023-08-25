@@ -30,6 +30,8 @@ import {
   FormLabel,
   RadioGroup,
   Radio,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 
 // Material UI Icons
@@ -63,15 +65,15 @@ const Page2 = () => {
   const [questions, setQuestions]           = useState([]);
   const [radioItems, setRadioItems]         = useState([]);
   const [ratings, setRatings]               = useState([]);
-  const [startLabel, setStartLabel]         = useState(["Most Unlikely"]);
-  const [endLabel, setEndLabel]             = useState(["Most Likely"]);
+  const [startLabel, setStartLabel]         = useState("Most Unlikely");
+  const [endLabel, setEndLabel]             = useState("Most Likely");
   const [checkbox, setCheckbox]             = useState([]);
   const [dropdown, setDropdown]             = useState([]);
   const [singleSelect, setSingleSelect]     = useState("");
   const [multiDropdown, setMultiDropdown]   = useState([]);
   const [multiSelect, setMultiSelect]       = useState([]);
-  const [firstBoolean, setFirstBoolean]     = useState(["Yes"]);
-  const [secondBoolean, setSecondBoolean]   = useState(["No"]);
+  const [firstBoolean, setFirstBoolean]     = useState("Yes");
+  const [secondBoolean, setSecondBoolean]   = useState("No");
   const [formData, setFormData] = useState({
     surveyTitle: '',
     description: '',
@@ -218,6 +220,7 @@ const Page2 = () => {
     const selectedSurveyTitle = previousSurvey.find((survey) => survey.surveyId === value);
 
     if (selectedSurveyTitle) {
+      console.log("selected", selectedSurveyTitle);
       setQuestions(selectedSurveyTitle.questions);
       setSurveyTitle(selectedSurveyTitle.surveyTitle);
       setDescription(selectedSurveyTitle.description);
@@ -244,6 +247,7 @@ const Page2 = () => {
       title: '',
       type: type,
       more: [],
+      label: [],
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -292,18 +296,33 @@ const Page2 = () => {
     setRadioItems(updatedRadioItems);
   };
   // Rating Scale
-  const handleRatingItemChange = (id, value) => {
-    const updatedRating = ratings.map(rating =>
-      rating.id === id ? { ...rating, rating: value } : rating
-    );
-    setRatings(updatedRating);
-  };
-  const addRating = () => {
+  const addRating = (id) => {
     const newRating = {
       id: ratings.length,
-      rating: '',
+      rating: ratings.length + 1,
     };
     setRatings([...ratings, newRating]);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, more: [...question.more, newRating], label: [startLabel, endLabel] } : question
+    );
+    setQuestions(updatedQuestions);
+    console.log("updated", updatedQuestions);
+  };
+  const handleRatingItemChange = (questionId, ratingId, value) => {
+    const updatedRating = ratings.map(rating =>
+      rating.id === ratingId ? { ...rating, rating: value } : rating
+    );
+    setRatings(updatedRating);
+    const updatedQuestions = questions.map(question => {
+      if (question.id === questionId) {
+        const updatedMore = question.more.map(more =>
+          more.id === ratingId ? { ...more, item: value } : more
+        );
+        return { ...question, more: updatedMore };
+      }
+      return question;
+    });
+    setQuestions(updatedQuestions);
   };
   const removeRating = () => {
     const updatedRating = [...ratings];
@@ -418,7 +437,6 @@ const Page2 = () => {
       questions: [...questions],
     };
     const questionsJson = JSON.stringify(updatedFormData.questions);
-  
     try {
       if (selectSurvey) {
         const response = await Axios.put(
@@ -843,7 +861,7 @@ const Page2 = () => {
                                   {/* Conditions for each question types */}
                                   {question.type === 'radio button group' && (
                                     <>
-                                      {radioItems.map((item, index) => (
+                                      {question.more ? (question.more.map((item, index) => (
                                         <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                           <Grid key={item.id} item xs={11} md={11}>
                                             <TextField
@@ -866,6 +884,55 @@ const Page2 = () => {
                                             </Button>
                                           </Grid>
                                         </Grid>
+                                      ))) : (
+                                        radioItems.map((item, index) => (
+                                          <Grid container item key={item.id} xs={12} md={12} spacing={2}>
+                                            <Grid key={item.id} item xs={11} md={11}>
+                                              <TextField
+                                                onChange={(e) => handleRadioItemChange(question.id, item.id, e.target.value)}
+                                                margin="dense"
+                                                label={`Item ${index + 1}`}
+                                                type="string"
+                                                fullWidth
+                                                variant="outlined"
+                                                value={item.item}
+                                              />
+                                            </Grid>
+                                            <Grid item xs={1} md={1}>
+                                              <Button
+                                                aria-label='delete'
+                                                onClick={() => handleDeleteRadioItem(item.id)}
+                                                style={{ width: "100%", height: "100%" }}
+                                              >
+                                                <DeleteIcon />
+                                              </Button>
+                                            </Grid>
+                                          </Grid>
+                                        ))
+                                      )}
+                                      {radioItems.map((item, index) => (
+                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
+                                          <Grid key={item.id} item xs={11} md={11}>
+                                            <TextField
+                                              onChange={(e) => handleRadioItemChange(question.id, item.id, e.target.value)}
+                                              margin="dense"
+                                              label={`Item ${index + 1}`}
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={question.more.item || item.item}
+                                            />
+                                          </Grid>
+                                          <Grid item xs={1} md={1}>
+                                            <Button
+                                              aria-label='delete'
+                                              onClick={() => handleDeleteRadioItem(item.id)}
+                                              style={{ width: "100%", height: "100%" }}
+                                            >
+                                              <DeleteIcon />
+                                            </Button>
+                                          </Grid>
+                                        </Grid>
                                       ))}
                                       <Grid item xs={3} md={3}>
                                         <Button variant="contained" onClick={() => addRadioItems(question.id)}>Add Items</Button>
@@ -874,6 +941,7 @@ const Page2 = () => {
                                   )}
                                   {question.type === 'rating scale' && (
                                     <>
+                                      {console.log(question.label)}
                                       <Grid container item spacing={2}>
                                         <Grid item xs={1.5} md={1.5}>
                                           <TextField
@@ -886,15 +954,15 @@ const Page2 = () => {
                                             value={startLabel}
                                           />
                                         </Grid>
-                                        {ratings.map((rating, index) => (
+                                        {ratings.map((rating) => (
                                           <Grid key={rating.id} item xs={0.5} md={0.5}>
                                             <TextField
-                                              onChange={(e) => handleRatingItemChange(rating.id, e.target.value)}
+                                              onChange={(e) => handleRatingItemChange(question.id, rating.id, e.target.value)}
                                               margin="dense"
                                               type="string"
                                               fullWidth
                                               variant="outlined"
-                                              value={index+1}
+                                              value={rating.rating}
                                             />
                                           </Grid>
                                         ))}
@@ -914,7 +982,7 @@ const Page2 = () => {
                                         <Button variant="contained" onClick={removeRating}><RemoveCircleIcon/></Button>
                                       </Grid>
                                       <Grid item xs={1} md={1}>
-                                        <Button variant="contained" onClick={addRating}><AddCircleIcon/></Button>
+                                        <Button variant="contained" onClick={(e) => addRating(question.id)}><AddCircleIcon/></Button>
                                       </Grid>
                                     </>
                                   )}
@@ -1102,107 +1170,147 @@ const Page2 = () => {
       {/* Survey Preview */}
       <Dialog
         fullWidth
-        maxWidth          ="xl"
+        maxWidth          ="md"
         open              ={preview}
         onClose           ={closePreview}
         aria-labelledby   ="alert-dialog-title"
         aria-describedby  ="alert-dialog-description"
       >
         <DialogTitle>
-          <Typography variant="h2" gutterBottom>{surveyTitle}</Typography>
+          <Typography variant="h2" gutterBottom>{`${surveyTitle}'s Preview`}</Typography>
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
-              {questions.map((question) => {
-                console.log(question);
-                return (
-                  <Grid item container key={question.id} xs={12} md={12}>
-                    {question.type === "radio button group" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <FormControl component="fieldset" fullWidth>
-                          <RadioGroup>
-                            {question.more.map((more) => (
-                              <Grid key={more.id} item xs={12} md={12}>
-                                <FormControlLabel
-                                  value={more.item}
-                                  control={<Radio />}
-                                  label={more.item} />
-                              </Grid>
-                            ))}
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
-                    ) : question.type === "checkboxes" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <FormGroup>
+            {questions.map((question) => {
+              return (
+                <Grid item key={question.id} xs={12} md={12}>
+                  {question.type === "radio button group" ? (
+                    <Grid item xs={12} md={12}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <FormControl component="fieldset" fullWidth>
+                        <RadioGroup>
                           {question.more.map((more) => (
-                            <FormControlLabel
-                              key     ={more.id}
-                              control ={<Checkbox />}
-                              label   ={more.item}
-                            />
+                            <Grid key={more.id} item xs={12} md={12}>
+                              <FormControlLabel
+                                value={more.item}
+                                control={<Radio />}
+                                label={more.item} />
+                            </Grid>
                           ))}
-                        </FormGroup>
-                      </Grid>
-                    ) : question.type === "dropdown" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <FormControl fullWidth>
-                          <Select
-                            id="dropdown"
-                            value={singleSelect}
-                            onChange={(e) => setSingleSelect(e.target.value)}
-                          >
-                            {question.more.map((more) => (
-                              <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                    ) : question.type === "multi-select dropdown" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <FormControl fullWidth>
-                          <Select
-                            multiple
-                            id="multi-select-dropdown"
-                            value={multiSelect}
-                            onChange={(e) => setMultiSelect(e.target.value)}
-                          >
-                            {question.more.map((more) => (
-                              <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                    ) : question.type === "short answers" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <TextField
-                          margin    ="dense"
-                          type      ="string"
-                          fullWidth
-                          variant   ="outlined"
-                        />
-                      </Grid>
-                    ) : question.type === "paragraph" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <TextField
-                          fullWidth
-                          multiline
-                          rows={4}
-                          margin    ="dense"
-                          type      ="text"
-                          variant   ="outlined"
-                        />
-                      </Grid>
-                    ) : null}
-                  </Grid>
-                )
-              })}
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                  ) : question.type === "checkboxes" ? (
+                    <Grid item xs={12} md={12}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <FormGroup>
+                        {question.more.map((more) => (
+                          <FormControlLabel
+                            key     ={more.id}
+                            control ={<Checkbox />}
+                            label   ={more.item}
+                          />
+                        ))}
+                      </FormGroup>
+                    </Grid>
+                  ) : question.type === "dropdown" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <FormControl fullWidth>
+                        <Select
+                          id="dropdown"
+                          value={singleSelect}
+                          onChange={(e) => setSingleSelect(e.target.value)}
+                        >
+                          {question.more.map((more) => (
+                            <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  ) : question.type === "multi-select dropdown" ? (
+                    <Grid item xs={6} md={6}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <FormControl fullWidth>
+                        <Select
+                          multiple
+                          id="multi-select-dropdown"
+                          value={multiSelect}
+                          onChange={(e) => setMultiSelect(e.target.value)}
+                        >
+                          {question.more.map((more) => (
+                            <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  ) : question.type === "short answers" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <TextField
+                        margin    ="dense"
+                        type      ="string"
+                        fullWidth
+                        variant   ="outlined"
+                      />
+                    </Grid>
+                  ) : question.type === "paragraph" ? (
+                    <Grid item xs={6} md={6}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        margin    ="dense"
+                        type      ="text"
+                        variant   ="outlined"
+                      />
+                    </Grid>
+                  ) : question.type === "date" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <TextField
+                        fullWidth
+                        margin    ="dense"
+                        type      ="date"
+                        variant   ="outlined"
+                      />
+                    </Grid>
+                  ) : question.type === "time" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <TextField
+                        fullWidth
+                        margin    ="dense"
+                        type      ="time"
+                        variant   ="outlined"
+                      />
+                    </Grid>
+                  ) : question.type === "yes/no boolean" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <ToggleButtonGroup>
+                        <ToggleButton value={firstBoolean}>{firstBoolean}</ToggleButton>
+                        <ToggleButton value={secondBoolean}>{secondBoolean}</ToggleButton>
+                      </ToggleButtonGroup>
+                    </Grid>
+                  ) : question.type === "rating scale" ? (
+                    <Grid item xs={12} md={12}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography varian="subtitle">{startLabel}</Typography>
+                        <ToggleButtonGroup>
+                          {ratings.map((rating) => (
+                            <ToggleButton key={rating.id} value={rating.rating}>{rating.rating}</ToggleButton>
+                          ))}
+                        </ToggleButtonGroup>
+                        <Typography varian="subtitle">{endLabel}</Typography>
+                      </div>
+                    </Grid>
+                  ) : null}
+                </Grid>
+              )
+            })}
           </Grid>
         </DialogContent>
         <DialogActions>
