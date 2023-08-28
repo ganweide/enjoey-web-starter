@@ -101,7 +101,7 @@ const Page2 = () => {
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [open]);
 
   // Initialise Survey
   const openDialog = async () => {
@@ -220,7 +220,6 @@ const Page2 = () => {
     const selectedSurveyTitle = previousSurvey.find((survey) => survey.surveyId === value);
 
     if (selectedSurveyTitle) {
-      console.log("selected", selectedSurveyTitle);
       setQuestions(selectedSurveyTitle.questions);
       setSurveyTitle(selectedSurveyTitle.surveyTitle);
       setDescription(selectedSurveyTitle.description);
@@ -248,6 +247,7 @@ const Page2 = () => {
       type: type,
       more: [],
       label: [],
+      condition: [],
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -291,22 +291,20 @@ const Page2 = () => {
     });
     setQuestions(updatedQuestions);
   };
-  const handleDeleteRadioItem = (itemId) => {
+  const handleDeleteRadioItem = (questionId, itemId) => {
     const updatedRadioItems = radioItems.filter(item => item.id !== itemId);
     setRadioItems(updatedRadioItems);
+    const updatedQuestions = questions.map(question =>
+      question.id === questionId ? { ...question, more: question.more.filter(item => item.id !== itemId) } : question
+    );
+    setQuestions(updatedQuestions);
   };
   // Rating Scale
   const addRating = (id) => {
-    const newRating = {
-      id: ratings.length,
-      rating: ratings.length + 1,
-    };
-    setRatings([...ratings, newRating]);
     const updatedQuestions = questions.map(question =>
-      question.id === id ? { ...question, more: [...question.more, newRating], label: [startLabel, endLabel] } : question
+      question.id === id ? { ...question, more: [...question.more, {id: question.more.length, rating: question.more.length + 1}]} : question
     );
     setQuestions(updatedQuestions);
-    console.log("updated", updatedQuestions);
   };
   const handleRatingItemChange = (questionId, ratingId, value) => {
     const updatedRating = ratings.map(rating =>
@@ -316,7 +314,7 @@ const Page2 = () => {
     const updatedQuestions = questions.map(question => {
       if (question.id === questionId) {
         const updatedMore = question.more.map(more =>
-          more.id === ratingId ? { ...more, item: value } : more
+          more.id === ratingId ? { ...more, rating: value } : more
         );
         return { ...question, more: updatedMore };
       }
@@ -324,10 +322,28 @@ const Page2 = () => {
     });
     setQuestions(updatedQuestions);
   };
-  const removeRating = () => {
+  const handleRatingStartLabelChange = (id, value) => {
+    setStartLabel(value);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, label: [value, question.label[1]] } : question
+    );
+    setQuestions(updatedQuestions);
+  }
+  const handleRatingEndLabelChange = (id, value) => {
+    setEndLabel(value);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, label: [question.label[0], value] } : question
+    );
+    setQuestions(updatedQuestions);
+  }
+  const removeRating = (id) => {
     const updatedRating = [...ratings];
     updatedRating.pop();
     setRatings(updatedRating);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, more: question.more.slice(0, -1) } : question
+    );
+    setQuestions(updatedQuestions);
   };
   // Checkboxes
   const addCheckbox = (id) => {
@@ -357,9 +373,13 @@ const Page2 = () => {
     });
     setQuestions(updatedQuestions);
   };
-  const handleDeleteCheckbox = (itemId) => {
+  const handleDeleteCheckbox = (questionId, itemId) => {
     const updatedCheckbox = checkbox.filter(item => item.id !== itemId);
     setCheckbox(updatedCheckbox);
+    const updatedQuestions = questions.map(question =>
+      question.id === questionId ? { ...question, more: question.more.filter(item => item.id !== itemId) } : question
+    );
+    setQuestions(updatedQuestions);
   };
   // Dropdown
   const addDropdown = (id) => {
@@ -389,9 +409,13 @@ const Page2 = () => {
     });
     setQuestions(updatedQuestions);
   };
-  const handleDeleteDropdown = (itemId) => {
-    const updatedDropdown = dropown.filter(item => item.id !== itemId);
+  const handleDeleteDropdown = (questionId, itemId) => {
+    const updatedDropdown = dropdown.filter(item => item.id !== itemId);
     setDropdown(updatedDropdown);
+    const updatedQuestions = questions.map(question =>
+      question.id === questionId ? { ...question, more: question.more.filter(item => item.id !== itemId) } : question
+    );
+    setQuestions(updatedQuestions);
   };
   // Multi-Select dropdown
   const addMultiDropdown = (id) => {
@@ -421,9 +445,28 @@ const Page2 = () => {
     });
     setQuestions(updatedQuestions);
   };
-  const handleDeleteMultiDropdown = (itemId) => {
+  const handleDeleteMultiDropdown = (questionId, itemId) => {
     const updatedMultiDropdown = multiDropdown.filter(item => item.id !== itemId);
     setMultiDropdown(updatedMultiDropdown);
+    const updatedQuestions = questions.map(question =>
+      question.id === questionId ? { ...question, more: question.more.filter(item => item.id !== itemId) } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+  // Yes/No boolean
+  const handleFirstBooleanChange = (id, value) => {
+    setFirstBoolean(value);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, label: [value, question.label[1]] } : question
+    );
+    setQuestions(updatedQuestions);
+  };
+  const handleSecondBooleanChange = (id, value) => {
+    setSecondBoolean(value);
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, label: [question.label[0], value] } : question
+    );
+    setQuestions(updatedQuestions);
   };
   const handleDeleteQuestion = (questionId) => {
     const updatedQuestions = questions.filter(question => question.id !== questionId);
@@ -877,7 +920,7 @@ const Page2 = () => {
                                           <Grid item xs={1} md={1}>
                                             <Button
                                               aria-label='delete'
-                                              onClick={() => handleDeleteRadioItem(item.id)}
+                                              onClick={() => handleDeleteRadioItem(question.id, item.id)}
                                               style={{ width: "100%", height: "100%" }}
                                             >
                                               <DeleteIcon />
@@ -901,7 +944,7 @@ const Page2 = () => {
                                             <Grid item xs={1} md={1}>
                                               <Button
                                                 aria-label='delete'
-                                                onClick={() => handleDeleteRadioItem(item.id)}
+                                                onClick={() => handleDeleteRadioItem(question.id, item.id)}
                                                 style={{ width: "100%", height: "100%" }}
                                               >
                                                 <DeleteIcon />
@@ -910,30 +953,6 @@ const Page2 = () => {
                                           </Grid>
                                         ))
                                       )}
-                                      {radioItems.map((item, index) => (
-                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
-                                          <Grid key={item.id} item xs={11} md={11}>
-                                            <TextField
-                                              onChange={(e) => handleRadioItemChange(question.id, item.id, e.target.value)}
-                                              margin="dense"
-                                              label={`Item ${index + 1}`}
-                                              type="string"
-                                              fullWidth
-                                              variant="outlined"
-                                              value={question.more.item || item.item}
-                                            />
-                                          </Grid>
-                                          <Grid item xs={1} md={1}>
-                                            <Button
-                                              aria-label='delete'
-                                              onClick={() => handleDeleteRadioItem(item.id)}
-                                              style={{ width: "100%", height: "100%" }}
-                                            >
-                                              <DeleteIcon />
-                                            </Button>
-                                          </Grid>
-                                        </Grid>
-                                      ))}
                                       <Grid item xs={3} md={3}>
                                         <Button variant="contained" onClick={() => addRadioItems(question.id)}>Add Items</Button>
                                       </Grid>
@@ -941,54 +960,93 @@ const Page2 = () => {
                                   )}
                                   {question.type === 'rating scale' && (
                                     <>
-                                      {console.log(question.label)}
-                                      <Grid container item spacing={2}>
-                                        <Grid item xs={1.5} md={1.5}>
-                                          <TextField
-                                            onChange={(e) => setStartLabel(e.target.value)}
-                                            margin="dense"
-                                            type="string"
-                                            label="Label"
-                                            fullWidth
-                                            variant="outlined"
-                                            value={startLabel}
-                                          />
-                                        </Grid>
-                                        {ratings.map((rating) => (
-                                          <Grid key={rating.id} item xs={0.5} md={0.5}>
+                                      {question.more.length > 0 && question.label.length > 0 ? (
+                                        <Grid container item spacing={2}>
+                                          <Grid item xs={1.5} md={1.5}>
                                             <TextField
-                                              onChange={(e) => handleRatingItemChange(question.id, rating.id, e.target.value)}
+                                              onChange={(e) => handleRatingStartLabelChange(question.id, e.target.value)}
                                               margin="dense"
                                               type="string"
+                                              label="Label"
                                               fullWidth
                                               variant="outlined"
-                                              value={rating.rating}
+                                              value={question.label[0]}
                                             />
                                           </Grid>
-                                        ))}
-                                        <Grid item xs={1.5} md={1.5}>
-                                          <TextField
-                                            onChange={(e) => setEndLabel(e.target.value)}
-                                            margin="dense"
-                                            type="string"
-                                            label="Label"
-                                            fullWidth
-                                            variant="outlined"
-                                            value={endLabel}
-                                          />
+                                          {question.more.map((rating) => (
+                                            <Grid key={rating.id} item xs={0.5} md={0.5}>
+                                              <TextField
+                                                onChange={(e) => handleRatingItemChange(question.id, rating.id, e.target.value)}
+                                                margin="dense"
+                                                type="string"
+                                                fullWidth
+                                                variant="outlined"
+                                                value={rating.rating}
+                                              />
+                                            </Grid>
+                                          ))}
+                                          <Grid item xs={1.5} md={1.5}>
+                                            <TextField
+                                              onChange={(e) => handleRatingEndLabelChange(question.id, e.target.value)}
+                                              margin="dense"
+                                              type="string"
+                                              label="Label"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={question.label[1]}
+                                            />
+                                          </Grid>
                                         </Grid>
-                                      </Grid>
+                                      ) : (
+                                        <Grid container item spacing={2}>
+                                          <Grid item xs={1.5} md={1.5}>
+                                            <TextField
+                                              onChange={(e) => handleRatingStartLabelChange(question.id, e.target.value)}
+                                              margin="dense"
+                                              type="string"
+                                              label="Label"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={startLabel}
+                                            />
+                                          </Grid>
+                                          {question.more.map((rating) => (
+                                            <Grid key={rating.id} item xs={0.5} md={0.5}>
+                                              <TextField
+                                                onChange={(e) => handleRatingItemChange(question.id, rating.id, e.target.value)}
+                                                margin="dense"
+                                                type="string"
+                                                fullWidth
+                                                variant="outlined"
+                                                value={rating.rating}
+                                              />
+                                            </Grid>
+                                          ))}
+                                          <Grid item xs={1.5} md={1.5}>
+                                            <TextField
+                                              onChange={(e) => handleRatingEndLabelChange(question.id, e.target.value)}
+                                              margin="dense"
+                                              type="string"
+                                              label="Label"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={endLabel}
+                                            />
+                                          </Grid>
+                                        </Grid>
+                                      )}
                                       <Grid item xs={1} md={1}>
                                         <Button variant="contained" onClick={removeRating}><RemoveCircleIcon/></Button>
                                       </Grid>
                                       <Grid item xs={1} md={1}>
-                                        <Button variant="contained" onClick={(e) => addRating(question.id)}><AddCircleIcon/></Button>
+                                        {console.log("question", question)}
+                                        <Button variant="contained" onClick={() => addRating(question.id)}><AddCircleIcon/></Button>
                                       </Grid>
                                     </>
                                   )}
                                   {question.type === 'checkboxes' && (
                                     <>
-                                     {checkbox.map((item, index) => (
+                                     {question.more ? (question.more.map((item, index) => (
                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                          <Grid key={item.id} item xs={11} md={11}>
                                            <TextField
@@ -1004,14 +1062,40 @@ const Page2 = () => {
                                          <Grid item xs={1} md={1}>
                                            <Button
                                              aria-label='delete'
-                                             onClick={() => handleDeleteCheckbox(item.id)}
+                                             onClick={() => handleDeleteCheckbox(question.id, item.id)}
                                              style={{ width: "100%", height: "100%" }}
                                            >
                                              <DeleteIcon />
                                            </Button>
                                          </Grid>
                                        </Grid>
-                                     ))}
+                                     ))) : (
+                                      checkbox.map((item, index) => (
+                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
+                                          <Grid key={item.id} item xs={11} md={11}>
+                                            <TextField
+                                              onChange={(e) => handleCheckboxChange(question.id, item.id, e.target.value)}
+                                              margin="dense"
+                                              label={`Item ${index + 1}`}
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={item.item}
+                                            />
+                                          </Grid>
+                                          <Grid item xs={1} md={1}>
+                                            <Button
+                                              aria-label='delete'
+                                              onClick={() => handleDeleteCheckbox(question.id, item.id)}
+                                              style={{ width: "100%", height: "100%" }}
+                                            >
+                                              <DeleteIcon />
+                                            </Button>
+                                          </Grid>
+                                        </Grid>
+                                      ))
+                                     )
+                                    }
                                      <Grid item xs={3} md={3}>
                                        <Button variant="contained" onClick={() => addCheckbox(question.id)}>Add Items</Button>
                                      </Grid>
@@ -1019,23 +1103,7 @@ const Page2 = () => {
                                   )}
                                   {question.type === 'dropdown' && (
                                     <>
-                                      <Grid item xs={12} md={12}>
-                                        <FormControl fullWidth>
-                                          <InputLabel id="dropdown">Select...</InputLabel>
-                                          <Select
-                                            labelId="dropdown"
-                                            id="dropdown"
-                                            value={singleSelect}
-                                            label="Select..."
-                                            onChange={(e) => setSingleSelect(e.target.value)}
-                                          >
-                                            {dropdown.map(item => (
-                                              <MenuItem key={item.id} value={item.item}>{item.item}</MenuItem>
-                                            ))}
-                                          </Select>
-                                        </FormControl>
-                                      </Grid>
-                                      {dropdown.map((item, index) => (
+                                      {question.more ? (question.more.map((item, index) => (
                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                          <Grid key={item.id} item xs={11} md={11}>
                                            <TextField
@@ -1051,39 +1119,46 @@ const Page2 = () => {
                                          <Grid item xs={1} md={1}>
                                            <Button
                                              aria-label='delete'
-                                             onClick={() => handleDeleteDropdown(item.id)}
+                                             onClick={() => handleDeleteDropdown(question.id, item.id)}
                                              style={{ width: "100%", height: "100%" }}
                                            >
                                              <DeleteIcon />
                                            </Button>
                                          </Grid>
                                        </Grid>
-                                     ))}
-                                     <Grid item xs={3} md={3}>
-                                       <Button variant="contained" onClick={() => addDropdown(question.id)}>Add Items</Button>
-                                     </Grid>
+                                     ))) : (dropdown.map((item, index) => (
+                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
+                                          <Grid key={item.id} item xs={11} md={11}>
+                                            <TextField
+                                              onChange={(e) => handleDropdownChange(question.id, item.id, e.target.value)}
+                                              margin="dense"
+                                              label={`Item ${index + 1}`}
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={item.item}
+                                            />
+                                          </Grid>
+                                          <Grid item xs={1} md={1}>
+                                            <Button
+                                              aria-label='delete'
+                                              onClick={() => handleDeleteDropdown(question.id, item.id)}
+                                              style={{ width: "100%", height: "100%" }}
+                                            >
+                                              <DeleteIcon />
+                                            </Button>
+                                          </Grid>
+                                        </Grid>
+                                      ))
+                                     )}
+                                      <Grid item xs={3} md={3}>
+                                        <Button variant="contained" onClick={() => addDropdown(question.id)}>Add Items</Button>
+                                      </Grid>
                                     </>
                                   )}
                                   {question.type === 'multi-select dropdown' && (
                                     <>
-                                      <Grid item xs={12} md={12}>
-                                        <FormControl fullWidth>
-                                          <InputLabel id="dropdown">Select...</InputLabel>
-                                          <Select
-                                            multiple
-                                            labelId="dropdown"
-                                            id="dropdown"
-                                            value={multiSelect}
-                                            label="Select..."
-                                            onChange={(e) => setMultiSelect(e.target.value)}
-                                          >
-                                            {multiDropdown.map(item => (
-                                              <MenuItem key={item.id} value={item.item}>{item.item}</MenuItem>
-                                            ))}
-                                          </Select>
-                                        </FormControl>
-                                      </Grid>
-                                      {multiDropdown.map((item, index) => (
+                                      {question.more ? (question.more.map((item, index) => (
                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
                                          <Grid key={item.id} item xs={11} md={11}>
                                            <TextField
@@ -1099,44 +1174,100 @@ const Page2 = () => {
                                          <Grid item xs={1} md={1}>
                                            <Button
                                              aria-label='delete'
-                                             onClick={() => handleDeleteMultiDropdown(item.id)}
+                                             onClick={() => handleDeleteMultiDropdown(question.id, item.id)}
                                              style={{ width: "100%", height: "100%" }}
                                            >
                                              <DeleteIcon />
                                            </Button>
                                          </Grid>
                                        </Grid>
-                                     ))}
-                                     <Grid item xs={3} md={3}>
-                                       <Button variant="contained" onClick={() => addMultiDropdown(question.id)}>Add Items</Button>
-                                     </Grid>
+                                     ))) : (multiDropdown.map((item, index) => (
+                                        <Grid container item key={item.id} xs={12} md={12} spacing={2}>
+                                          <Grid key={item.id} item xs={11} md={11}>
+                                            <TextField
+                                              onChange={(e) => handleMultiDropdownChange(question.id, item.id, e.target.value)}
+                                              margin="dense"
+                                              label={`Item ${index + 1}`}
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={item.item}
+                                            />
+                                          </Grid>
+                                          <Grid item xs={1} md={1}>
+                                            <Button
+                                              aria-label='delete'
+                                              onClick={() => handleDeleteMultiDropdown(question.id, item.id)}
+                                              style={{ width: "100%", height: "100%" }}
+                                            >
+                                              <DeleteIcon />
+                                            </Button>
+                                          </Grid>
+                                        </Grid>
+                                      ))
+                                     )}
+                                      <Grid item xs={3} md={3}>
+                                        <Button variant="contained" onClick={() => addMultiDropdown(question.id)}>Add Items</Button>
+                                      </Grid>
                                     </>
                                   )}
                                   {question.type === 'yes/no boolean' && (
-                                    <Grid container item xs={12} md={12} spacing={2}>
-                                      <Grid item xs={3} md={3}>
-                                        <TextField
-                                          onChange={(e) => setFirstBoolean(e.target.value)}
-                                          margin="dense"
-                                          type="string"
-                                          fullWidth
-                                          variant="outlined"
-                                          value={firstBoolean}
-                                        />
-                                      </Grid>
-                                      <Grid item xs={3} md={3}>
-                                        <TextField
-                                          onChange={(e) => setSecondBoolean(e.target.value)}
-                                          margin="dense"
-                                          type="string"
-                                          fullWidth
-                                          variant="outlined"
-                                          value={secondBoolean}
-                                        />
-                                      </Grid>
-                                    </Grid>
+                                    question.label.length > 0 ? (
+                                      <>
+                                        <Grid container item xs={12} md={12} spacing={2}>
+                                          <Grid item xs={3} md={3}>
+                                            <TextField
+                                              onChange={(e) => handleFirstBooleanChange(question.id, e.target.value)}
+                                              margin="dense"
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={question.label[0]}
+                                            />
+                                          </Grid>
+                                          <Grid item xs={3} md={3}>
+                                            <TextField
+                                              onChange={(e) => handleSecondBooleanChange(question.id, e.target.value)}
+                                              margin="dense"
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={question.label[1]}
+                                            />
+                                          </Grid>
+                                        </Grid>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Grid container item xs={12} md={12} spacing={2}>
+                                          <Grid item xs={3} md={3}>
+                                            <TextField
+                                              onChange={(e) => handleFirstBooleanChange(question.id, e.target.value)}
+                                              margin="dense"
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={firstBoolean}
+                                            />
+                                          </Grid>
+                                          <Grid item xs={3} md={3}>
+                                            <TextField
+                                              onChange={(e) => handleSecondBooleanChange(question.id, e.target.value)}
+                                              margin="dense"
+                                              type="string"
+                                              fullWidth
+                                              variant="outlined"
+                                              value={secondBoolean}
+                                            />
+                                          </Grid>
+                                        </Grid>
+                                      </>
+                                    )
                                   )}
                                 </Grid>
+                                <Box style={{ paddingTop: "10px", display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+                                  <Button>Condition Settings</Button>
+                                </Box>
                               </Card>
                             </div>
                           )}
@@ -1290,21 +1421,21 @@ const Page2 = () => {
                     <Grid item xs={3} md={3}>
                       <Typography variant="h3" gutterBottom>{question.title}</Typography>
                       <ToggleButtonGroup>
-                        <ToggleButton value={firstBoolean}>{firstBoolean}</ToggleButton>
-                        <ToggleButton value={secondBoolean}>{secondBoolean}</ToggleButton>
+                        <ToggleButton value={firstBoolean}>{question.label[0]}</ToggleButton>
+                        <ToggleButton value={secondBoolean}>{question.label[1]}</ToggleButton>
                       </ToggleButtonGroup>
                     </Grid>
                   ) : question.type === "rating scale" ? (
                     <Grid item xs={12} md={12}>
                       <Typography variant="h3" gutterBottom>{question.title}</Typography>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography varian="subtitle">{startLabel}</Typography>
+                        <Typography varian="subtitle">{question.label[0]}</Typography>
                         <ToggleButtonGroup>
-                          {ratings.map((rating) => (
+                          {question.more.map((rating) => (
                             <ToggleButton key={rating.id} value={rating.rating}>{rating.rating}</ToggleButton>
                           ))}
                         </ToggleButtonGroup>
-                        <Typography varian="subtitle">{endLabel}</Typography>
+                        <Typography varian="subtitle">{question.label[1]}</Typography>
                       </div>
                     </Grid>
                   ) : null}
