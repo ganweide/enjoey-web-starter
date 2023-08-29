@@ -32,6 +32,7 @@ import {
   Radio,
   ToggleButton,
   ToggleButtonGroup,
+  ListSubheader,
 } from "@mui/material";
 
 // Material UI Icons
@@ -45,35 +46,36 @@ const childUrl  = "http://127.0.0.1:8000/api/child/";
 const surveyUrl = "http://127.0.0.1:8000/api/surveysettings/";
 
 const Page2 = () => {
-  const [child, setChild]                   = useState([]);
-  const [previousSurvey, setPreviousSurvey] = useState([]);
-  const [open, setOpen]                     = useState(false);
-  const [recipientType, setRecipientType]   = useState([]);
-  const [sendTo, setSendTo]                 = useState([]);
-  const [selectClass, setSelectClass]       = useState([]);
-  const [schoolName, setSchoolName]         = useState([]);
-  const [student, setStudent]               = useState([]);
-  const [surveyTitle, setSurveyTitle]       = useState([]);
-  const [description, setDescription]       = useState([]);
-  const [surveyType, setSurveyType]         = useState([]);
-  const [startDate, setStartDate]           = useState([]);
-  const [endDate, setEndDate]               = useState([]);
-  const [settings, setSettings]             = useState(false);
-  const [showResult, setShowResult]         = useState([]);
-  const [create, setCreate]                 = useState(false);
-  const [selectSurvey, setSelectSurvey]     = useState([]);
-  const [questions, setQuestions]           = useState([]);
-  const [radioItems, setRadioItems]         = useState([]);
-  const [ratings, setRatings]               = useState([]);
-  const [startLabel, setStartLabel]         = useState("Most Unlikely");
-  const [endLabel, setEndLabel]             = useState("Most Likely");
-  const [checkbox, setCheckbox]             = useState([]);
-  const [dropdown, setDropdown]             = useState([]);
-  const [singleSelect, setSingleSelect]     = useState("");
-  const [multiDropdown, setMultiDropdown]   = useState([]);
-  const [multiSelect, setMultiSelect]       = useState([]);
-  const [firstBoolean, setFirstBoolean]     = useState("Yes");
-  const [secondBoolean, setSecondBoolean]   = useState("No");
+  const [child, setChild]                     = useState([]);
+  const [previousSurvey, setPreviousSurvey]   = useState([]);
+  const [open, setOpen]                       = useState(false);
+  const [recipientType, setRecipientType]     = useState([]);
+  const [sendTo, setSendTo]                   = useState([]);
+  const [selectClass, setSelectClass]         = useState([]);
+  const [schoolName, setSchoolName]           = useState([]);
+  const [student, setStudent]                 = useState([]);
+  const [surveyTitle, setSurveyTitle]         = useState([]);
+  const [description, setDescription]         = useState([]);
+  const [surveyType, setSurveyType]           = useState([]);
+  const [startDate, setStartDate]             = useState([]);
+  const [endDate, setEndDate]                 = useState([]);
+  const [settings, setSettings]               = useState(false);
+  const [showResult, setShowResult]           = useState([]);
+  const [create, setCreate]                   = useState(false);
+  const [selectSurvey, setSelectSurvey]       = useState([]);
+  const [questions, setQuestions]             = useState([]);
+  const [radioItems, setRadioItems]           = useState([]);
+  const [ratings, setRatings]                 = useState([]);
+  const [startLabel, setStartLabel]           = useState("Most Unlikely");
+  const [endLabel, setEndLabel]               = useState("Most Likely");
+  const [checkbox, setCheckbox]               = useState([]);
+  const [dropdown, setDropdown]               = useState([]);
+  const [singleSelect, setSingleSelect]       = useState("");
+  const [multiDropdown, setMultiDropdown]     = useState([]);
+  const [multiSelect, setMultiSelect]         = useState([]);
+  const [firstBoolean, setFirstBoolean]       = useState("Yes");
+  const [secondBoolean, setSecondBoolean]     = useState("No");
+  const [conditionSelect, setConditionSelect] = useState([]);
   const [formData, setFormData] = useState({
     surveyTitle: '',
     description: '',
@@ -91,11 +93,11 @@ const Page2 = () => {
     }
     try {
       Axios.get(surveyUrl).then((response) => {
+        console.log(response);
         const parsedSurveys = response.data.map((survey) => ({
           ...survey,
           questions: JSON.parse(survey.questions),
         }));
-
         setPreviousSurvey(parsedSurveys);
       });
     } catch (error) {
@@ -244,7 +246,12 @@ const Page2 = () => {
     const newQuestion = {
       id: questions.length,
       title: '',
+      text: '',
       type: type,
+      format: [{
+        type: type,
+        more: [],
+      }],
       more: [],
       label: [],
       condition: [],
@@ -257,12 +264,24 @@ const Page2 = () => {
     );
     setQuestions(updatedQuestions);
   };
+  const handleQuestionTextChange = (id, value) => {
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, text: value } : question
+    );
+    setQuestions(updatedQuestions);
+  };
   const handleQuestionTypeChange = (id, value) => {
     const updatedQuestions = questions.map(question =>
       question.id === id ? { ...question, type: value } : question
     );
     setQuestions(updatedQuestions);
   };
+  const handleConditionSelect = (id, value) => {
+    const updatedQuestions = questions.map(question =>
+      question.id === id ? { ...question, condition: value } : question
+    );
+    setQuestions(updatedQuestions);
+  }
   // Radio Button Group
   const addRadioItems = (id) => {
     const newRadioItems = {
@@ -285,7 +304,14 @@ const Page2 = () => {
         const updatedMore = question.more.map(more =>
           more.id === radioId ? { ...more, item: value } : more
         );
-        return { ...question, more: updatedMore };
+
+        const updatedFormats = question.format.map(format => {
+          if (format.type === question.type) {
+            return { ...format, more: updatedMore };
+          }
+          return format;
+        });
+        return { ...question, format: updatedFormats, more: updatedMore };
       }
       return question;
     });
@@ -323,14 +349,12 @@ const Page2 = () => {
     setQuestions(updatedQuestions);
   };
   const handleRatingStartLabelChange = (id, value) => {
-    setStartLabel(value);
     const updatedQuestions = questions.map(question =>
       question.id === id ? { ...question, label: [value, question.label[1]] } : question
     );
     setQuestions(updatedQuestions);
   }
   const handleRatingEndLabelChange = (id, value) => {
-    setEndLabel(value);
     const updatedQuestions = questions.map(question =>
       question.id === id ? { ...question, label: [question.label[0], value] } : question
     );
@@ -876,6 +900,15 @@ const Page2 = () => {
                                       variant="outlined"
                                       value={question.title}
                                     />
+                                    <TextField
+                                      onChange={(e) => handleQuestionTextChange(question.id, e.target.value)}
+                                      margin="dense"
+                                      label="Question Text"
+                                      type="string"
+                                      fullWidth
+                                      variant="outlined"
+                                      value={question.text}
+                                    />
                                   </Grid>
                                   {/* Question Type */}
                                   <Grid item xs={12} md={12}>
@@ -970,7 +1003,7 @@ const Page2 = () => {
                                               label="Label"
                                               fullWidth
                                               variant="outlined"
-                                              value={question.label[0]}
+                                              value={question.label[0] ? question.label[0] : startLabel}
                                             />
                                           </Grid>
                                           {question.more.map((rating) => (
@@ -993,7 +1026,7 @@ const Page2 = () => {
                                               label="Label"
                                               fullWidth
                                               variant="outlined"
-                                              value={question.label[1]}
+                                              value={question.label[1] ? question.label[1] : endLabel}
                                             />
                                           </Grid>
                                         </Grid>
@@ -1007,7 +1040,7 @@ const Page2 = () => {
                                               label="Label"
                                               fullWidth
                                               variant="outlined"
-                                              value={startLabel}
+                                              value={question.label[0] ? question.label[0] : startLabel}
                                             />
                                           </Grid>
                                           {question.more.map((rating) => (
@@ -1030,7 +1063,7 @@ const Page2 = () => {
                                               label="Label"
                                               fullWidth
                                               variant="outlined"
-                                              value={endLabel}
+                                              value={question.label[1] ? question.label[1] : endLabel}
                                             />
                                           </Grid>
                                         </Grid>
@@ -1039,7 +1072,6 @@ const Page2 = () => {
                                         <Button variant="contained" onClick={removeRating}><RemoveCircleIcon/></Button>
                                       </Grid>
                                       <Grid item xs={1} md={1}>
-                                        {console.log("question", question)}
                                         <Button variant="contained" onClick={() => addRating(question.id)}><AddCircleIcon/></Button>
                                       </Grid>
                                     </>
@@ -1266,7 +1298,36 @@ const Page2 = () => {
                                   )}
                                 </Grid>
                                 <Box style={{ paddingTop: "10px", display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-                                  <Button>Condition Settings</Button>
+                                  <FormControl sx={{ m: 1, minWidth: 120 }}>
+                                    <InputLabel htmlFor="grouped-select">Conditions</InputLabel>
+                                    <Select
+                                      onChange={(e) => handleConditionSelect(question.id, e.target.value)}
+                                      value={conditionSelect}
+                                      defaultValue=""
+                                      id="grouped-select"
+                                      label="Conditions"
+                                    >
+                                      <MenuItem value="">
+                                        <em>None</em>
+                                      </MenuItem>
+                                      {questions.map((question) => (
+                                        <>
+                                          <ListSubheader key={question.id}>{question.title}</ListSubheader>
+                                          {question.label.length > 0 && question.more.length > 0 ? (
+                                            <MenuItem>{question.text}</MenuItem>
+                                          ) : question.more.length > 0 ? (question.more.map((more) => {
+                                            console.log("more", more);
+                                            return <MenuItem key={more.id}>{more.item}</MenuItem>
+                                          })) : question.label.length > 0 ? (
+                                            question.label.map((label, index) => {
+                                              console.log("label", label);
+                                              return <MenuItem key={index}>{label}</MenuItem>
+                                            })
+                                          ) : null}
+                                        </>
+                                      ))}
+                                    </Select>
+                                  </FormControl>
                                 </Box>
                               </Card>
                             </div>

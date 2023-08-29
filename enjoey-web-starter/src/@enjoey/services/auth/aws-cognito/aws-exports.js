@@ -3,10 +3,10 @@
 export const awsConfig = {
   aws_project_region: 'ap-southeast-1',
   aws_cognito_region: 'ap-southeast-1',
-  aws_user_pools_id: 'ap-southeast-1_htdzg3ZTk',
-  aws_user_pools_web_client_id: '2hb6i7lj1onu65aukamaf93h2i',
+  aws_user_pools_id: 'ap-southeast-1_oLoYiXapl',
+  aws_user_pools_web_client_id: '4ro7csrp27ruuvvkg51bkphuce',
   oauth: {
-    domain: 'enjoey-dev-user-pool.auth.ap-southeast-1.amazoncognito.com',
+    domain: 'enjoey-dev-userpool.auth.ap-southeast-1.amazoncognito.com',
     scope: [
       'phone',
       'email',
