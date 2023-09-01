@@ -70,9 +70,7 @@ const Page2 = () => {
   const [endLabel, setEndLabel]               = useState("Most Likely");
   const [checkbox, setCheckbox]               = useState([]);
   const [dropdown, setDropdown]               = useState([]);
-  const [singleSelect, setSingleSelect]       = useState("");
   const [multiDropdown, setMultiDropdown]     = useState([]);
-  const [multiSelect, setMultiSelect]         = useState([]);
   const [firstBoolean, setFirstBoolean]       = useState("Yes");
   const [secondBoolean, setSecondBoolean]     = useState("No");
   const [conditionSelect, setConditionSelect] = useState([]);
@@ -81,8 +79,17 @@ const Page2 = () => {
     description: '',
     questions: [],
   });
-  const [preview, setPreview]                 = useState(false);
-
+  const [preview, setPreview]                         = useState(false);
+  const [previewSingleSelect, setPreviewSingleSelect] = useState([]);
+  const [previewMultiSelect, setPreviewMultiSelect]   = useState([]);
+  const [previewShortAnswers, setPreviewShortAnswers] = useState([]);
+  const [previewParagraph, setPreviewParagraph]       = useState([]);
+  const [previewBoolean, setPreviewBoolean]           = useState([]);
+  const [previewRadio, setPreviewRadio]               = useState([]);
+  const [previewCheckbox, setPreviewCheckbox]         = useState([]);
+  const [previewDate, setPreviewDate]                 = useState([]);
+  const [previewTime, setPreviewTime]                 = useState([]);
+  const [previewRating, setPreviewRating]             = useState([]);
   useEffect(() => {
     try {
       Axios.get(childUrl).then((response) => {
@@ -578,20 +585,103 @@ const Page2 = () => {
   const closeCreate = async () => {
     setCreate(false);
   }
-  const evaluateCondition = (condition) => {
-    if (condition === 'none') {
-      return false;
+  const handlePreviewShortAnswersChange = (id, question, value) => {
+    const existingAnswer = previewShortAnswers.find(answer => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewShortAnswers.map(answer =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewShortAnswers(updatedAnswers);
+    } else {
+      const newShortAnswers = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewShortAnswers([...previewShortAnswers, newShortAnswers]);
     }
-    if (condition) {
-      try {
-        return eval(condition); // Evaluates to true or false
-      } catch (error) {
-        console.error('Error evaluating condition:', error);
-        return false;
-      }
+  }
+  const handlePreviewParagraphChange = (id, question, value) => {
+    const existingAnswer = previewParagraph.find(answer => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewParagraph.map(answer =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewParagraph(updatedAnswers);
+    } else {
+      const newParagraph = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewParagraph([...previewParagraph, newParagraph]);
     }
-    return true;
+  }
+  const handlePreviewDateChange = (id, question, value) => {
+    const existingAnswer = previewDate.find(answer => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewDate.map(answer =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewDate(updatedAnswers);
+    } else {
+      const newDate = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewDate([...previewDate, newDate]);
+    }
+  }
+  const handlePreviewTimeChange = (id, question, value) => {
+    const existingAnswer = previewTime.find(answer => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewTime.map(answer =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewTime(updatedAnswers);
+    } else {
+      const newTime = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewTime([...previewTime, newTime]);
+    }
+  }
+  const handlePreviewSingleSelectChange = (id, question, value) => {
+    const existingAnswer = previewSingleSelect.find((answer) => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewSingleSelect.map((answer) =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewSingleSelect(updatedAnswers);
+    } else {
+      const newSingleSelect = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewSingleSelect([...previewSingleSelect, newSingleSelect]);
+    }
   };
+  const handlePreviewMultiSelectChange = (id, question, value) => {
+    const existingAnswer = previewMultiSelect.find((answer) => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewMultiSelect.map((answer) =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewMultiSelect(updatedAnswers);
+    } else {
+      const newMultiSelect = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewMultiSelect([...previewMultiSelect, newMultiSelect]);
+    }
+  };
+  console.log(previewMultiSelect);
   const closePreview = async () => {
     setPreview(false);
   }
@@ -1405,137 +1495,142 @@ const Page2 = () => {
         <DialogContent dividers>
           <Grid container spacing={2}>
             {questions.map((question) => {
-              if (evaluateCondition(question.condition)) {
-                return (
-                  <Grid item key={question.id} xs={12} md={12}>
-                    {question.type === "radio button group" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <FormControl component="fieldset" fullWidth>
-                          <RadioGroup>
-                            {question.more.map((more) => (
-                              <Grid key={more.id} item xs={12} md={12}>
-                                <FormControlLabel
-                                  value={more.item}
-                                  control={<Radio />}
-                                  label={more.item} />
-                              </Grid>
-                            ))}
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
-                    ) : question.type === "checkboxes" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <FormGroup>
+              return (
+                <Grid item key={question.id} xs={12} md={12}>
+                  {question.type === "radio button group" ? (
+                    <Grid item xs={12} md={12}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <FormControl component="fieldset" fullWidth>
+                        <RadioGroup>
                           {question.more.map((more) => (
-                            <FormControlLabel
-                              key     ={more.id}
-                              control ={<Checkbox />}
-                              label   ={more.item}
-                            />
+                            <Grid key={more.id} item xs={12} md={12}>
+                              <FormControlLabel
+                                value={more.item}
+                                control={<Radio />}
+                                label={more.item} />
+                            </Grid>
                           ))}
-                        </FormGroup>
-                      </Grid>
-                    ) : question.type === "dropdown" ? (
-                      <Grid item xs={3} md={3}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <FormControl fullWidth>
-                          <Select
-                            id="dropdown"
-                            value={singleSelect}
-                            onChange={(e) => setSingleSelect(e.target.value)}
-                          >
-                            {question.more.map((more) => (
-                              <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                    ) : question.type === "multi-select dropdown" ? (
-                      <Grid item xs={6} md={6}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <FormControl fullWidth>
-                          <Select
-                            multiple
-                            id="multi-select-dropdown"
-                            value={multiSelect}
-                            onChange={(e) => setMultiSelect(e.target.value)}
-                          >
-                            {question.more.map((more) => (
-                              <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                    ) : question.type === "short answers" ? (
-                      <Grid item xs={3} md={3}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <TextField
-                          margin    ="dense"
-                          type      ="string"
-                          fullWidth
-                          variant   ="outlined"
-                        />
-                      </Grid>
-                    ) : question.type === "paragraph" ? (
-                      <Grid item xs={6} md={6}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <TextField
-                          fullWidth
-                          multiline
-                          rows={4}
-                          margin    ="dense"
-                          type      ="text"
-                          variant   ="outlined"
-                        />
-                      </Grid>
-                    ) : question.type === "date" ? (
-                      <Grid item xs={3} md={3}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <TextField
-                          fullWidth
-                          margin    ="dense"
-                          type      ="date"
-                          variant   ="outlined"
-                        />
-                      </Grid>
-                    ) : question.type === "time" ? (
-                      <Grid item xs={3} md={3}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <TextField
-                          fullWidth
-                          margin    ="dense"
-                          type      ="time"
-                          variant   ="outlined"
-                        />
-                      </Grid>
-                    ) : question.type === "yes/no boolean" ? (
-                      <Grid item xs={3} md={3}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                  ) : question.type === "checkboxes" ? (
+                    <Grid item xs={12} md={12}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <FormGroup>
+                        {question.more.map((more) => (
+                          <FormControlLabel
+                            key     ={more.id}
+                            control ={<Checkbox />}
+                            label   ={more.item}
+                          />
+                        ))}
+                      </FormGroup>
+                    </Grid>
+                  ) : question.type === "dropdown" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.text}</Typography>
+                      <FormControl fullWidth>
+                        <Select
+                          id="dropdown"
+                          value={previewSingleSelect.find(answer => answer.text === question.text)?.answer || ''}
+                          onChange={(e) => handlePreviewSingleSelectChange(question.id, question.text, e.target.value)}
+                        >
+                          {question.more.map((more) => (
+                            <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  ) : question.type === "multi-select dropdown" ? (
+                    <Grid item xs={6} md={6}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <FormControl fullWidth>
+                        <Select
+                          multiple
+                          id="multi-select-dropdown"
+                          value={previewMultiSelect.find(answer => answer.text === question.text)?.answer || []}
+                          onChange={(e) => handlePreviewMultiSelectChange(question.id, question.text, e.target.value)}
+                        >
+                          {question.more.map((more) => (
+                            <MenuItem key={more.id} value={more.item}>{more.item}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  ) : question.type === "short answers" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.text}</Typography>
+                      <TextField
+                        margin    ="dense"
+                        type      ="string"
+                        fullWidth
+                        variant   ="outlined"
+                        onChange  ={(e) => handlePreviewShortAnswersChange(question.id, question.text, e.target.value)}
+                        value     ={previewShortAnswers.find(answer => answer.text === question.text)?.answer || ''}
+                      />
+                    </Grid>
+                  ) : question.type === "paragraph" ? (
+                    <Grid item xs={6} md={6}>
+                      <Typography variant="h3" gutterBottom>{question.text}</Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        margin    ="dense"
+                        type      ="text"
+                        variant   ="outlined"
+                        onChange  ={(e) => handlePreviewParagraphChange(question.id, question.text, e.target.value)}
+                        value     ={previewParagraph.find(answer => answer.text === question.text)?.answer || ''}
+                      />
+                    </Grid>
+                  ) : question.type === "date" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.text}</Typography>
+                      <TextField
+                        fullWidth
+                        margin    ="dense"
+                        type      ="date"
+                        variant   ="outlined"
+                        onChange  ={(e) => handlePreviewDateChange(question.id, question.text, e.target.value)}
+                        value     ={previewDate.find(answer => answer.text === question.text)?.answer || ''}
+                      />
+                    </Grid>
+                  ) : question.type === "time" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.text}</Typography>
+                      <TextField
+                        fullWidth
+                        margin    ="dense"
+                        type      ="time"
+                        variant   ="outlined"
+                        onChange  ={(e) => handlePreviewTimeChange(question.id, question.text, e.target.value)}
+                        value     ={previewTime.find(answer => answer.text === question.text)?.answer || ''}
+                      />
+                    </Grid>
+                  ) : question.type === "yes/no boolean" ? (
+                    <Grid item xs={3} md={3}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <ToggleButtonGroup>
+                        <ToggleButton value={firstBoolean}>{question.label[0]}</ToggleButton>
+                        <ToggleButton value={secondBoolean}>{question.label[1]}</ToggleButton>
+                      </ToggleButtonGroup>
+                    </Grid>
+                  ) : question.type === "rating scale" ? (
+                    <Grid item xs={12} md={12}>
+                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography varian="subtitle">{question.label[0]}</Typography>
                         <ToggleButtonGroup>
-                          <ToggleButton value={firstBoolean}>{question.label[0]}</ToggleButton>
-                          <ToggleButton value={secondBoolean}>{question.label[1]}</ToggleButton>
+                          {question.more.map((rating) => (
+                            <ToggleButton key={rating.id} value={rating.rating}>{rating.rating}</ToggleButton>
+                          ))}
                         </ToggleButtonGroup>
-                      </Grid>
-                    ) : question.type === "rating scale" ? (
-                      <Grid item xs={12} md={12}>
-                        <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography varian="subtitle">{question.label[0]}</Typography>
-                          <ToggleButtonGroup>
-                            {question.more.map((rating) => (
-                              <ToggleButton key={rating.id} value={rating.rating}>{rating.rating}</ToggleButton>
-                            ))}
-                          </ToggleButtonGroup>
-                          <Typography varian="subtitle">{question.label[1]}</Typography>
-                        </div>
-                      </Grid>
-                    ) : null}
-                  </Grid>
-                );
-              }
-              return null;
+                        <Typography varian="subtitle">{question.label[1]}</Typography>
+                      </div>
+                    </Grid>
+                  ) : null}
+                </Grid>
+              );
             })}
           </Grid>
         </DialogContent>
