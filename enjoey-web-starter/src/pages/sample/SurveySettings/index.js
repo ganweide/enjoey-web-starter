@@ -681,7 +681,55 @@ const Page2 = () => {
       setPreviewMultiSelect([...previewMultiSelect, newMultiSelect]);
     }
   };
-  console.log(previewMultiSelect);
+  const handlePreviewCheckboxChange = (id, question, value) => {
+    const existingAnswer = previewCheckbox.find((answer) => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewCheckbox.map((answer) =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewCheckbox(updatedAnswers);
+    } else {
+      const newCheckbox = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewCheckbox([...previewCheckbox, newCheckbox]);
+    }
+  };
+  const handlePreviewRadioChange = (id, question, value) => {
+    const existingAnswer = previewRadio.find((answer) => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewRadio.map((answer) =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewRadio(updatedAnswers);
+    } else {
+      const newRadio = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewRadio([...previewRadio, newRadio]);
+    }
+  };
+  const handlePreviewBooleanChange = (id, question, value) => {
+    const existingAnswer = previewBoolean.find((answer) => answer.text === question);
+    if (existingAnswer) {
+      const updatedAnswers = previewBoolean.map((answer) =>
+        answer.text === question ? { ...answer, answer: value } : answer
+      );
+      setPreviewBoolean(updatedAnswers);
+    } else {
+      const newBoolean = {
+        id: id,
+        text: question,
+        answer: value,
+      };
+      setPreviewBoolean([...previewBoolean, newBoolean]);
+    }
+  };
+  console.log("boolean", previewBoolean);
   const closePreview = async () => {
     setPreview(false);
   }
@@ -1499,7 +1547,7 @@ const Page2 = () => {
                 <Grid item key={question.id} xs={12} md={12}>
                   {question.type === "radio button group" ? (
                     <Grid item xs={12} md={12}>
-                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <Typography variant="h3" gutterBottom>{question.text}</Typography>
                       <FormControl component="fieldset" fullWidth>
                         <RadioGroup>
                           {question.more.map((more) => (
@@ -1507,7 +1555,9 @@ const Page2 = () => {
                               <FormControlLabel
                                 value={more.item}
                                 control={<Radio />}
-                                label={more.item} />
+                                label={more.item}
+                                onChange={(e) => handlePreviewRadioChange(question.id, question.text, e.target.value)}
+                              />
                             </Grid>
                           ))}
                         </RadioGroup>
@@ -1515,13 +1565,22 @@ const Page2 = () => {
                     </Grid>
                   ) : question.type === "checkboxes" ? (
                     <Grid item xs={12} md={12}>
-                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
+                      <Typography variant="h3" gutterBottom>{question.text}</Typography>
                       <FormGroup>
                         {question.more.map((more) => (
                           <FormControlLabel
                             key     ={more.id}
                             control ={<Checkbox />}
                             label   ={more.item}
+                            onChange={(e) => {
+                              const selectedItem = more.item;
+                              const isChecked = e.target.checked;
+                              const currentSelectedValues = previewCheckbox.find((answer) => answer.text === question.text)?.answer || [];
+                              const selectedValues = isChecked
+                              ? [...currentSelectedValues, selectedItem]
+                              : currentSelectedValues.filter((item) => item !== selectedItem);
+                              handlePreviewCheckboxChange(question.id, question.text, selectedValues)
+                            }}
                           />
                         ))}
                       </FormGroup>
@@ -1609,10 +1668,23 @@ const Page2 = () => {
                     </Grid>
                   ) : question.type === "yes/no boolean" ? (
                     <Grid item xs={3} md={3}>
-                      <Typography variant="h3" gutterBottom>{question.title}</Typography>
-                      <ToggleButtonGroup>
-                        <ToggleButton value={firstBoolean}>{question.label[0]}</ToggleButton>
-                        <ToggleButton value={secondBoolean}>{question.label[1]}</ToggleButton>
+                      <Typography variant="h3" gutterBottom>{question.text}</Typography>
+                      <ToggleButtonGroup
+                        exclusive
+                        onChange={(e) => handlePreviewBooleanChange(question.id, question.text, e.target.value)}
+                      >
+                        <ToggleButton
+                          value={question.label[0]}
+                          selected={previewBoolean.find((answer) => answer.text === question.text)?.answer === question.label[0]}
+                        >
+                            {question.label[0]}
+                        </ToggleButton>
+                        <ToggleButton
+                          value={question.label[1]}
+                          selected={previewBoolean.find((answer) => answer.text === question.text)?.answer === question.label[1]}
+                        >
+                          {question.label[1]}
+                        </ToggleButton>
                       </ToggleButtonGroup>
                     </Grid>
                   ) : question.type === "rating scale" ? (
