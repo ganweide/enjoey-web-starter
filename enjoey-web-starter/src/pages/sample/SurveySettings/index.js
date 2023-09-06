@@ -315,69 +315,137 @@ const Page2 = () => {
       "dropdown": previewSingleSelect,
       "multi-select dropdown": previewMultiSelect,
     }
-    switch(question.type) {
-      case "short answers":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return shortAnswerUI(question);
-          }
-        });
-      case "paragraph":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return paragraphUI(question);
-          }
-        });
-      case "radio button group":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return radioButtonGroupUI(question);
-          }
-        });
-      case "checkboxes":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return checkboxUI(question);
-          }
-        });
-      case "rating scale":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return ratingUI(question);
-          }
-        });
-      case "date":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return dateUI(question);
-          }
-        });
-      case "time":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return timeUI(question);
-          }
-        });
-      case "dropdown":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return singleSelectUI(question);
-          }
-        });
-      case "multi-select dropdown":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return multiSelectUI(question);
-          }
-        });
-      case "yes/no boolean":
-        return typeToPreview[check[0].type].map((text) => {
-          if(text.text === question.condition && text.answer !== "") {
-            return booleanUI(question);
-          }
-        });
-      default:
-        return null;
+    if(check.length) {
+      switch(question.type) {
+        case "short answers":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return shortAnswerUI(question);
+            }
+          });
+        case "paragraph":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return paragraphUI(question);
+            }
+          });
+        case "radio button group":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return radioButtonGroupUI(question);
+            }
+          });
+        case "checkboxes":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return checkboxUI(question);
+            }
+          });
+        case "rating scale":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return ratingUI(question);
+            }
+          });
+        case "date":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return dateUI(question);
+            }
+          });
+        case "time":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return timeUI(question);
+            }
+          });
+        case "dropdown":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return singleSelectUI(question);
+            }
+          });
+        case "multi-select dropdown":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return multiSelectUI(question);
+            }
+          });
+        case "yes/no boolean":
+          return typeToPreview[check[0].type].map((text) => {
+            if(text.text === question.condition && text.answer !== "") {
+              return booleanUI(question);
+            }
+          });
+        default:
+          return null;
+      }
+    } else {
+      const checkMore = questions.find((checkMore) => checkMore.more.some((more) => more.item === question.condition))
+      switch(question.type) {
+        case "short answers":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return shortAnswerUI(question);
+            }
+          });
+        case "paragraph":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return paragraphUI(question);
+            }
+          });
+        case "radio button group":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return radioButtonGroupUI(question);
+            }
+          });
+        case "checkboxes":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return checkboxUI(question);
+            }
+          });
+        case "rating scale":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return ratingUI(question);
+            }
+          });
+        case "date":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return dateUI(question);
+            }
+          });
+        case "time":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return timeUI(question);
+            }
+          });
+        case "dropdown":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return singleSelectUI(question);
+            }
+          });
+        case "multi-select dropdown":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return multiSelectUI(question);
+            }
+          });
+        case "yes/no boolean":
+          return typeToPreview[checkMore.type].map((text) => {
+            if(text.answer === question.condition && text.answer !== "") {
+              return booleanUI(question);
+            }
+          });
+        default:
+          return null;
+      }
     }
   }
 
@@ -872,6 +940,16 @@ const Page2 = () => {
   };
   const handlePreview = async () => {
     setPreview(true);
+    setPreviewSingleSelect([]);
+    setPreviewMultiSelect([]);
+    setPreviewShortAnswers([]);
+    setPreviewParagraph([]);
+    setPreviewBoolean([]);
+    setPreviewRadio([]);
+    setPreviewCheckbox([]);
+    setPreviewDate([]);
+    setPreviewTime([]);
+    setPreviewRating([]);
   };
   const closeCreate = async () => {
     setCreate(false);
@@ -1785,10 +1863,17 @@ const Page2 = () => {
                                       {questions
                                         .filter((check) => check.id !== question.id)
                                         .map((condition) => (
-                                          <MenuItem key={condition.id} value={condition.text}>
-                                            {condition.type === "dropdown" && condition.more.map((more) => more.item)}
-                                            {condition.text}
-                                          </MenuItem>
+                                          condition.type === "dropdown" || condition.type === "checkboxes" || condition.type === "radio button group" || condition.type === "multi-select dropdown" ? (
+                                            condition.more.map((moreItem) => (
+                                              <MenuItem key={moreItem.id} value={moreItem.item}>
+                                                {moreItem.item}
+                                              </MenuItem>
+                                            ))
+                                          ) : (
+                                            <MenuItem key={condition.id} value={condition.text}>
+                                              {condition.text}
+                                            </MenuItem>
+                                          )
                                         ))
                                       }
                                     </Select>
