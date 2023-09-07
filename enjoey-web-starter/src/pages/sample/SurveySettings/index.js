@@ -302,6 +302,7 @@ const Page2 = () => {
     }
   };
   const checkQuestionCondition =(question) => {
+    console.log("checkCondition", question);
     const check = questions.filter((check) => check.text === question.condition)
     const typeToPreview = {
       "short answers": previewShortAnswers,
@@ -892,8 +893,23 @@ const Page2 = () => {
     setQuestions(updatedQuestions);
   };
   const handleDeleteQuestion = (questionId) => {
-    const updatedQuestions = questions.filter(question => question.id !== questionId);
-    setQuestions(updatedQuestions);
+    const questionToDelete = questions.find((question) => question.id === questionId);
+    console.log(questionToDelete.more);
+    const updatedQuestions = questions.map((question) => {
+      if (questionToDelete.more){
+        const hasMatch = questionToDelete.more.some((more) => question.condition === more.item);
+        console.log("hasMatch", hasMatch);
+        if (hasMatch) {
+          return { ...question, condition: "none" };
+        }
+      } else if (question.condition === questionToDelete.text) {
+        return { ...question, condition: "none" };
+      } else {
+        return question;
+      }
+    });
+    const filteredQuestions = updatedQuestions.filter(question => question.id !== questionId);
+    setQuestions(filteredQuestions);
   };
   const handleSave = async () => {
     const updatedFormData = {
@@ -1932,9 +1948,6 @@ const Page2 = () => {
             })}
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleSave}>Save</Button>
-        </DialogActions>
       </Dialog>
     </div>
   );
