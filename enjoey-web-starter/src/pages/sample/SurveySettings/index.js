@@ -315,6 +315,7 @@ const Page2 = () => {
       "dropdown": previewSingleSelect,
       "multi-select dropdown": previewMultiSelect,
     }
+    console.log(check);
     if(check.length) {
       switch(question.type) {
         case "short answers":

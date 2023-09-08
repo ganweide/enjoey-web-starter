@@ -2,7 +2,7 @@ import React from 'react';
 import {RoutePermittedRole} from 'shared/constants/AppConst';
 
 const Page1 = React.lazy(() => import('./SurveyEditor'));
-const Page2 = React.lazy(() => import('./SurveyForm'));
+const Page2 = React.lazy(() => import('./AddmissionForm'));
 const Page3 = React.lazy(() => import('./ActivitiesForm'));
 const Page4 = React.lazy(() => import('./MenuPlanning'));
 const Page5 = React.lazy(() => import('./SleepCheck'));
@@ -20,7 +20,7 @@ export const samplePagesConfigs = [
     permittedRole: [RoutePermittedRole.Admin, RoutePermittedRole.Teacher],
   },
   {
-    path: '/sample/SurveyForm',
+    path: '/sample/AddmissionForm',
     element: <Page2 />,
   },
   {

@@ -16,11 +16,11 @@ const routesConfig = [
       },
       {
         id: 'survey-form',
-        title: 'Survey Form',
-        messageId: 'Survey Form',
+        title: 'Addmission Form',
+        messageId: 'Addmission Form',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/SurveyForm',
+        url: '/sample/AddmissionForm',
       },
       {
         id: 'activities-form',
@@ -95,6 +95,22 @@ const routesConfig = [
         url: '/sample/SurveySettings',
       },
     ],
+  },
+  {
+    id: 'app',
+    title: 'Sample',
+    messageId: 'landing.solutions',
+    type: 'collapse',
+    children: [
+      {
+        id: 'survey-editor',
+        title: 'Survey Editor',
+        messageId: 'Survey Editor',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/SurveyEditor',
+      },
+    ]
   },
 ];
 export default routesConfig;
