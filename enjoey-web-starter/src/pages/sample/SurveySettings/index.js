@@ -896,14 +896,11 @@ const Page2 = () => {
     const questionToDelete = questions.find((question) => question.id === questionId);
     console.log(questionToDelete.more);
     const updatedQuestions = questions.map((question) => {
-      if (questionToDelete.more){
-        const hasMatch = questionToDelete.more.some((more) => question.condition === more.item);
-        console.log("hasMatch", hasMatch);
-        if (hasMatch) {
-          return { ...question, condition: "none" };
-        }
-      } else if (question.condition === questionToDelete.text) {
+      if (question.condition === questionToDelete.text) {
         return { ...question, condition: "none" };
+      } else if (questionToDelete.more) {
+        const hasMatch = questionToDelete.more.some((more) => question.condition === more.item);
+        return hasMatch ? { ...question, condition: "none" } : question;
       } else {
         return question;
       }
