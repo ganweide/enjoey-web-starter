@@ -302,7 +302,6 @@ const Page2 = () => {
     }
   };
   const checkQuestionCondition =(question) => {
-    console.log("checkCondition", question);
     const check = questions.filter((check) => check.text === question.condition)
     const typeToPreview = {
       "short answers": previewShortAnswers,
@@ -386,61 +385,91 @@ const Page2 = () => {
       switch(question.type) {
         case "short answers":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return shortAnswerUI(question);
             }
           });
         case "paragraph":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return paragraphUI(question);
             }
           });
         case "radio button group":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return radioButtonGroupUI(question);
             }
           });
         case "checkboxes":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return checkboxUI(question);
             }
           });
         case "rating scale":
           return typeToPreview[checkMore.type].map((text) => {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
             if(text.answer === question.condition && text.answer !== "") {
               return ratingUI(question);
             }
           });
         case "date":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return dateUI(question);
             }
           });
         case "time":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return timeUI(question);
             }
           });
         case "dropdown":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return singleSelectUI(question);
             }
           });
         case "multi-select dropdown":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return multiSelectUI(question);
             }
           });
         case "yes/no boolean":
           return typeToPreview[checkMore.type].map((text) => {
-            if(text.answer === question.condition && text.answer !== "") {
+            const isMatch = Array.isArray(text.answer)
+              ? text.answer.includes(question.condition)
+              : text.answer === question.condition;
+            if(isMatch && text.answer !== "") {
               return booleanUI(question);
             }
           });
@@ -894,7 +923,6 @@ const Page2 = () => {
   };
   const handleDeleteQuestion = (questionId) => {
     const questionToDelete = questions.find((question) => question.id === questionId);
-    console.log(questionToDelete.more);
     const updatedQuestions = questions.map((question) => {
       if (question.condition === questionToDelete.text) {
         return { ...question, condition: "none" };
