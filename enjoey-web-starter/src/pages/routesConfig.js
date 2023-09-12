@@ -99,16 +99,32 @@ const routesConfig = [
   {
     id: 'app',
     title: 'Sample',
-    messageId: 'landing.solutions',
+    messageId: 'Room Report',
     type: 'collapse',
     children: [
       {
-        id: 'survey-editor',
-        title: 'Survey Editor',
-        messageId: 'Survey Editor',
+        id: 'check-in-report',
+        title: 'Check-in Report',
+        messageId: 'Check-in Report',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/SurveyEditor',
+        url: '/sample/Check-inReport',
+      },
+      {
+        id: 'room-check-report',
+        title: 'Room Check Report',
+        messageId: 'Room Check Report',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/RoomCheckReport',
+      },
+      {
+        id: 'immunization-report',
+        title: 'Immunization Report',
+        messageId: 'Immunization Report',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/ImmunizationReport',
       },
     ]
   },
