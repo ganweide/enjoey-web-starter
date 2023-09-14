@@ -15,22 +15,6 @@ const routesConfig = [
         url: '/sample/SurveyEditor',
       },
       {
-        id: 'survey-form',
-        title: 'Addmission Form',
-        messageId: 'Addmission Form',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/AddmissionForm',
-      },
-      {
-        id: 'activities-form',
-        title: 'Activities Form',
-        messageId: 'Activities Form',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/ActivitiesForm',
-      },
-      {
         id: 'menu-planning',
         title: 'Menu Planning',
         messageId: 'Menu Planning',
@@ -39,20 +23,36 @@ const routesConfig = [
         url: '/sample/MenuPlanning',
       },
       {
-        id: 'sleep-check',
-        title: 'Sleep Check',
-        messageId: 'Sleep Check',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/SleepCheck',
-      },
-      {
         id: 'immunization',
         title: 'Immunization',
         messageId: 'Immunization',
         type: 'item',
         icon: <BiAlignLeft />,
         url: '/sample/Immunization',
+      },
+      {
+        id: 'survey-settings',
+        title: 'Survey Settings',
+        messageId: 'Survey Settings',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/SurveySettings',
+      },
+    ],
+  },
+  {
+    id: 'app',
+    title: 'Sample',
+    messageId: 'Checks',
+    type: 'collapse',
+    children: [
+      {
+        id: 'sleep-check',
+        title: 'Sleep Check',
+        messageId: 'Sleep Check',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/SleepCheck',
       },
       {
         id: 'health-check',
@@ -70,6 +70,30 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/ToiletCheck',
       },
+    ]
+  },
+  {
+    id: 'app',
+    title: 'Sample',
+    messageId: 'Forms',
+    type: 'collapse',
+    children: [
+      {
+        id: 'survey-form',
+        title: 'Addmission Form',
+        messageId: 'Addmission Form',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/AddmissionForm',
+      },
+      {
+        id: 'activities-form',
+        title: 'Activities Form',
+        messageId: 'Activities Form',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/ActivitiesForm',
+      },
       {
         id: 'injuries-form',
         title: 'Injuries Form',
@@ -86,15 +110,7 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/ChargesForm',
       },
-      {
-        id: 'survey-settings',
-        title: 'Survey Settings',
-        messageId: 'Survey Settings',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/SurveySettings',
-      },
-    ],
+    ]
   },
   {
     id: 'app',
