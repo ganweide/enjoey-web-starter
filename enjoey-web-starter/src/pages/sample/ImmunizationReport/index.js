@@ -201,7 +201,7 @@ const Page2 = () => {
                   <TableCell>{prop[10]}</TableCell>
                 </TableRow>
               ))}
-                          {tableData.map((prop, index) => (
+              {tableData.map((prop, index) => (
                 <TableRow key={index}>
                   {index === 0 ?
                     <TableCell rowSpan={tableData.length}>

@@ -7,14 +7,6 @@ const routesConfig = [
     type: 'group',
     children: [
       {
-        id: 'survey-editor',
-        title: 'Survey Editor',
-        messageId: 'Survey Editor',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/SurveyEditor',
-      },
-      {
         id: 'menu-planning',
         title: 'Menu Planning',
         messageId: 'Menu Planning',
@@ -31,6 +23,30 @@ const routesConfig = [
         url: '/sample/Immunization',
       },
       {
+        id: 'learning',
+        title: 'Learning',
+        messageId: 'Learning',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/Learning',
+      },
+    ],
+  },
+  {
+    id: 'app',
+    title: 'Sample',
+    messageId: 'Surveys',
+    type: 'collapse',
+    children: [
+      {
+        id: 'survey-editor',
+        title: 'Survey Editor',
+        messageId: 'Survey Editor',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/SurveyEditor',
+      },
+      {
         id: 'survey-settings',
         title: 'Survey Settings',
         messageId: 'Survey Settings',
@@ -38,7 +54,7 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/SurveySettings',
       },
-    ],
+    ]
   },
   {
     id: 'app',
