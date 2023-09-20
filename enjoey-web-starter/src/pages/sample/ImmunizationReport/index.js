@@ -64,6 +64,18 @@ const Page2 = () => {
         <Typography variant="subtitle1" component="div" gutterBottom>
           All immunizations by school, room, or student.
         </Typography>
+        <Box sx={{ my: 5 }}>
+          <Button startIcon={<ExportIcon />} variant="contained" sx={{ mr: 2 }}>
+            <Typography variant="button" component="div">
+              Export
+            </Typography>
+          </Button>
+          <Button startIcon={<PrintIcon />} variant="contained">
+            <Typography variant="button" component="div">
+              Print
+            </Typography>
+          </Button>
+        </Box>
         <Divider sx={{ my: 5 }}/>
       </Box>
       <Grid container spacing={2} alignItems="center">
@@ -145,18 +157,6 @@ const Page2 = () => {
           </FormControl>
         </Grid>
       </Grid>
-      <Box sx={{ my: 5 }}>
-        <Button startIcon={<ExportIcon />} variant="contained" sx={{ mr: 2 }}>
-          <Typography variant="button" component="div">
-            Export
-          </Typography>
-        </Button>
-        <Button startIcon={<PrintIcon />} variant="contained">
-          <Typography variant="button" component="div">
-            Print
-          </Typography>
-        </Button>
-      </Box>
       <Card>
         <div style={{ overflowX: 'auto', maxHeight: '400px' }}>
           <Table>
