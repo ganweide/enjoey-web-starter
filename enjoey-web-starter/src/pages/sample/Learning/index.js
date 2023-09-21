@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import PlagiarismIcon from '@mui/icons-material/Plagiarism';
+import ClassIcon from '@mui/icons-material/Class';
 import {
   Button,
   Card,
@@ -209,25 +210,39 @@ const Page2 = () => {
             <TabPanel value={libraryTabPanelValue} index={0}>
               <Grid container spacing={2}>
                 <Grid item xs={3} md={3}>
-                  <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Box sx={{ m: 3, backgroundColor: '#808080', height: '100px', width: '90%' }}></Box>
-                    <Typography variant="h3" sx={{ mx: 3, alignSelf: 'flex-start' }}>Test</Typography>
-                    <Typography variatn="caption" sx={{ mx: 3, mb: 3, alignSelf: 'flex-start' }}>Test</Typography>
-                    <Button>Assign to room</Button>
+                  <Card sx={{ border: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ m: 3, backgroundColor: 'rgba(33, 150, 243, 0.2)', height: '100px', width: '90%', alignSelf: 'center' }}></Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Box sx={{ mx: 3, mb: 3 }}>
+                        <Typography variant="h3">Test</Typography>
+                        <Typography variatn="caption">Test</Typography>
+                      </Box>
+                      <Button sx={{ mx: 3, mb: 3 }}><ClassIcon /></Button>
+                    </Box>
                   </Card>
                 </Grid>
                 <Grid item xs={3} md={3}>
-                  <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Box sx={{ m: 3, backgroundColor: '#808080', height: '100px', width: '90%' }}></Box>
-                    <Typography variant="h3" sx={{ mx: 3, alignSelf: 'flex-start' }}>Test 2</Typography>
-                    <Typography variatn="caption" sx={{ mx: 3, mb: 3, alignSelf: 'flex-start' }}>Test 2</Typography>
+                  <Card sx={{ border: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ m: 3, backgroundColor: 'rgba(33, 150, 243, 0.2)', height: '100px', width: '90%' }}></Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Box sx={{ mx: 3, mb: 3 }}>
+                        <Typography variant="h3">Test 2</Typography>
+                        <Typography variatn="caption">Test 2</Typography>
+                      </Box>
+                      <Button sx={{ mx: 3, mb: 3 }}><ClassIcon /></Button>
+                    </Box>
                   </Card>
                 </Grid>
                 <Grid item xs={3} md={3}>
-                  <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Box sx={{ m: 3, backgroundColor: '#808080', height: '100px', width: '90%' }}></Box>
-                    <Typography variant="h3" sx={{ mx: 3, alignSelf: 'flex-start' }}>Test 3</Typography>
-                    <Typography variatn="caption" sx={{ mx: 3, mb: 3, alignSelf: 'flex-start' }}>Test 3</Typography>
+                  <Card sx={{ border: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ m: 3, backgroundColor: 'rgba(33, 150, 243, 0.2)', height: '100px', width: '90%' }}></Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Box sx={{ mx: 3, mb: 3 }}>
+                        <Typography variant="h3">Test 3</Typography>
+                        <Typography variatn="caption">Test 3</Typography>
+                      </Box>
+                      <Button sx={{ mx: 3, mb: 3 }}><ClassIcon /></Button>
+                    </Box>
                   </Card>
                 </Grid>
               </Grid>

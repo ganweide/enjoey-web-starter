@@ -53,18 +53,20 @@ const Page2 = () => {
         sx={{
           p: 2,
           display: "flex",
-          flexDirection: "column",
-          alignItems: "left",
+          flexDirection: "row",
+          alignItems: "center",
           justifyContent: "space-between"
         }}
       >
-        <Typography variant="h1" component="div" gutterBottom>
-          Immunizations Report
-        </Typography>
-        <Typography variant="subtitle1" component="div" gutterBottom>
-          All immunizations by school, room, or student.
-        </Typography>
-        <Box sx={{ my: 5 }}>
+        <div>
+          <Typography variant="h1" component="div" gutterBottom>
+            Immunizations Report
+          </Typography>
+          <Typography variant="subtitle1" component="div" gutterBottom>
+            All immunizations by school, room, or student.
+          </Typography>
+        </div>
+        <div>
           <Button startIcon={<ExportIcon />} variant="contained" sx={{ mr: 2 }}>
             <Typography variant="button" component="div">
               Export
@@ -75,10 +77,10 @@ const Page2 = () => {
               Print
             </Typography>
           </Button>
-        </Box>
-        <Divider sx={{ my: 5 }}/>
+        </div>
       </Box>
-      <Grid container spacing={2} alignItems="center">
+      <Divider sx={{ my: 5 }}/>
+      <Grid container spacing={2} alignItems="center" sx={{ my: 5 }}>
         <Grid item xs={3} md={3}>
           <FormControl fullWidth>
             <InputLabel id={"room-select"}>Rooms</InputLabel>
