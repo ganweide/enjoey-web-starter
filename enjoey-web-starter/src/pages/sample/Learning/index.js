@@ -1,6 +1,8 @@
 // React Imports
 import React, { useEffect, useState } from "react";
 
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 import { makeStyles } from "@material-ui/core/styles";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
@@ -8,6 +10,7 @@ import PlagiarismIcon from '@mui/icons-material/Plagiarism';
 import ClassIcon from '@mui/icons-material/Class';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Button,
   Card,
@@ -35,6 +38,7 @@ import {
   Tabs,
   Tab,
   TablePagination,
+  Divider,
 } from "@mui/material";
 import PropTypes from 'prop-types';
 import Styles from "./style";
@@ -78,16 +82,21 @@ const Page2 = () => {
   const classes   = useStyles();
   const tableHead = ["Name", "Assigned week", "Theme", ""];
   const [cardText, setCardText]                         = useState([]);
-  const [createRoomPlanOpen, setCreateRoomPlanOpen]     = useState(false);
-  const [assignRoomOpen, setAssignRoomOpen]             = useState(false);
-  const [lessonTemplateOpen, setLessonPlanTemplateOpen] = useState(false);
-  const [mainTabPanelValue, setMainTabPanelValue]       = useState(0);
-  const [libraryTabPanelValue, setLibraryTabPanelValue] = useState(0);
-  const [selectedRooms, setSelectedRooms]               = useState([]);
-  const [selectedSkill, setSelectedSkill]               = useState([]);
-  const [selectedCategory, setSelectedCategory]         = useState([]);
-  const [selectedType, setSelectedType]                 = useState([]);
+  const [createRoomPlanOpen, setCreateRoomPlanOpen]                         = useState(false);
+  const [assignRoomOpen, setAssignRoomOpen]                                 = useState(false);
+  const [lessonTemplateOpen, setLessonPlanTemplateOpen]                     = useState(false);
+  const [sectionNameOpen, setSectionNameOpen]                               = useState(false);
+  const [sectionNoteOpen, setSectionNoteOpen]                               = useState(false);
+  const [sectionItemOpen, setSectionItemOpen]                               = useState(false);
+  const [roomPlanViewOpen, setRoomPlanViewOpen]                             = useState(false);
+  const [selectedRooms, setSelectedRooms]                                   = useState([]);
+  const [selectedSkill, setSelectedSkill]                                   = useState([]);
+  const [selectedCategory, setSelectedCategory]                             = useState([]);
+  const [selectedType, setSelectedType]                                     = useState([]);
   const [selectedLearningFramework, setSelectedLearningFramework]           = useState([]);
+  const [mainTabPanelValue, setMainTabPanelValue]                           = useState(0);
+  const [libraryTabPanelValue, setLibraryTabPanelValue]                     = useState(0);
+  const [sectionNoteTabPanelValue, setSectionNoteTabPanelValue]             = useState(0);
   const [roomPlansPage, setRoomPlansPage]                                   = useState(0);
   const [roomPlansRowsPerPage, setRoomPlansRowsPerPage]                     = useState(10);
   const [lessonPlanTemplatesPage, setLessonPlanTemplatesPage]               = useState(0);
@@ -99,6 +108,10 @@ const Page2 = () => {
 
   const handleLibraryTabChange = (event, newValue) => {
     setLibraryTabPanelValue(newValue);
+  };
+
+  const handleSectionNoteTabChange = (event, newValue) => {
+    setSectionNoteTabPanelValue(newValue);
   };
 
   const handleChangeRoomPlansPage = (event, newPage) => {
@@ -118,6 +131,38 @@ const Page2 = () => {
     setLessonPlanTemplatesRowsPerPage(parseInt(event.target.value, 10));
     setLessonPlanTemplatesPage(0);
   };
+
+  const openSectionName = async () => {
+    setSectionNameOpen(true);
+  }
+
+  const closeSectionName = async () => {
+    setSectionNameOpen(false);
+  }
+
+  const openSectionNote = async () => {
+    setSectionNoteOpen(true);
+  }
+
+  const closeSectionNote = async () => {
+    setSectionNoteOpen(false);
+  }
+
+  const openSectionItem = async () => {
+    setSectionItemOpen(true);
+  }
+
+  const closeSectionItem = async () => {
+    setSectionItemOpen(false);
+  }
+
+  const openRoomPlanView = async () => {
+    setRoomPlanViewOpen(true);
+  }
+
+  const closeRoomPlanView = async () => {
+    setRoomPlanViewOpen(false);
+  }
 
   const openCreateRoomPlan = async () => {
     setCreateRoomPlanOpen(true);
@@ -197,7 +242,7 @@ const Page2 = () => {
                 <TableCell>Test</TableCell>
                 <TableCell>Test</TableCell>
                 <TableCell sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button endIcon={<ChevronRightIcon />}>
+                  <Button endIcon={<ChevronRightIcon />} onClick={() => openRoomPlanView()}>
                     <Typography variant="button" component="div">
                       View
                     </Typography>
@@ -645,7 +690,7 @@ const Page2 = () => {
       {/* Lesson Template Dialog */}
       <Dialog
         fullWidth
-        maxWidth          ="sm"
+        maxWidth          ="xl"
         open              ={lessonTemplateOpen}
         onClose           ={closeLessonTemplate}
         aria-labelledby   ="alert-dialog-title"
@@ -657,6 +702,7 @@ const Page2 = () => {
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
+            {/* Template Textfield */}
             <Grid item xs={12} md={12}>
               <TextField
                 fullWidth
@@ -668,7 +714,8 @@ const Page2 = () => {
                 onChange        ={(e) => setCardText(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12} md={12}>
+            {/* Room Select */}
+            <Grid item xs={6} md={6}>
               <FormControl fullWidth>
                 <InputLabel id="room-select">Room</InputLabel>
                 <Select
@@ -685,7 +732,8 @@ const Page2 = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={12}>
+            {/* Theme Select */}
+            <Grid item xs={6} md={6}>
               <FormControl fullWidth>
                 <InputLabel id="room-select">Theme</InputLabel>
                 <Select
@@ -702,11 +750,590 @@ const Page2 = () => {
                 </Select>
               </FormControl>
             </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Daily Topic Container */}
+            <Grid item container xs={12} md={12} spacing={2}>
+              <Grid item xs={5.5} md={5.5}>
+                <TextField
+                  fullWidth
+                  label           ="Daily topic"
+                  margin          ="dense"
+                  type            ="text"
+                  variant         ="outlined"
+                />
+              </Grid>
+              <Grid item xs={5.5} md={5.5}>
+                <TextField
+                  fullWidth
+                  label           ="Description"
+                  margin          ="dense"
+                  type            ="text"
+                  variant         ="outlined"
+                />
+              </Grid>
+              <Grid item xs={1} md={1}>
+                <Button sx={{ minHeight: "100%", minWidth: "100%" }}><DeleteIcon /></Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }}>+ Add topic</Button>
+              </Grid>
+            </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Section Grid */}
+            <Grid item xs={12} md={12}>
+              <Card sx={{ borderRadius: 1.5 }}>
+                <Box sx={{ minWidth: '100%', display: 'flex', justifyContent: 'space-between', backgroundColor: '#e3f2fd', p: 2 }}>
+                  <Button endIcon={<EditIcon />} onClick={() => openSectionName()}>Add section name (optional)</Button>
+                  <Button endIcon={<EditIcon />} onClick={() => openSectionNote()}>Section notes</Button>
+                </Box>
+                <Grid container item xs={12} md={12} spacing={3} sx={{ p: 5 }}>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      {/* <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable droppableId="questions-list" direction="vertical">
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              // eslint-disable-next-line
+                              {...provided.droppableProps}
+                            >
+                              <Draggable>
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    // eslint-disable-next-line
+                                    {...provided.draggableProps}
+                                    // eslint-disable-next-line
+                                    {...provided.dragHandleProps}
+                                  > */}
+                                    <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                                      <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                                        <Typography variant="caption">Large Group · Song</Typography>
+                                        <Typography variant="h3">Space Songs</Typography>
+                                      </Box>
+                                      <Box sx={{ p: 5 }}>
+                                        <Typography variant="body1">· Approach to learning the planets in our solar system.</Typography>
+                                      </Box>
+                                    </Card>
+                                  {/* </div>
+                                  )}
+                                </Draggable>
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext> */}
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                          <Typography variant="h3">Counting the Planets</Typography>
+                        </Box>
+                        <Box sx={{ p: 5 }}>
+                          <Typography variant="body1">· Communication</Typography>
+                          <Typography variant="body1">· Gross Motor</Typography>
+                        </Box>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                          <Typography variant="h3">Earth From Space</Typography>
+                        </Box>
+                        <Box sx={{ p: 5 }}>
+                          <Typography variant="body1">· Arts</Typography>
+                          <Typography variant="body1">· Literacy</Typography>
+                        </Box>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                          <Typography variant="caption">Small Group · Arts</Typography>
+                          <Typography variant="h3">Make Your Own Planet</Typography>
+                        </Box>
+                        <Box sx={{ p: 5 }}>
+                          <Typography variant="body1">· Cognition, Including Math</Typography>
+                        </Box>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                          <Typography variant="caption">Small Group · Arts</Typography>
+                          <Typography variant="h3">Make Your Own Planet</Typography>
+                        </Box>
+                        <Box sx={{ p: 5 }}>
+                          <Typography variant="body1">· Cognition, Including Math</Typography>
+                        </Box>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }}>+ Add Section</Button>
+            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button variant="text" onClick={() => setAssignRoomOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={() => setAssignRoomOpen(false)}>Assign</Button>
+          <Button variant="text" onClick={() => closeLessonTemplate()}>Done</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Section Name Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={sectionNameOpen}
+        onClose           ={closeSectionName}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Add Section Name</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                label           ="Name"
+                margin          ="dense"
+                type            ="text"
+                variant         ="outlined"
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={closeSectionName}>Done</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Section Note Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={sectionNoteOpen}
+        onClose           ={closeSectionNote}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Section Note</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs
+              value={sectionNoteTabPanelValue}
+              onChange={handleSectionNoteTabChange}
+              aria-label="basic tabs example"
+            >
+              <Tab label="Day 1" {...a11yProps(0)} />
+              <Tab label="Day 2" {...a11yProps(1)} />
+              <Tab label="Day 3" {...a11yProps(2)} />
+              <Tab label="Day 4" {...a11yProps(3)} />
+              <Tab label="Day 5" {...a11yProps(4)} />
+            </Tabs>
+          </Box>
+          <TabPanel value={sectionNoteTabPanelValue} index={0}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows    ={3}
+                  label   ="Notes"
+                  margin  ="dense"
+                  type    ="text"
+                  variant ="outlined"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={sectionNoteTabPanelValue} index={1}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows    ={3}
+                  label   ="Notes"
+                  margin  ="dense"
+                  type    ="text"
+                  variant ="outlined"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={sectionNoteTabPanelValue} index={2}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows    ={3}
+                  label   ="Notes"
+                  margin  ="dense"
+                  type    ="text"
+                  variant ="outlined"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={sectionNoteTabPanelValue} index={3}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows    ={3}
+                  label   ="Notes"
+                  margin  ="dense"
+                  type    ="text"
+                  variant ="outlined"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={sectionNoteTabPanelValue} index={4}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows    ={3}
+                  label   ="Notes"
+                  margin  ="dense"
+                  type    ="text"
+                  variant ="outlined"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={closeSectionNote}>Done</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Section Item Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={sectionItemOpen}
+        onClose           ={closeSectionItem}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Section Activity</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="group-select">Targeted Group</InputLabel>
+                <Select
+                  labelId="group-select"
+                  id="group-select"
+                  label="Targeted Group"
+                >
+                  <MenuItem value="large group">Large Group</MenuItem>
+                  <MenuItem value="small group">Small Group</MenuItem>
+                  <MenuItem value="center">Center</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="Category-select">Category</InputLabel>
+                <Select
+                  labelId="Category-select"
+                  id="Category-select"
+                  label="Category"
+                >
+                  <MenuItem value="song">Song</MenuItem>
+                  <MenuItem value="arts">Arts</MenuItem>
+                  <MenuItem value="science">Science</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                label   ="Activity Title"
+                margin  ="dense"
+                type    ="text"
+                variant ="outlined"
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows    ={2}
+                label   ="Activity Description"
+                margin  ="dense"
+                type    ="text"
+                variant ="outlined"
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={closeSectionItem}>Done</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Room Plans View Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="xl"
+        open              ={roomPlanViewOpen}
+        onClose           ={closeRoomPlanView}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>{cardText}</h2>
+          <Typography variant="body2">This is a lesson plan template, you can assign it to rooms in your school.</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            {/* Template Textfield */}
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                label           ="Template title"
+                margin          ="dense"
+                type            ="text"
+                variant         ="outlined"
+                value           ={cardText}
+                onChange        ={(e) => setCardText(e.target.value)}
+              />
+            </Grid>
+            {/* Room Select */}
+            <Grid item xs={6} md={6}>
+              <FormControl fullWidth>
+                <InputLabel id="room-select">Room</InputLabel>
+                <Select
+                  multiple
+                  labelId="room-select"
+                  id="room-select"
+                  label="Room"
+                  value={selectedRooms}
+                  onChange={(e) => setSelectedRooms(e.target.value)}
+                >
+                  <MenuItem value="hibiscus room">Hibiscus Room</MenuItem>
+                  <MenuItem value="banana room">Banana Room</MenuItem>
+                  <MenuItem value="kitty room">Kitty Room</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            {/* Theme Select */}
+            <Grid item xs={6} md={6}>
+              <FormControl fullWidth>
+                <InputLabel id="room-select">Theme</InputLabel>
+                <Select
+                  multiple
+                  labelId="room-select"
+                  id="room-select"
+                  label="Room"
+                  value={selectedRooms}
+                  onChange={(e) => setSelectedRooms(e.target.value)}
+                >
+                  <MenuItem value="hibiscus room">Hibiscus Room</MenuItem>
+                  <MenuItem value="banana room">Banana Room</MenuItem>
+                  <MenuItem value="kitty room">Kitty Room</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Daily Topic Container */}
+            <Grid item container xs={12} md={12} spacing={2}>
+              <Grid item xs={5.5} md={5.5}>
+                <TextField
+                  fullWidth
+                  label           ="Daily topic"
+                  margin          ="dense"
+                  type            ="text"
+                  variant         ="outlined"
+                />
+              </Grid>
+              <Grid item xs={5.5} md={5.5}>
+                <TextField
+                  fullWidth
+                  label           ="Description"
+                  margin          ="dense"
+                  type            ="text"
+                  variant         ="outlined"
+                />
+              </Grid>
+              <Grid item xs={1} md={1}>
+                <Button sx={{ minHeight: "100%", minWidth: "100%" }}><DeleteIcon /></Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }}>+ Add topic</Button>
+              </Grid>
+            </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Section Grid */}
+            <Grid item xs={12} md={12}>
+              <Card sx={{ borderRadius: 1.5 }}>
+                <Box sx={{ minWidth: '100%', display: 'flex', justifyContent: 'space-between', backgroundColor: '#e3f2fd', p: 2 }}>
+                  <Button endIcon={<EditIcon />} onClick={() => openSectionName()}>Add section name (optional)</Button>
+                  <Button endIcon={<EditIcon />} onClick={() => openSectionNote()}>Section notes</Button>
+                </Box>
+                <Grid container item xs={12} md={12} spacing={3} sx={{ p: 5 }}>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      {/* <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable droppableId="questions-list" direction="vertical">
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              // eslint-disable-next-line
+                              {...provided.droppableProps}
+                            >
+                              <Draggable>
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    // eslint-disable-next-line
+                                    {...provided.draggableProps}
+                                    // eslint-disable-next-line
+                                    {...provided.dragHandleProps}
+                                  > */}
+                                    <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                                      <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                                        <Typography variant="caption">Large Group · Song</Typography>
+                                        <Typography variant="h3">Space Songs</Typography>
+                                      </Box>
+                                      <Box sx={{ p: 5 }}>
+                                        <Typography variant="body1">· Approach to learning the planets in our solar system.</Typography>
+                                      </Box>
+                                    </Card>
+                                  {/* </div>
+                                  )}
+                                </Draggable>
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext> */}
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                          <Typography variant="h3">Counting the Planets</Typography>
+                        </Box>
+                        <Box sx={{ p: 5 }}>
+                          <Typography variant="body1">· Communication</Typography>
+                          <Typography variant="body1">· Gross Motor</Typography>
+                        </Box>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                          <Typography variant="h3">Earth From Space</Typography>
+                        </Box>
+                        <Box sx={{ p: 5 }}>
+                          <Typography variant="body1">· Arts</Typography>
+                          <Typography variant="body1">· Literacy</Typography>
+                        </Box>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                          <Typography variant="caption">Small Group · Arts</Typography>
+                          <Typography variant="h3">Make Your Own Planet</Typography>
+                        </Box>
+                        <Box sx={{ p: 5 }}>
+                          <Typography variant="body1">· Cognition, Including Math</Typography>
+                        </Box>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                  <Grid container item md={2.4} xs={2.4} spacing={2}>
+                    <Grid item md={12} xs={12}>
+                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
+                          <Typography variant="caption">Small Group · Arts</Typography>
+                          <Typography variant="h3">Make Your Own Planet</Typography>
+                        </Box>
+                        <Box sx={{ p: 5 }}>
+                          <Typography variant="body1">· Cognition, Including Math</Typography>
+                        </Box>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }}>+ Add Section</Button>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={() => closeRoomPlanView()}>Done</Button>
         </DialogActions>
       </Dialog>
     </Card>
