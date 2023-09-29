@@ -78,6 +78,7 @@ const useStyles = makeStyles(Styles);
 const Page2 = () => {
   const classes   = useStyles();
   const tableHead = ["Name", "Assigned week", "Theme", ""];
+  const learningActivitiesHead = ["Name", "Category/type", "Skills", "Summary", ""];
   const [cardText, setCardText]                         = useState([]);
   const [createRoomPlanOpen, setCreateRoomPlanOpen]                         = useState(false);
   const [assignRoomOpen, setAssignRoomOpen]                                 = useState(false);
@@ -86,6 +87,9 @@ const Page2 = () => {
   const [sectionNoteOpen, setSectionNoteOpen]                               = useState(false);
   const [sectionItemOpen, setSectionItemOpen]                               = useState(false);
   const [roomPlanViewOpen, setRoomPlanViewOpen]                             = useState(false);
+  const [createLearningActivityOpen, setCreateLearningActivityOpen]         = useState(false);
+  const [learningActivityDetailOpen, setLearningActivityDetailOpen]         = useState(false);
+  const [activityTitle, setActivityTitle]                                   = useState([]);
   const [selectedRooms, setSelectedRooms]                                   = useState([]);
   const [selectedSkill, setSelectedSkill]                                   = useState([]);
   const [selectedCategory, setSelectedCategory]                             = useState([]);
@@ -168,6 +172,23 @@ const Page2 = () => {
 
   const closeSectionItem = async () => {
     setSectionItemOpen(false);
+  }
+
+  const openCreateLearningActivity = async () => {
+    setCreateLearningActivityOpen(true);
+  }
+  
+  const closeCreateLearningActivity = async () => {
+    setCreateLearningActivityOpen(false);
+  }
+
+  const openLearningActivityDetail = async () => {
+    setCreateLearningActivityOpen(false);
+    setLearningActivityDetailOpen(true);
+  }
+  
+  const closeLearningActivityDetail = async () => {
+    setLearningActivityDetailOpen(false);
   }
 
   const openRoomPlanView = async () => {
@@ -285,9 +306,9 @@ const Page2 = () => {
                 <Tab label="Lesson plan templates" {...a11yProps(0)} />
                 <Tab label="Learning activities" {...a11yProps(1)} />
               </Tabs>
-              <Button variant ="contained" onClick ={openCreateRoomPlan}>
+              <Button variant ="contained" onClick={openCreateLearningActivity}>
                 <Typography variant="button" component="div">
-                  Create room plan
+                  Create learning activity
                 </Typography>
               </Button>
             </Box>
@@ -701,6 +722,39 @@ const Page2 = () => {
           <Button variant="contained" onClick={() => setAssignRoomOpen(false)}>Assign</Button>
         </DialogActions>
       </Dialog>
+      {/* Create Learning Activity Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={createLearningActivityOpen}
+        onClose           ={closeCreateLearningActivity}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Create learning activity</h2>
+          <Typography variant="body2">Add a title for your learning activity to get started.</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                label           ="Title"
+                margin          ="dense"
+                type            ="text"
+                variant         ="outlined"
+                value           ={activityTitle}
+                onChange        ={(e) => setActivityTitle(e.target.value)}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={() => closeCreateLearningActivity()}>Cancel</Button>
+          <Button variant="contained" onClick={() => openLearningActivityDetail()}>Create</Button>
+        </DialogActions>
+      </Dialog>
       {/* Lesson Template Dialog */}
       <Dialog
         fullWidth
@@ -716,7 +770,7 @@ const Page2 = () => {
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            {/* Template Textfield */}
+            {/* Template Title Textfield */}
             <Grid item xs={12} md={12}>
               <TextField
                 fullWidth
@@ -1062,18 +1116,18 @@ const Page2 = () => {
       {/* Section Item Dialog */}
       <Dialog
         fullWidth
-        maxWidth          ="sm"
+        maxWidth          ="xl"
         open              ={sectionItemOpen}
         onClose           ={closeSectionItem}
         aria-labelledby   ="alert-dialog-title"
         aria-describedby  ="alert-dialog-description"
       >
         <DialogTitle>
-          <h2>Section Activity</h2>
+          <h2>Learning Activity</h2>
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={2.75} md={2.75}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="group-select">Targeted Group</InputLabel>
                 <Select
@@ -1087,7 +1141,7 @@ const Page2 = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={2.75} md={2.75}>
               <FormControl fullWidth margin="dense">
                 <InputLabel id="Category-select">Category</InputLabel>
                 <Select
@@ -1101,25 +1155,67 @@ const Page2 = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                fullWidth
-                label   ="Activity Title"
-                margin  ="dense"
-                type    ="text"
-                variant ="outlined"
-              />
+            <Grid item xs={2.75} md={2.75}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="Category-select">Category</InputLabel>
+                <Select
+                  labelId="Category-select"
+                  id="Category-select"
+                  label="Category"
+                >
+                  <MenuItem value="song">Song</MenuItem>
+                  <MenuItem value="arts">Arts</MenuItem>
+                  <MenuItem value="science">Science</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={2.75} md={2.75}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="Category-select">Category</InputLabel>
+                <Select
+                  labelId="Category-select"
+                  id="Category-select"
+                  label="Category"
+                >
+                  <MenuItem value="song">Song</MenuItem>
+                  <MenuItem value="arts">Arts</MenuItem>
+                  <MenuItem value="science">Science</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={1} md={1}>
+              <Button sx={{ minHeight: "100%", minWidth: "100%" }}>Reset All</Button>
             </Grid>
             <Grid item xs={12} md={12}>
-              <TextField
-                fullWidth
-                multiline
-                rows    ={2}
-                label   ="Activity Description"
-                margin  ="dense"
-                type    ="text"
-                variant ="outlined"
-              />
+              <Table>
+                <TableHead>
+                  <TableRow className={classes.tableHeadRow}>
+                    {learningActivitiesHead.map((prop) => (
+                      <TableCell
+                        className={classes.tableCell + classes.tableHeadCell}
+                        key={prop}
+                      >
+                        {prop}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Test</TableCell>
+                    <TableCell>Test</TableCell>
+                    <TableCell>Test</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <Button onClick={() => closeSectionItem()}>
+                        <Typography variant="button" component="div">
+                          Add
+                        </Typography>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </Grid>
           </Grid>
         </DialogContent>
@@ -1280,6 +1376,130 @@ const Page2 = () => {
             </Grid>
             <Grid item xs={12} md={12}>
               <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }}>+ Add Section</Button>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={() => closeRoomPlanView()}>Done</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Create Learning Activity Details Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="xl"
+        open              ={learningActivityDetailOpen}
+        onClose           ={closeLearningActivityDetail}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Create Learning Activity</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            {/* Activity Title Textfield */}
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                label           ="Learning activity title"
+                margin          ="dense"
+                type            ="text"
+                variant         ="outlined"
+                value           ={activityTitle}
+                onChange        ={(e) => setActivityTitle(e.target.value)}
+              />
+            </Grid>
+            {/* Category Select */}
+            <Grid item xs={6} md={6}>
+              <FormControl fullWidth>
+                <InputLabel id="category-select">Category</InputLabel>
+                <Select
+                  labelId="category-select"
+                  id="category-select"
+                  label="Category"
+                >
+                  <MenuItem value="category 1">Category 1</MenuItem>
+                  <MenuItem value="category 2">Category 2</MenuItem>
+                  <MenuItem value="category 3">Category 3</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            {/* Theme Select */}
+            <Grid item xs={6} md={6}>
+              <FormControl fullWidth>
+                <InputLabel id="type-select">Type</InputLabel>
+                <Select
+                  labelId="type-select"
+                  id="type-select"
+                  label="Type"
+                >
+                  <MenuItem value="type 1">Type 1</MenuItem>
+                  <MenuItem value="type 2">Type 2</MenuItem>
+                  <MenuItem value="type 3">Type 3</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Skills Add */}
+            <Grid item xs={12} md={12}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Typography variant="h3">Skills</Typography>
+                <Button startIcon={<AddIcon />}>Add</Button>
+              </Box>
+            </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Requirements Container */}
+            <Grid item container xs={12} md={12} spacing={2}>
+              <Grid item xs={4} md={4}>
+                <Typography variant="h4">Age (months)</Typography>
+                <TextField
+                  fullWidth
+                  label           ="Min age"
+                  margin          ="dense"
+                  type            ="integer"
+                  variant         ="outlined"
+                />
+              </Grid>
+              <Grid item xs={4} md={4}>
+                <TextField
+                  fullWidth
+                  label           ="Description"
+                  margin          ="dense"
+                  type            ="text"
+                  variant         ="outlined"
+                />
+              </Grid>
+              <Grid item xs={4} md={4}>
+                <TextField
+                  fullWidth
+                  label           ="Description"
+                  margin          ="dense"
+                  type            ="text"
+                  variant         ="outlined"
+                />
+              </Grid>
+            </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Description Textfield */}
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                multiline
+                rows            ={4}
+                label           ="Description"
+                margin          ="dense"
+                type            ="text"
+                variant         ="outlined"
+              />
             </Grid>
           </Grid>
         </DialogContent>
