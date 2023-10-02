@@ -1456,33 +1456,76 @@ const Page2 = () => {
             </Grid>
             {/* Requirements Container */}
             <Grid item container xs={12} md={12} spacing={2}>
-              <Grid item xs={4} md={4}>
-                <Typography variant="h4">Age (months)</Typography>
-                <TextField
-                  fullWidth
-                  label           ="Min age"
-                  margin          ="dense"
-                  type            ="integer"
-                  variant         ="outlined"
-                />
+              <Grid item container xs={4} md={4} alignItems="center" justifyContent="center">
+                <Grid item xs={12} md={12}>
+                  <Typography variant="h4">Age (months)</Typography>
+                </Grid>
+                <Grid item xs={5.5} md={5.5}>
+                  <TextField
+                    fullWidth
+                    label           ="Min age"
+                    margin          ="dense"
+                    type            ="text"
+                    variant         ="outlined"
+                  />
+                </Grid>
+                <Grid item xs={1} md={1} align="center">
+                  <Typography variant="h4">-</Typography>
+                </Grid>
+                <Grid item xs={5.5} md={5.5}>
+                  <TextField
+                    fullWidth
+                    label           ="Max age"
+                    margin          ="dense"
+                    type            ="text"
+                    variant         ="outlined"
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={4} md={4}>
-                <TextField
-                  fullWidth
-                  label           ="Description"
-                  margin          ="dense"
-                  type            ="text"
-                  variant         ="outlined"
-                />
+              <Grid item container xs={4} md={4} alignItems="center" justifyContent="center">
+                <Grid item xs={12} md={12}>
+                  <Typography variant="h4">Duration</Typography>
+                </Grid>
+                <Grid item xs={5.5} md={5.5}>
+                  <TextField
+                    fullWidth
+                    label           ="Hours"
+                    margin          ="dense"
+                    type            ="text"
+                    variant         ="outlined"
+                  />
+                </Grid>
+                <Grid item xs={1} md={1} align="center">
+                  <Typography variant="h4">:</Typography>
+                </Grid>
+                <Grid item xs={5.5} md={5.5}>
+                  <TextField
+                    fullWidth
+                    label           ="Minutes"
+                    margin          ="dense"
+                    type            ="text"
+                    variant         ="outlined"
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={4} md={4}>
-                <TextField
-                  fullWidth
-                  label           ="Description"
-                  margin          ="dense"
-                  type            ="text"
-                  variant         ="outlined"
-                />
+              <Grid item container xs={4} md={4} alignItems="center" justifyContent="center">
+                <Grid item xs={12} md={12}>
+                  <Typography variant="h4">Location</Typography>
+                </Grid>
+                <Grid item xs={12} md={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="location-select">Select or type to add</InputLabel>
+                    <Select
+                      labelId="location-select"
+                      id="location-select"
+                      label="Select or type to add"
+                    >
+                      <MenuItem value="location 1">Location 1</MenuItem>
+                      <MenuItem value="location 2">Location 2</MenuItem>
+                      <MenuItem value="location 3">Location 3</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
               </Grid>
             </Grid>
             {/* Divider */}
@@ -1491,11 +1534,49 @@ const Page2 = () => {
             </Grid>
             {/* Description Textfield */}
             <Grid item xs={12} md={12}>
+              <Typography variant="h4">Description</Typography>
               <TextField
                 fullWidth
                 multiline
                 rows            ={4}
                 label           ="Description"
+                margin          ="dense"
+                type            ="text"
+                variant         ="outlined"
+              />
+            </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Supplies Select */}
+            <Grid item xs={12} md={12}>
+              <Typography variant="h4" sx={{ marginBottom: 2 }}>Supplies</Typography>
+              <FormControl fullWidth>
+                <InputLabel id="category-select">Select supplies</InputLabel>
+                <Select
+                  labelId="category-select"
+                  id="category-select"
+                  label="Select supplies"
+                >
+                  <MenuItem value="category 1">Category 1</MenuItem>
+                  <MenuItem value="category 2">Category 2</MenuItem>
+                  <MenuItem value="category 3">Category 3</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            {/* Divider */}
+            <Grid item xs={12} md={12}>
+              <Divider />
+            </Grid>
+            {/* Description Textfield */}
+            <Grid item xs={12} md={12}>
+              <Typography variant="h4">Notes</Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows            ={2}
+                label           ="Add notes to adapt, extend or customise this activity to your group or child. Your notes are only visible to you."
                 margin          ="dense"
                 type            ="text"
                 variant         ="outlined"
