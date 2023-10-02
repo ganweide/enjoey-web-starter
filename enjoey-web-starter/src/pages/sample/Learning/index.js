@@ -306,11 +306,19 @@ const Page2 = () => {
                 <Tab label="Lesson plan templates" {...a11yProps(0)} />
                 <Tab label="Learning activities" {...a11yProps(1)} />
               </Tabs>
-              <Button variant ="contained" onClick={openCreateLearningActivity}>
-                <Typography variant="button" component="div">
-                  Create learning activity
-                </Typography>
-              </Button>
+              {libraryTabPanelValue === 0 ? (
+                <Button variant="contained" onClick={openCreateRoomPlan}>
+                  <Typography variant="button" component="div">
+                    Create room plan
+                  </Typography>
+                </Button>
+              ) : (
+                <Button variant="contained" onClick={openCreateLearningActivity}>
+                  <Typography variant="button" component="div">
+                    Create learning activity
+                  </Typography>
+                </Button>
+              )}
             </Box>
             <TabPanel value={libraryTabPanelValue} index={0}>
               {/* Template Section */}
