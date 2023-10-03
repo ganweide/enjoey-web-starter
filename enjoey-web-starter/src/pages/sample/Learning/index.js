@@ -982,156 +982,6 @@ const Page2 = () => {
                     ))}
                   </div>
                 </DragDropContext>
-                {/* <DragDropContext onDragEnd={onDragEnd}>
-                  <Grid container spacing={2}>
-                    <Droppable droppableId="cards" direction="horizontal">
-                      {(provided) => (
-                        <div
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                          style={{ display: 'flex' }}
-                        >
-                          {cards.map((card, index) => (
-                            <Grid key={card.id} container item md={2.4} xs={2.4} spacing={2}>
-                              <Grid item md={12} xs={12}>
-                                <Draggable draggableId={card.id} index={index}>
-                                  {(provided) => (
-                                    <div
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                    >
-                                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
-                                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
-                                          <Typography variant="caption">Small Group · Arts</Typography>
-                                          <Typography variant="h3">{card.title}</Typography>
-                                        </Box>
-                                        <Box sx={{ p: 5 }}>
-                                          <Typography variant="body1">{card.description}</Typography>
-                                        </Box>
-                                      </Card>
-                                    </div>
-                                  )}
-                                </Draggable>
-                              </Grid>
-                              <Grid item xs={12} md={12}>
-                                <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
-                              </Grid>
-                            </Grid>
-                          ))}
-                          {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-                  </Grid>
-                </DragDropContext> */}
-                {/* <Grid container item xs={12} md={12} spacing={3} sx={{ p: 5 }}>
-                  <Grid container item md={2.4} xs={2.4} spacing={2}>
-                    <Grid item md={12} xs={12}>
-                      <DragDropContext onDragEnd={handleDragEnd}>
-                        <Droppable droppableId="questions-list" direction="vertical">
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              // eslint-disable-next-line
-                              {...provided.droppableProps}
-                            >
-                              <Draggable>
-                                {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    // eslint-disable-next-line
-                                    {...provided.draggableProps}
-                                    // eslint-disable-next-line
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
-                                      <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
-                                        <Typography variant="caption">Large Group · Song</Typography>
-                                        <Typography variant="h3">Space Songs</Typography>
-                                      </Box>
-                                      <Box sx={{ p: 5 }}>
-                                        <Typography variant="body1">· Approach to learning the planets in our solar system.</Typography>
-                                      </Box>
-                                    </Card>
-                                  </div>
-                                  )}
-                                </Draggable>
-                              {provided.placeholder}
-                            </div>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
-                    </Grid>
-                  </Grid>
-                  <Grid container item md={2.4} xs={2.4} spacing={2}>
-                    <Grid item md={12} xs={12}>
-                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
-                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
-                          <Typography variant="h3">Counting the Planets</Typography>
-                        </Box>
-                        <Box sx={{ p: 5 }}>
-                          <Typography variant="body1">· Communication</Typography>
-                          <Typography variant="body1">· Gross Motor</Typography>
-                        </Box>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
-                    </Grid>
-                  </Grid>
-                  <Grid container item md={2.4} xs={2.4} spacing={2}>
-                    <Grid item md={12} xs={12}>
-                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
-                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
-                          <Typography variant="h3">Earth From Space</Typography>
-                        </Box>
-                        <Box sx={{ p: 5 }}>
-                          <Typography variant="body1">· Arts</Typography>
-                          <Typography variant="body1">· Literacy</Typography>
-                        </Box>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
-                    </Grid>
-                  </Grid>
-                  <Grid container item md={2.4} xs={2.4} spacing={2}>
-                    <Grid item md={12} xs={12}>
-                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
-                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
-                          <Typography variant="caption">Small Group · Arts</Typography>
-                          <Typography variant="h3">Make Your Own Planet</Typography>
-                        </Box>
-                        <Box sx={{ p: 5 }}>
-                          <Typography variant="body1">· Cognition, Including Math</Typography>
-                        </Box>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
-                    </Grid>
-                  </Grid>
-                  <Grid container item md={2.4} xs={2.4} spacing={2}>
-                    <Grid item md={12} xs={12}>
-                      <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
-                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
-                          <Typography variant="caption">Small Group · Arts</Typography>
-                          <Typography variant="h3">Make Your Own Planet</Typography>
-                        </Box>
-                        <Box sx={{ p: 5 }}>
-                          <Typography variant="body1">· Cognition, Including Math</Typography>
-                        </Box>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                      <Button variant="outlined" sx={{ minHeight: "100%", minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
-                    </Grid>
-                  </Grid>
-                </Grid> */}
               </Card>
             </Grid>
             <Grid item xs={12} md={12}>
@@ -1493,53 +1343,58 @@ const Page2 = () => {
                   <Button endIcon={<EditIcon />} onClick={() => openSectionName()}>Add section name (optional)</Button>
                   <Button endIcon={<EditIcon />} onClick={() => openSectionNote()}>Section notes</Button>
                 </Box>
-                <Grid container item xs={12} md={12} spacing={3} sx={{ p: 5 }}>
-                  <DragDropContext onDragEnd={handleDragEnd}>
-                    {cards.map((card, index) => (
-                      <Grid key={card.id} container item md={2.4} xs={2.4} spacing={2}>
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <div style={{ display: 'flex' }}>
+                    {Object.values(boardColumns).map(column => (
+                      <Grid item container key={column.id} xs={2.4} maxWidth={2.4} spacing={2}>
                         <Grid item xs={12} md={12}>
-                          <Droppable droppableId={`cards-${card.id}`} direction="horizontal">
-                            {(provided) => (
+                          <Droppable droppableId={column.id} key={column.id}>
+                            {(provided, snapshot) => (
                               <div
                                 ref={provided.innerRef}
                                 // eslint-disable-next-line
                                 {...provided.droppableProps}
+                                style={{
+                                  background: snapshot.isDraggingOver ? 'lightblue' : 'lightgrey',
+                                  padding: 4,
+                                  minHeight: 500,
+                                }}
                               >
-                                <Draggable key={card.id} draggableId={card.id} index={index}>
-                                  {(provided) => (
-                                    <div
-                                      ref={provided.innerRef}
-                                      // eslint-disable-next-line
-                                      {...provided.draggableProps}
-                                      // eslint-disable-next-line
-                                      {...provided.dragHandleProps}
-                                    >
-                                      <Card sx={{ height: "200px", border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
-                                        <Box sx={{ backgroundColor: "#D3D3D3", p: 5 }}>
-                                          <Typography variant="h3">{`${card.targetGroup} · ${card.category}`}</Typography>
-                                          <Typography variant="h3">{card.title}</Typography>
-                                        </Box>
-                                        <Box sx={{ p: 5 }}>
-                                          <Typography variant="body1">{`·${card.description}`}</Typography>
-                                        </Box>
-                                      </Card>
-                                    </div>
-                                  )}
-                                </Draggable>
+                                {column.cards.map((card, index) => (
+                                  <Draggable key={card.id} draggableId={card.id} index={index}>
+                                    {(provided, snapshot) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        // eslint-disable-next-line
+                                        {...provided.draggableProps}
+                                        // eslint-disable-next-line
+                                        {...provided.dragHandleProps}
+                                      >
+                                        <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
+                                          <Box sx={{ backgroundColor: '#D3D3D3', p: 5 }}>
+                                            <Typography variant="caption">{`${card.targetGroup} · ${card.category}`}</Typography>
+                                            <Typography variant="h3">{card.title}</Typography>
+                                          </Box>
+                                          <Box sx={{ p: 5 }}>
+                                            <Typography variant="body1">{card.description}</Typography>
+                                          </Box>
+                                        </Card>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
                                 {provided.placeholder}
                               </div>
                             )}
                           </Droppable>
                         </Grid>
                         <Grid item xs={12} md={12}>
-                          <IconButton aria-label='delete' onClick={() => openSectionItem()}>
-                            <AddIcon />
-                          </IconButton>
+                          <Button variant="outlined" sx={{ minWidth: "100%" }} onClick={() => openSectionItem()}>+</Button>
                         </Grid>
                       </Grid>
                     ))}
-                  </DragDropContext>
-                </Grid>
+                  </div>
+                </DragDropContext>
               </Card>
             </Grid>
             <Grid item xs={12} md={12}>
