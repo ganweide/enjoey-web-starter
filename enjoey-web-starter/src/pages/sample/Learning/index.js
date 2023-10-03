@@ -939,6 +939,7 @@ const Page2 = () => {
                             {(provided, snapshot) => (
                               <div
                                 ref={provided.innerRef}
+                                // eslint-disable-next-line
                                 {...provided.droppableProps}
                                 style={{
                                   background: snapshot.isDraggingOver ? 'lightblue' : 'lightgrey',
@@ -951,7 +952,9 @@ const Page2 = () => {
                                     {(provided, snapshot) => (
                                       <div
                                         ref={provided.innerRef}
+                                        // eslint-disable-next-line
                                         {...provided.draggableProps}
+                                        // eslint-disable-next-line
                                         {...provided.dragHandleProps}
                                       >
                                         <Card sx={{ border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
@@ -1499,13 +1502,16 @@ const Page2 = () => {
                             {(provided) => (
                               <div
                                 ref={provided.innerRef}
+                                // eslint-disable-next-line
                                 {...provided.droppableProps}
                               >
                                 <Draggable key={card.id} draggableId={card.id} index={index}>
                                   {(provided) => (
                                     <div
                                       ref={provided.innerRef}
+                                      // eslint-disable-next-line
                                       {...provided.draggableProps}
+                                      // eslint-disable-next-line
                                       {...provided.dragHandleProps}
                                     >
                                       <Card sx={{ height: "200px", border: 1, display: 'flex', flexDirection: 'column', borderRadius: 1.5 }}>
