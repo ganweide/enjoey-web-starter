@@ -40,7 +40,12 @@ INSTALLED_APPS = [
     'enjoey_api',
     'corsheaders',
     'rest_framework',
+    'django_apscheduler',
 ]
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
