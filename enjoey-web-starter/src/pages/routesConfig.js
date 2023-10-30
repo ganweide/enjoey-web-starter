@@ -30,6 +30,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/Learning',
       },
+      {
+        id: 'scheduler-settings',
+        title: 'Scheduler Settings',
+        messageId: 'Scheduler Settings',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/SchedulerSettings',
+      },
     ],
   },
   {

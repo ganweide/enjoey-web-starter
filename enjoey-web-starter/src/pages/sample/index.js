@@ -16,6 +16,7 @@ const Page12 = React.lazy(() => import('./Check-inReport'));
 const Page13 = React.lazy(() => import('./RoomCheckReport'));
 const Page14 = React.lazy(() => import('./ImmunizationReport'));
 const Page15 = React.lazy(() => import('./Learning'));
+const Page16 = React.lazy(() => import('./SchedulerSettings'));
 
 export const samplePagesConfigs = [
   {
@@ -78,5 +79,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/Learning',
     element: <Page15 />,
+  },
+  {
+    path: '/sample/SchedulerSettings',
+    element: <Page16 />,
   },
 ];

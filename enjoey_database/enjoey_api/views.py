@@ -1,8 +1,45 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from rest_framework import viewsets, status
 from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable
 from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.core.management import call_command
+
+@api_view(['POST'])
+def start_scheduler(request):
+    call_command("startscheduler")
+    return Response({'message': 'Scheduler started'})
+
+@api_view(['POST'])
+def stop_scheduler(request):
+    call_command("stopscheduler")
+    return Response({'message': 'Scheduler stopped'})
+
+# @api_view(['POST'])
+# def start_scheduler(request):
+#     scheduler = get_scheduler()
+#     if not scheduler.running:
+#         scheduler.start()
+#     return Response({'message': 'Scheduler started'})
+
+# @api_view(['POST'])
+# def stop_scheduler(request):
+#     scheduler = get_scheduler()
+#     if scheduler.running:
+#         scheduler.shutdown()
+#     return Response({'message': 'Scheduler stopped'})
+
+# @api_view(['POST'])
+# def start_scheduler(request):
+#     scheduler.add_job(my_job, trigger='interval', seconds=2)
+#     scheduler.start()
+#     return Response({'message': 'Scheduler started'})
+
+# @api_view(['POST'])
+# def stop_scheduler(request):
+#     scheduler.shutdown()
+#     return Response({'message': 'Scheduler stopped'})
 
 class ChildView(viewsets.ModelViewSet):
     queryset = ChildTable.objects.all().order_by('-created_at')
@@ -216,3 +253,4 @@ class SurveySettingsView(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
