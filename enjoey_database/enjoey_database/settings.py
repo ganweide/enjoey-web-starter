@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'django_apscheduler',
+    'apscheduler',
 ]
 
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"

@@ -16,30 +16,10 @@ def stop_scheduler(request):
     call_command("stopscheduler")
     return Response({'message': 'Scheduler stopped'})
 
-# @api_view(['POST'])
-# def start_scheduler(request):
-#     scheduler = get_scheduler()
-#     if not scheduler.running:
-#         scheduler.start()
-#     return Response({'message': 'Scheduler started'})
-
-# @api_view(['POST'])
-# def stop_scheduler(request):
-#     scheduler = get_scheduler()
-#     if scheduler.running:
-#         scheduler.shutdown()
-#     return Response({'message': 'Scheduler stopped'})
-
-# @api_view(['POST'])
-# def start_scheduler(request):
-#     scheduler.add_job(my_job, trigger='interval', seconds=2)
-#     scheduler.start()
-#     return Response({'message': 'Scheduler started'})
-
-# @api_view(['POST'])
-# def stop_scheduler(request):
-#     scheduler.shutdown()
-#     return Response({'message': 'Scheduler stopped'})
+# @api_view(['GET'])
+# def check_status(request):
+#     is_running = scheduler_status
+#     return Response({'isRunning': is_running})
 
 class ChildView(viewsets.ModelViewSet):
     queryset = ChildTable.objects.all().order_by('-created_at')
