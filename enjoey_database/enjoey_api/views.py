@@ -5,6 +5,7 @@ from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionT
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.core.management import call_command
+from enjoey_api.management.commands.scheduler_manager import is_scheduler_running
 
 @api_view(['POST'])
 def start_scheduler(request):
@@ -16,10 +17,13 @@ def stop_scheduler(request):
     call_command("stopscheduler")
     return Response({'message': 'Scheduler stopped'})
 
-# @api_view(['GET'])
-# def check_status(request):
-#     is_running = scheduler_status
-#     return Response({'isRunning': is_running})
+@api_view(['GET'])
+def check_scheduler_status(request):
+    status = is_scheduler_running()
+    if status:
+        return Response({'status': 'true'})
+    else:
+        return Response({'status': 'false'})
 
 class ChildView(viewsets.ModelViewSet):
     queryset = ChildTable.objects.all().order_by('-created_at')

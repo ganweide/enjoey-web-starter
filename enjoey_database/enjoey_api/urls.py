@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler#, check_status
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status
 from rest_framework import routers
 
 route1 = routers.DefaultRouter()
@@ -41,6 +41,6 @@ urlpatterns = [
     path('surveysettings/', include(route9.urls)),
     path('start-scheduler/', start_scheduler, name='start_scheduler'),
     path('stop-scheduler/', stop_scheduler, name='stop_scheduler'),
-    # path('check-status/', check_status, name='check_status'),
+    path('check-status/', check_scheduler_status, name='check_status'),
 ]
 

@@ -36,41 +36,46 @@ const useStyles = makeStyles(Styles);
 
 const Page2 = () => {
   const classes   = useStyles();
-  const tableHead = [" ", "Action", "On", "Off"];
+  const tableHead = [" ", "Action", "Details", "On", "Off"];
   const [schedulerCreationOpen, setSchedulerCreationOpen] = useState(false);
   const [checkRunningScheduler, setCheckRunningScheduler] = useState(false);
 
-  // useEffect(() => {
-  //   checkStatus()
-  // }, []);
-
-  // const checkStatus = async () => {
-  //   try {
-  //     const response = await Axios.get('http://127.0.0.1:8000/api/check-status/');
-  //     setCheckRunningScheduler(response.data.isRunning);
-  //     console.log(response.data.isRunning)
-  //   } catch (error) {
-  //     console.log('Error checking status:', error);
-  //   }
-  // }
-
+  // On Button
   const start = async () => {
     try {
       await Axios.post('http://127.0.0.1:8000/api/start-scheduler/');
       console.log('Scheduler started.');
+      checkStatus();
     } catch (error) {
       console.error('Error starting scheduler:', error);
     }
   }
 
+  const checkStatus = async () => {
+    try {
+      const response = await Axios.get('http://127.0.0.1:8000/api/check-status/');
+      const status = response.data.status === 'true';
+      setCheckRunningScheduler(status);
+      console.log(status)
+    } catch (error) {
+      console.log('Error checking status:', error);
+    }
+  }
+
+  // Off Button
   const stop = async () => {
     try {
       await Axios.post('http://127.0.0.1:8000/api/stop-scheduler/');
       console.log('Scheduler stopped.');
+      checkStatus();
     } catch (error) {
       console.error('Error stopping scheduler:', error);
     }
   }
+
+  useEffect(() => {
+    checkStatus()
+  }, []);
   
   const openAddScheduler = async () => {
     setSchedulerCreationOpen(true);
@@ -170,8 +175,9 @@ const Page2 = () => {
             <TableRow>
               <TableCell style={{textAlign: "center", width: '15%'}}>1</TableCell>
               <TableCell style={{textAlign: "center"}}>Testing 1</TableCell>
+              <TableCell style={{textAlign: "center"}}>Testing 1 details</TableCell>
               <TableCell style={{textAlign: "center"}}>
-                <Button onClick={start}>On</Button>
+                <Button onClick={start} disabled={checkRunningScheduler}>On</Button>
               </TableCell>
               <TableCell style={{textAlign: "center"}}>
                 <Button onClick={stop}>Off</Button>

@@ -17,3 +17,6 @@ def stop_scheduler():
     if scheduler is not None:
         scheduler.shutdown()
         scheduler = None
+
+def is_scheduler_running():
+    return scheduler is not None
