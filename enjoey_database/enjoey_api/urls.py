@@ -39,8 +39,8 @@ urlpatterns = [
     path('sleep/', include(route7.urls)),
     path('immunization/', include(route8.urls)),
     path('surveysettings/', include(route9.urls)),
-    path('start-scheduler/', start_scheduler, name='start_scheduler'),
-    path('stop-scheduler/', stop_scheduler, name='stop_scheduler'),
+    path('start-scheduler/<str:job_name>/', start_scheduler),
+    path('stop-scheduler/<str:job_name>/', stop_scheduler),
     path('check-status/', check_scheduler_status, name='check_status'),
 ]
 

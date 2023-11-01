@@ -5,21 +5,21 @@ from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionT
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.core.management import call_command
-from enjoey_api.management.commands.scheduler_manager import is_scheduler_running
+from enjoey_api.management.commands.scheduler_manager import is_scheduler_running_job1
 
 @api_view(['POST'])
-def start_scheduler(request):
-    call_command("startscheduler")
+def start_scheduler(request, job_name):
+    call_command("startscheduler", job_name)
     return Response({'message': 'Scheduler started'})
 
 @api_view(['POST'])
-def stop_scheduler(request):
-    call_command("stopscheduler")
+def stop_scheduler(request, job_name):
+    call_command("stopscheduler", job_name)
     return Response({'message': 'Scheduler stopped'})
 
 @api_view(['GET'])
 def check_scheduler_status(request):
-    status = is_scheduler_running()
+    status = is_scheduler_running_job1()
     if status:
         return Response({'status': 'true'})
     else:
