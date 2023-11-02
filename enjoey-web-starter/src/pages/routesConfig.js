@@ -38,6 +38,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/SchedulerSettings',
       },
+      {
+        id: 'pdf-download',
+        title: 'PDF Download',
+        messageId: 'PDF Download',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/PDFDownload',
+      },
     ],
   },
   {

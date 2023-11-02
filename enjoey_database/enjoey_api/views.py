@@ -3,6 +3,13 @@ from rest_framework import viewsets, status
 from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable
 from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer
 from rest_framework.response import Response
+import datetime
+from django.views import View
+import os
+from io import BytesIO
+from xhtml2pdf import pisa
+from django.http import HttpResponse
+from django.template.loader import get_template
 from rest_framework.decorators import api_view
 from django.core.management import call_command
 from enjoey_api.management.commands.scheduler_manager import is_scheduler_running_job1
@@ -24,6 +31,35 @@ def check_scheduler_status(request):
         return Response({'status': 'true'})
     else:
         return Response({'status': 'false'})
+
+class PdfFileApiView(View):
+    def get(self, request, *args, **kwargs):
+        today = datetime.date.today().strftime("%Y-%m-%d")
+        data = {
+            'date': today,
+            'amount': 0.00,
+            'customer_name': 'Testing 1',
+            'invoice_number': 1234567,
+        }
+
+        template = get_template('pdf/pdf.html')
+        html = template.render(data)
+        result = BytesIO()
+
+        pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+        if not pdf.err:
+            if not os.path.exists('pdfFiles/pdf/'):
+                os.makedirs('pdfFiles/pdf/')
+            pdf_path = os.path.join('pdfFiles/pdf/', 'testing.pdf')
+            with open(pdf_path, 'wb') as pdf_file:
+                pdf_file.write(result.getvalue())
+
+            response = HttpResponse(result.getvalue(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="invoice.pdf"'
+            return response
+
+        return HttpResponse("Error generating PDF", content_type='text/plain')
+
 
 class ChildView(viewsets.ModelViewSet):
     queryset = ChildTable.objects.all().order_by('-created_at')

@@ -26,7 +26,7 @@ def start_scheduler(job_name):
                 my_job,
                 trigger="interval",
                 seconds=1,
-                id="my_job",
+                id="my_job1",
                 replace_existing=True,
             )
         elif job_name == 'job2':
@@ -34,7 +34,7 @@ def start_scheduler(job_name):
                 my_job2,
                 trigger="interval",
                 seconds=1,
-                id="my_job",
+                id="my_job2",
                 replace_existing=True,
             )
         scheduler.start()
