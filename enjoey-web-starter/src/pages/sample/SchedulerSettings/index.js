@@ -21,11 +21,9 @@ import {
   DialogContent,
   Grid,
   DialogActions,
-  Select,
-  MenuItem,
   TextField,
-  FormControl,
-  InputLabel,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 
 // Local Imports
@@ -131,20 +129,16 @@ const Page2 = () => {
               <TextField
                 fullWidth
                 InputLabelProps ={{ shrink: true }}
-                label           ="Assign week"
+                label           ="Scheduled time"
                 margin          ="dense"
-                type            ="date"
+                type            ="time"
                 variant         ="outlined"
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <TextField
-                fullWidth
-                InputLabelProps ={{ shrink: true }}
-                label           ="Assign time"
-                margin          ="dense"
-                type            ="time"
-                variant         ="outlined"
+              <FormControlLabel
+                control={<Checkbox />}
+                label="Manual On/Off"
               />
             </Grid>
           </Grid>
