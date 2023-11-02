@@ -22,8 +22,6 @@ import {
   Grid,
   DialogActions,
   TextField,
-  FormControlLabel,
-  Checkbox,
 } from "@mui/material";
 
 // Local Imports
@@ -49,17 +47,6 @@ const Page2 = () => {
     }
   }
 
-  const checkStatus = async (job_name) => {
-    try {
-      const response = await Axios.get('http://127.0.0.1:8000/api/check-status/');
-      const status = response.data.status === 'true';
-      setCheckRunningScheduler(status);
-      console.log(status)
-    } catch (error) {
-      console.log('Error checking status:', error);
-    }
-  }
-
   // Off Button
   const stop = async (job_name) => {
     try {
@@ -71,10 +58,23 @@ const Page2 = () => {
     }
   }
 
+  // Check Status
+  const checkStatus = async (job_name) => {
+    try {
+      const response = await Axios.get('http://127.0.0.1:8000/api/check-status/');
+      const status = response.data.status === 'true';
+      setCheckRunningScheduler(status);
+      console.log(status)
+    } catch (error) {
+      console.log('Error checking status:', error);
+    }
+  }
+
   useEffect(() => {
     checkStatus()
   }, []);
   
+  // Open Add Scheduler
   const openAddScheduler = async () => {
     setSchedulerCreationOpen(true);
   }
@@ -84,6 +84,7 @@ const Page2 = () => {
 
   return (
     <div>
+      {/* Header Section */}
       <Box 
         sx={{
           p: 2,
@@ -102,6 +103,7 @@ const Page2 = () => {
           </Typography>
         </Button>
       </Box>
+      {/* Add Scheduler Dialog */}
       <Dialog
         fullWidth
         maxWidth          ="sm"
@@ -135,18 +137,13 @@ const Page2 = () => {
                 variant         ="outlined"
               />
             </Grid>
-            <Grid item xs={12} md={12}>
-              <FormControlLabel
-                control={<Checkbox />}
-                label="Manual On/Off"
-              />
-            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button variant="text" onClick={closeAddScheduler}>Save</Button>
         </DialogActions>
       </Dialog>
+      {/* Body Section */}
       <Card>
         <Table>
           <TableHead>
