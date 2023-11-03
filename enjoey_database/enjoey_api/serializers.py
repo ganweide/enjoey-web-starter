@@ -1,5 +1,15 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles
+
+class PDFFilesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PDFFiles
+        fields = [
+            'id',
+            'file',
+            'stored_at',
+            'updated_at',
+        ]
 
 class ChildTableSerializer(serializers.ModelSerializer):
     childId = serializers.CharField(required=False)

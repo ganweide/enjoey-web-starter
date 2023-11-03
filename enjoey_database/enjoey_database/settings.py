@@ -9,11 +9,28 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+#-------------------------------AWS----------------------------
+MAX_BLOG_FILE_SIZE_MB = 4
+MAX_AVATAR_IMAGE_SIZE_MB = 2
+AWS_STORAGE_BUCKET_NAME = "weide1234"
+AWS_S3_REGION_NAME = 'eu-central-1'
+AWS_ACCESS_KEY_ID = "AKIAXA62Z6WI57FRGWOR"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+# s3 avatar settings
+DEFAULT_FILE_STORAGE = 'enjoey_api.storagebackend.PDFStorage'
+STATICFILES_STORAGE = 'enjoey_api.storagebackend.PDFStorage'
+FILE_LOCATION = 'pdf'
+# AVATAR_STORAGE = 'UploadFiles.storage_backends.AvatarStorage'
 
 
 # Quick-start development settings - unsuitable for production
@@ -144,8 +161,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIR = [BASE_DIR / "static"]
+
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

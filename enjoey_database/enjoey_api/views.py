@@ -1,10 +1,12 @@
 # from django.shortcuts import render
 from rest_framework import viewsets, status
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer
+from rest_framework.generics import CreateAPIView
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer
 from rest_framework.response import Response
 import datetime
 from django.views import View
+from django.conf import settings
 import os
 from io import BytesIO
 from xhtml2pdf import pisa
@@ -13,6 +15,8 @@ from django.template.loader import get_template
 from rest_framework.decorators import api_view
 from django.core.management import call_command
 from enjoey_api.management.commands.scheduler_manager import is_scheduler_running_job1
+
+
 
 @api_view(['POST'])
 def start_scheduler(request, job_name):
@@ -37,7 +41,7 @@ class PdfFileApiView(View):
         today = datetime.date.today().strftime("%Y-%m-%d")
         data = {
             'date': today,
-            'amount': 0.00,
+            'amount': 100.00,
             'customer_name': 'Testing 1',
             'invoice_number': 1234567,
         }
@@ -59,7 +63,32 @@ class PdfFileApiView(View):
             return response
 
         return HttpResponse("Error generating PDF", content_type='text/plain')
+    
+class PDFUploadView(CreateAPIView):
+    serializer_class = PDFFilesSerializer
+    def create(self, request, *args, **kwargs):
+        if not request.FILES.get('file', False):
+            return Response({"msg":"file key is missing in body"}, \
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+        file = request.FILES.getlist('file')[0]
+        
+        # perform checks
+        file_ext = os.path.splitext( str(file.name) )[-1]
+        if file_ext not in ['.pdf']:
+            return Response({ \
+                "msg":"file not valid" , "acceptable_extension" : \
+                "[pdf]", }, \
+                status=status.HTTP_400_BAD_REQUEST)
+        
+        PDFFiles.objects.filter(file=file).delete()
 
+        upload = PDFFiles(file=file)
+        upload.save()
+        file_url = upload.file.url
+        upload_id = upload.id
+        return Response({"file_url" : file_url, "upload_id": upload_id}, \
+                        status=status.HTTP_201_CREATED)
 
 class ChildView(viewsets.ModelViewSet):
     queryset = ChildTable.objects.all().order_by('-created_at')

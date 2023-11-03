@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE HTML>
 <html>
     <head>
@@ -42,8 +43,9 @@
             </div>
         <div>
         <div class='details'>
+            <img src="https://samplelib.com/lib/preview/png/sample-boat-400x300.png" /><br/>
             Bill to: {{ customer_name }}<br/>
-            Amount: {{ amount }} <br/>
+            Amount: $ {{ amount }} <br/>
             Date: {{ date }}
             <hr class='hrItem' />
         </div>

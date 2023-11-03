@@ -1,5 +1,31 @@
 from django.db import models
 from django.utils.text import slugify
+from .storagebackend import PDFStorage
+import os
+import datetime
+from django.utils.timezone import utc
+from django.conf import settings
+import uuid
+
+
+class PDFFiles(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    file = models.FileField( storage=PDFStorage() )
+    stored_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if self.file:
+            now = datetime.datetime.utcnow().replace(tzinfo=utc)
+            # timestamp = now.strftime('%s')
+            self.updated_at = now
+            file_ext = os.path.splitext(str(self.file.name))[-1]
+            self.file.name = f"testing{file_ext}"
+            self.file.storage.location = \
+                f"{settings.FILE_LOCATION}/{self.id}"
+            #or self.file.storage.location = \
+                #f"{settings.AVATAR_LOCATION}/{username}/{timestamp}"
+        super(PDFFiles, self).save(*args, **kwargs)
 
 class ChildTable(models.Model):
     childId         = models.CharField(primary_key=True, db_index=True, max_length=250)

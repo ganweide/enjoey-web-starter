@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView
 from rest_framework import routers
 
 route1 = routers.DefaultRouter()
@@ -43,5 +43,6 @@ urlpatterns = [
     path('stop-scheduler/<str:job_name>/', stop_scheduler),
     path('check-status/', check_scheduler_status, name='check_status'),
     path('generate-pdf/', PdfFileApiView.as_view(), name='generate_pdf'),
+    path('upload-pdf/', PDFUploadView.as_view(), name='upload_pdf'),
 ]
 

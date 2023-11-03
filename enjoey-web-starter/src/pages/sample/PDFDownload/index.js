@@ -41,6 +41,15 @@ const Page2 = () => {
     }
   }
 
+  const handleUploadClick = async () => {
+    try {
+      await Axios.post(`http://127.0.0.1:8000/api/upload-pdf/`);
+      console.log('PDF Uploaded.');
+    } catch (error) {
+      console.error('Error starting scheduler:', error);
+    }
+  }
+
   return (
     <div>
       <Card sx={{ p: 5}}>
@@ -58,6 +67,21 @@ const Page2 = () => {
           <Grid item xs={12} md={12}>
             <Typography variant="h3" component="div">
               Click button above to download the PDF
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Button variant ="contained" onClick={handleUploadClick}>
+              <Typography variant="button" component="div">
+                Upload PDF
+              </Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Typography variant="h3" component="div">
+              Click button above to upload the PDF to AWS S3 Bucket
             </Typography>
           </Grid>
         </Grid>
