@@ -83,8 +83,7 @@ class PDFUploadView(CreateAPIView):
         
         PDFFiles.objects.filter(file=file).delete()
 
-        upload = PDFFiles(file=file)
-        upload.save()
+        upload = PDFFiles.objects.create(file=file)
         file_url = upload.file.url
         upload_id = upload.id
         return Response({"file_url" : file_url, "upload_id": upload_id}, \

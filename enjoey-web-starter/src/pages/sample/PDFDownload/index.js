@@ -13,24 +13,7 @@ import {
 
 
 const Page2 = () => {
-  // const handleDownloadClick = () => {
-  //   Axios
-  //     .get('/generate-pdf/', {
-  //       responseType: 'blob', // Ensure the response is treated as a binary blob
-  //     })
-  //     .then((response) => {
-  //       const url = window.URL.createObjectURL(new Blob([response.data]));
-  //       const a = document.createElement('a');
-  //       a.href = url;
-  //       a.download = 'invoice.pdf';
-  //       document.body.appendChild(a);
-  //       a.click();
-  //       window.URL.revokeObjectURL(url);
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error downloading PDF:', error);
-  //     });
-  // };
+  const [file, setFile] = useState(null);
 
   const handleDownloadClick = async () => {
     try {
@@ -41,9 +24,24 @@ const Page2 = () => {
     }
   }
 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
   const handleUploadClick = async () => {
     try {
-      await Axios.post(`http://127.0.0.1:8000/api/upload-pdf/`);
+      if(!file) {
+        console.log("Please select a PDF file.");
+        return
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+
+      await Axios.post('http://127.0.0.1:8000/api/upload-pdf/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       console.log('PDF Uploaded.');
     } catch (error) {
       console.error('Error starting scheduler:', error);
@@ -62,12 +60,15 @@ const Page2 = () => {
             </Button>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Divider />
-          </Grid>
-          <Grid item xs={12} md={12}>
             <Typography variant="h3" component="div">
               Click button above to download the PDF
             </Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <input type="file" accept=".pdf" onChange={handleFileChange} />
           </Grid>
           <Grid item xs={12} md={12}>
             <Button variant ="contained" onClick={handleUploadClick}>
@@ -77,11 +78,23 @@ const Page2 = () => {
             </Button>
           </Grid>
           <Grid item xs={12} md={12}>
+            <Typography variant="h3" component="div">
+              Click button above to upload the PDF to AWS S3 Bucket
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
             <Divider />
           </Grid>
           <Grid item xs={12} md={12}>
+            <Button variant ="contained" onClick={handleUploadClick}>
+              <Typography variant="button" component="div">
+                Show PDF
+              </Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={12}>
             <Typography variant="h3" component="div">
-              Click button above to upload the PDF to AWS S3 Bucket
+              Click button above show the uploaded pdf file
             </Typography>
           </Grid>
         </Grid>

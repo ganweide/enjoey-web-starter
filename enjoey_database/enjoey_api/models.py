@@ -22,7 +22,7 @@ class PDFFiles(models.Model):
             file_ext = os.path.splitext(str(self.file.name))[-1]
             self.file.name = f"testing{file_ext}"
             self.file.storage.location = \
-                f"{settings.FILE_LOCATION}/{self.id}"
+                f"{settings.PDF_LOCATION}/{self.id}"
             #or self.file.storage.location = \
                 #f"{settings.AVATAR_LOCATION}/{username}/{timestamp}"
         super(PDFFiles, self).save(*args, **kwargs)
