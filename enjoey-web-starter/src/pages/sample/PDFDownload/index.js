@@ -11,16 +11,16 @@ import {
   Typography,
 } from "@mui/material";
 
+import { saveAs } from 'file-saver';
 
 const Page2 = () => {
   const [file, setFile] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState('');
+  const [pdfBlob, setPdfBlob] = useState(null);
 
   const handleDownloadClick = async () => {
-    try {
-      await Axios.get(`http://127.0.0.1:8000/api/generate-pdf/`);
-      console.log('PDF Generated.');
-    } catch (error) {
-      console.error('Error starting scheduler:', error);
+    if (pdfBlob) {
+      saveAs(pdfBlob, 'invoice.pdf');
     }
   }
 
@@ -47,6 +47,15 @@ const Page2 = () => {
       console.error('Error starting scheduler:', error);
     }
   }
+
+  const handleShowPDF = async () => {
+    try {
+      const response = await Axios.get('http://127.0.0.1:8000/api/get-presigned-url/pdf/5fb6c8a5-c8fc-481e-8677-0025d9da01cf/testing.pdf');
+      setPdfUrl(response.data.url);
+    } catch (error) {
+      console.error('Error getting pre-signed URL:', error);
+    }
+  };
 
   return (
     <div>
@@ -86,7 +95,7 @@ const Page2 = () => {
             <Divider />
           </Grid>
           <Grid item xs={12} md={12}>
-            <Button variant ="contained" onClick={handleUploadClick}>
+            <Button variant ="contained" onClick={handleShowPDF}>
               <Typography variant="button" component="div">
                 Show PDF
               </Typography>
@@ -96,6 +105,16 @@ const Page2 = () => {
             <Typography variant="h3" component="div">
               Click button above show the uploaded pdf file
             </Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            {pdfUrl && (
+              <iframe
+                title="PDF Viewer"
+                src={pdfUrl}
+                width="100%"
+                height="600"
+              />
+            )}
           </Grid>
         </Grid>
       </Card>

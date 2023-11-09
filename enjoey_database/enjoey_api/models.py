@@ -17,14 +17,11 @@ class PDFFiles(models.Model):
     def save(self, *args, **kwargs):
         if self.file:
             now = datetime.datetime.utcnow().replace(tzinfo=utc)
-            # timestamp = now.strftime('%s')
             self.updated_at = now
             file_ext = os.path.splitext(str(self.file.name))[-1]
             self.file.name = f"testing{file_ext}"
             self.file.storage.location = \
                 f"{settings.PDF_LOCATION}/{self.id}"
-            #or self.file.storage.location = \
-                #f"{settings.AVATAR_LOCATION}/{username}/{timestamp}"
         super(PDFFiles, self).save(*args, **kwargs)
 
 class ChildTable(models.Model):

@@ -11,25 +11,26 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from the .env file
 
 #-------------------------------AWS----------------------------
-MAX_BLOG_FILE_SIZE_MB = 4
-MAX_AVATAR_IMAGE_SIZE_MB = 2
-AWS_STORAGE_BUCKET_NAME = "weide1234"
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'weide1234'
+AWS_S3_SIGNATURE_NAME = 's3v4'
 AWS_S3_REGION_NAME = 'eu-central-1'
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
-AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_VERITY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-# s3 avatar settings
 PDF_STORAGE = 'enjoey_api.storagebackend.PDFStorage'
 PDF_LOCATION = 'pdf'
-# AVATAR_STORAGE = 'UploadFiles.storage_backends.AvatarStorage'
 
 
 # Quick-start development settings - unsuitable for production

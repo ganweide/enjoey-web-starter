@@ -10,11 +10,13 @@ from django.conf import settings
 import os
 from io import BytesIO
 from xhtml2pdf import pisa
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import get_template
 from rest_framework.decorators import api_view
 from django.core.management import call_command
 from enjoey_api.management.commands.scheduler_manager import is_scheduler_running_job1
+import boto3
+from botocore.exceptions import NoCredentialsError
 
 
 
@@ -42,7 +44,7 @@ class PdfFileApiView(View):
         data = {
             'date': today,
             'amount': 100.00,
-            'customer_name': 'Testing 1',
+            'customer_name': 'Testing 2',
             'invoice_number': 1234567,
         }
 
@@ -88,6 +90,23 @@ class PDFUploadView(CreateAPIView):
         upload_id = upload.id
         return Response({"file_url" : file_url, "upload_id": upload_id}, \
                         status=status.HTTP_201_CREATED)
+
+def get_presigned_url(request, file_key):
+    try:
+        s3_client = boto3.client(
+            's3',
+            region_name=settings.AWS_S3_REGION_NAME,
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
+        )
+        url = s3_client.generate_presigned_url('get_object', Params={'Bucket': 'weide1234', 'Key': file_key}, ExpiresIn=3600)
+        print("Pre-signed URL:", url)
+        return JsonResponse({'url': url})
+    except NoCredentialsError:
+        return JsonResponse({'error': 'AWS credentials are missing or invalid.'}, status=500)
+    except Exception as e:
+        print("Error generating pre-signed URL:", str(e))
+        return JsonResponse({'error': 'Error generating pre-signed URL.'}, status=500)
 
 class ChildView(viewsets.ModelViewSet):
     queryset = ChildTable.objects.all().order_by('-created_at')
