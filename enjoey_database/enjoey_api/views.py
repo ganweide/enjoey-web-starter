@@ -17,6 +17,12 @@ from django.core.management import call_command
 from enjoey_api.management.commands.scheduler_manager import is_scheduler_running_job1
 import boto3
 from botocore.exceptions import NoCredentialsError
+from django.http import JsonResponse
+from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 
 
@@ -90,6 +96,26 @@ class PDFUploadView(CreateAPIView):
         upload_id = upload.id
         return Response({"file_url" : file_url, "upload_id": upload_id}, \
                         status=status.HTTP_201_CREATED)
+
+class PDFUploadViewWithDjangoStorages(APIView):
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            try:
+                file = request.FILES.get('file')
+                
+                # Use the storage backend to upload the file to S3
+                storage = S3Boto3Storage()
+                file_name = file.name
+                file_path = f"{settings.PDF_LOCATION}/{file_name}"
+                storage.save(file_path, file)
+                
+                url = storage.url(file_path)
+                
+                return JsonResponse({'success': True, 'url': url})
+            except Exception as e:
+                print('Error:', e)
+                return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 def get_presigned_url(request, file_key):
     try:

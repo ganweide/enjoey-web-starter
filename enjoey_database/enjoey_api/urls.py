@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages
 from . import views
 from rest_framework import routers
 
@@ -45,6 +45,8 @@ urlpatterns = [
     path('check-status/', check_scheduler_status, name='check_status'),
     path('generate-pdf/', PdfFileApiView.as_view(), name='generate_pdf'),
     path('upload-pdf/', PDFUploadView.as_view(), name='upload_pdf'),
+    path('upload/', PDFUploadViewWithDjangoStorages.as_view(), name='upload'),
     re_path(r'^get-presigned-url/(?P<file_key>.*)/$', get_presigned_url),
+
 ]
 

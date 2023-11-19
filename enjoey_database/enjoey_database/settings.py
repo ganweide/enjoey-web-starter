@@ -107,6 +107,7 @@ CORS_ALLOW_HEADERS = [
     'origin',
     'user-agent',
     'withCredentials',
+    'x-csrftoken',
 ]
 
 WSGI_APPLICATION = 'enjoey_database.wsgi.application'
@@ -120,7 +121,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'enjoey-web-starter',
         'USER': 'postgres',
-        'PASSWORD': 'ROOT',
+        'PASSWORD': 'admin',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
