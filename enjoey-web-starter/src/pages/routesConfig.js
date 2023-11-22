@@ -46,6 +46,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/PDFDownload',
       },
+      {
+        id: 'albums',
+        title: 'Albums',
+        messageId: 'Albums',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/Albums',
+      },
     ],
   },
   {

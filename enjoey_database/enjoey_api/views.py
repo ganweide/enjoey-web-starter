@@ -102,8 +102,7 @@ class PDFUploadViewWithDjangoStorages(APIView):
         if request.method == 'POST':
             try:
                 file = request.FILES.get('file')
-                
-                # Use the storage backend to upload the file to S3
+
                 storage = S3Boto3Storage()
                 file_name = file.name
                 file_path = f"{settings.PDF_LOCATION}/{file_name}"
@@ -116,6 +115,17 @@ class PDFUploadViewWithDjangoStorages(APIView):
                 print('Error:', e)
                 return JsonResponse({'error': str(e)}, status=500)
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+class PDFShowView(APIView):
+    def get(self, request, file_key):
+        try:
+            storage = S3Boto3Storage()
+            url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{file_key}"
+            print("Constructed URL:", url)
+            return JsonResponse({'url': url})
+        except Exception as e:
+            print("Error generating pre-signed URL:", str(e))
+            return JsonResponse({'error': 'Error generating pre-signed URL.'}, status=500)
 
 def get_presigned_url(request, file_key):
     try:

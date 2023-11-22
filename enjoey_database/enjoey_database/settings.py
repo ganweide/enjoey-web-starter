@@ -121,7 +121,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'enjoey-web-starter',
         'USER': 'postgres',
-        'PASSWORD': 'admin',
+        'PASSWORD': 'ROOT',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }

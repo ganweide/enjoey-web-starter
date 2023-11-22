@@ -25,6 +25,29 @@ class PDFFiles(models.Model):
         super(PDFFiles, self).save(*args, **kwargs)
 
 class ChildTable(models.Model):
+    activityName    = models.CharField(max_length=250)
+    activityType        = models.CharField(max_length=250)
+    hashtagValue       = models.CharField(max_length=250)
+    created_at      = models.DateTimeField("created_at", auto_now_add=True)
+    updated_at      = models.DateTimeField("updated_at", auto_now=True)
+    deleted_at      = models.DateTimeField("deleted_at", null=True, blank=True)
+
+    def __str__(self):
+        return self.childId
+    
+    def save(self, *args, **kwargs):
+        if not self.childId:
+            self.childId = slugify(self.childNameENG + "-" + self.childNRIC)
+        super().save(*args, **kwargs)
+
+class ActivityMediaTable(models.Model):
+    file = models.ImageField( storage=PDFStorage() )
+    hashtagValue = models.CharField(max_length=250)
+    fileURL = models.CharField(max_length=250)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ChildTable(models.Model):
     childId         = models.CharField(primary_key=True, db_index=True, max_length=250)
     childNameENG    = models.CharField(max_length=250)
     childDOB        = models.CharField(max_length=250)

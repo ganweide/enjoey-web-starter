@@ -18,6 +18,7 @@ const Page14 = React.lazy(() => import('./ImmunizationReport'));
 const Page15 = React.lazy(() => import('./Learning'));
 const Page16 = React.lazy(() => import('./SchedulerSettings'));
 const Page17 = React.lazy(() => import('./PDFDownload'));
+const Page18 = React.lazy(() => import('./Albums'));
 
 export const samplePagesConfigs = [
   {
@@ -88,5 +89,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/PDFDownload',
     element: <Page17 />,
+  },
+  {
+    path: '/sample/Albums',
+    element: <Page18 />,
   },
 ];
