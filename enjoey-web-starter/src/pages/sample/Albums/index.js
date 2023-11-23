@@ -1,5 +1,5 @@
 // React Imports
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Axios from "axios";
 
@@ -13,11 +13,22 @@ import {
   Select
 } from "@mui/material";
 
-
-import { Document, Page, pdfjs } from 'react-pdf';
-
 const Page2 = () => {
   const [tag, setTag] = useState('');
+  const [imageURL, setImageURL] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await Axios.get(`http://localhost:8000/api/upload-image/?tag=${tag}`);
+        setImageURL(response.data);
+      } catch (error) {
+        console.error('Error fetching data', error);
+      }
+    };
+
+    fetchData();
+  }, [tag]);
 
   return (
     <div>
@@ -39,14 +50,15 @@ const Page2 = () => {
                 onChange={(e) => setTag(e.target.value)}
               >
                 <MenuItem disabled value="">Pick a tag</MenuItem>
-                <MenuItem value="before-school-care">Before School Care</MenuItem>
-                <MenuItem value="after-school-care">After School Care</MenuItem>
-                <MenuItem value="infant-care-program">Infant Care Program</MenuItem>
-                <MenuItem value="preschool-program">Preschool Program</MenuItem>
-                <MenuItem value="toddler-care-program">Toddler Care Program</MenuItem>
+                <MenuItem value="outdoor">Outdoor</MenuItem>
+                <MenuItem value="ball">Ball</MenuItem>
+                <MenuItem value="rock-climbing">Rock Climbing</MenuItem>
               </Select>
             </FormControl>
           </Grid>
+        </Grid>
+        <Grid container spacing={2} alignItems="center" justify="center">
+
         </Grid>
       </Card>
     </div>

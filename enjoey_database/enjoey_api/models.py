@@ -1,11 +1,12 @@
 from django.db import models
 from django.utils.text import slugify
-from .storagebackend import PDFStorage
+from .storagebackend import PDFStorage, ImageStorage
 import os
 import datetime
 from django.utils.timezone import utc
 from django.conf import settings
 import uuid
+from django.contrib.postgres.fields import ArrayField
 
 
 class PDFFiles(models.Model):
@@ -24,26 +25,17 @@ class PDFFiles(models.Model):
                 f"{settings.PDF_LOCATION}/{self.id}"
         super(PDFFiles, self).save(*args, **kwargs)
 
-class ChildTable(models.Model):
-    activityName    = models.CharField(max_length=250)
-    activityType        = models.CharField(max_length=250)
-    hashtagValue       = models.CharField(max_length=250)
-    created_at      = models.DateTimeField("created_at", auto_now_add=True)
-    updated_at      = models.DateTimeField("updated_at", auto_now=True)
-    deleted_at      = models.DateTimeField("deleted_at", null=True, blank=True)
-
-    def __str__(self):
-        return self.childId
-    
-    def save(self, *args, **kwargs):
-        if not self.childId:
-            self.childId = slugify(self.childNameENG + "-" + self.childNRIC)
-        super().save(*args, **kwargs)
+# class ActivityTable(models.Model):
+#     activityName    = models.CharField(max_length=250)
+#     activityType        = models.CharField(max_length=250)
+#     hashtagValue       = models.CharField(max_length=250)
+#     created_at      = models.DateTimeField("created_at", auto_now_add=True)
+#     updated_at      = models.DateTimeField("updated_at", auto_now=True)
+#     deleted_at      = models.DateTimeField("deleted_at", null=True, blank=True)
 
 class ActivityMediaTable(models.Model):
-    file = models.ImageField( storage=PDFStorage() )
-    hashtagValue = models.CharField(max_length=250)
-    fileURL = models.CharField(max_length=250)
+    file = models.ImageField( storage=ImageStorage() )
+    hashtagValue = ArrayField(models.CharField(max_length=250), blank=True, default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

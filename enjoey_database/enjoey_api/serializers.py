@@ -1,5 +1,14 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable
+
+class ActivityMediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityMediaTable
+        fields = [
+            'file',
+            'hashtagValue',
+            'fileURL',
+        ]
 
 class PDFFilesSerializer(serializers.ModelSerializer):
     class Meta:

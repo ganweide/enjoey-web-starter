@@ -1,8 +1,8 @@
 # from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.generics import CreateAPIView
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer
 from rest_framework.response import Response
 import datetime
 from django.views import View
@@ -24,7 +24,39 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+class ImageUploadView(APIView):
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            try:
+                image = request.FILES.get('image')
+                storage = S3Boto3Storage()
+                image_name = image.name
+                image_path = f"{settings.IMG_LOCATION}/{image_name}"
+                storage.save(image_path, image)
 
+                url = storage.url(image_path)
+
+                ActivityMediaTable.objects.create(
+                    file=image,
+                    hashtagValue=request.data.get('hashtagValue', ['outdoor']),
+                )
+
+                return JsonResponse({'success': True, 'url': url})
+            except Exception as e:
+                print('Error:', e)
+                return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+    def get(self, request, *args, **kwargs):
+        tag = request.GET.get('tag', '')  # Get the selected tag from the query parameters
+        if tag:
+            media_objects = ActivityMediaTable.objects.filter(hashtagValue__contains=[tag])
+        else:
+            media_objects = ActivityMediaTable.objects.all()
+
+        serializer = ActivityMediaSerializer(media_objects, many=True)
+        print(serializer.data)
+        return Response(serializer.data)
 
 @api_view(['POST'])
 def start_scheduler(request, job_name):

@@ -17,6 +17,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 const Page2 = () => {
   const [file, setFile] = useState(null);
   const [file2, setFile2] = useState(null);
+  const [image, setImage] = useState(null);
   const [pdfUrl, setPdfUrl] = useState('');
   const [pdfData, setPdfData] = useState(null);
 
@@ -45,6 +46,29 @@ const Page2 = () => {
       const formData = new FormData();
       formData.append('file', file2);
       await Axios.post('http://127.0.0.1:8000/api/upload/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('Upload successful.');
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
+  };
+
+
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+  const uploadImage = async () => {
+    try {
+      if (!image) {
+        console.log("Please select an image");
+        return;
+      }
+      const formData = new FormData();
+      formData.append('image', image);
+      await Axios.post('http://127.0.0.1:8000/api/upload-image/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -140,6 +164,24 @@ const Page2 = () => {
           <Grid item xs={12} md={12}>
             <Typography variant="h3" component="div">
               Click button above to upload the PDF to AWS S3 Bucket using django-storages
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <input type="file" onChange={handleImageChange} />
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Button variant ="contained" onClick={uploadImage}>
+              <Typography variant="button" component="div">
+                Upload Image
+              </Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Typography variant="h3" component="div">
+              Click button above to upload images to AWS S3 Bucket using django-storages
             </Typography>
           </Grid>
           <Grid item xs={12} md={12}>
