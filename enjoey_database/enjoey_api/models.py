@@ -34,7 +34,7 @@ class PDFFiles(models.Model):
 #     deleted_at      = models.DateTimeField("deleted_at", null=True, blank=True)
 
 class ActivityMediaTable(models.Model):
-    file = models.ImageField( storage=ImageStorage() )
+    file = models.ImageField(storage=ImageStorage())
     hashtagValue = ArrayField(models.CharField(max_length=250), blank=True, default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

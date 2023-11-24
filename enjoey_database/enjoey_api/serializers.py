@@ -7,7 +7,6 @@ class ActivityMediaSerializer(serializers.ModelSerializer):
         fields = [
             'file',
             'hashtagValue',
-            'fileURL',
         ]
 
 class PDFFilesSerializer(serializers.ModelSerializer):

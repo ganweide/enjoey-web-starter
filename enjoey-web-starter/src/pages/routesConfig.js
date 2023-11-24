@@ -54,6 +54,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/Albums',
       },
+      {
+        id: 'activity-upload',
+        title: 'Activity Upload',
+        messageId: 'Activity Upload',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/ActivityMediaUpload',
+      },
     ],
   },
   {

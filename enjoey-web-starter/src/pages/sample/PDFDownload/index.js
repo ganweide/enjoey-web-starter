@@ -170,24 +170,6 @@ const Page2 = () => {
             <Divider />
           </Grid>
           <Grid item xs={12} md={12}>
-            <input type="file" onChange={handleImageChange} />
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Button variant ="contained" onClick={uploadImage}>
-              <Typography variant="button" component="div">
-                Upload Image
-              </Typography>
-            </Button>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Typography variant="h3" component="div">
-              Click button above to upload images to AWS S3 Bucket using django-storages
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Divider />
-          </Grid>
-          <Grid item xs={12} md={12}>
             <Button variant ="contained" onClick={handleShowPDF}>
               <Typography variant="button" component="div">
                 Show PDF
