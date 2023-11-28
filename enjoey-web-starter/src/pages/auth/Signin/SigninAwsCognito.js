@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Form, Formik} from 'formik';
 import * as yup from 'yup';
 import {Link, useNavigate} from 'react-router-dom';
@@ -8,8 +8,11 @@ import IntlMessages from '@enjoey/utility/IntlMessages';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
+import { InputAdornment } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import AppInfoView from '@enjoey/core/AppInfoView';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import {useAuthMethod, useAuthUser} from '@enjoey/utility/AuthHooks';
 import {Fonts} from 'shared/constants/AppEnums';
@@ -30,6 +33,11 @@ const SigninAwsCognito = () => {
   const {auth} = useAuthUser();
   const {signIn} = useAuthMethod();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onGoToForgetPassword = () => {
     navigate('/forget-password', {tab: 'awsCognito'});
@@ -75,11 +83,20 @@ const SigninAwsCognito = () => {
 
               <Box sx={{mb: {xs: 3, xl: 4}}}>
                 <AppTextField
-                  type='password'
+                  type={showPassword ? 'text' : 'password'}
                   placeholder={messages['common.password']}
                   label={<IntlMessages id='common.password' />}
                   name='password'
                   variant='outlined'
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={handleTogglePasswordVisibility} edge="end">
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                   sx={{
                     width: '100%',
                     '& .MuiInputBase-input': {
