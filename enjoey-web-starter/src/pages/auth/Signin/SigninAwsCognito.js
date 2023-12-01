@@ -51,7 +51,7 @@ const SigninAwsCognito = () => {
         <Formik
           validateOnChange={true}
           initialValues={{
-            email: 'devuser1@gmail.com',
+            email: 'ganweide@visualogic.com.my',
             password: 'Devuser1!',
           }}
           validationSchema={validationSchema}

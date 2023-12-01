@@ -20,6 +20,7 @@ const Page16 = React.lazy(() => import('./SchedulerSettings'));
 const Page17 = React.lazy(() => import('./PDFDownload'));
 const Page18 = React.lazy(() => import('./Albums'));
 const Page19 = React.lazy(() => import('./ActivityMediaUpload'));
+const Page20 = React.lazy(() => import('./Invoice'));
 
 export const samplePagesConfigs = [
   {
@@ -95,8 +96,12 @@ export const samplePagesConfigs = [
     path: '/sample/Albums',
     element: <Page18 />,
   },
-    {
+  {
     path: '/sample/ActivityMediaUpload',
     element: <Page19 />,
+  },
+  {
+    path: '/sample/Invoice',
+    element: <Page20 />,
   },
 ];

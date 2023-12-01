@@ -7,20 +7,28 @@ const routesConfig = [
     type: 'group',
     children: [
       {
+        id: 'payment',
+        title: 'Payment',
+        messageId: 'Payment',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/Invoice',
+      },
+    ],
+  },
+  {
+    id: 'app',
+    title: 'Sample',
+    messageId: 'Plannings',
+    type: 'collapse',
+    children: [
+      {
         id: 'menu-planning',
         title: 'Menu Planning',
         messageId: 'Menu Planning',
         type: 'item',
         icon: <BiAlignLeft />,
         url: '/sample/MenuPlanning',
-      },
-      {
-        id: 'immunization',
-        title: 'Immunization',
-        messageId: 'Immunization',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/Immunization',
       },
       {
         id: 'learning',
@@ -30,22 +38,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/Learning',
       },
-      {
-        id: 'scheduler-settings',
-        title: 'Scheduler Settings',
-        messageId: 'Scheduler Settings',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/SchedulerSettings',
-      },
-      {
-        id: 'pdf-download',
-        title: 'PDF Download',
-        messageId: 'PDF Download',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/PDFDownload',
-      },
+    ]
+  },
+  {
+    id: 'app',
+    title: 'Sample',
+    messageId: 'Albmus',
+    type: 'collapse',
+    children: [
       {
         id: 'albums',
         title: 'Albums',
@@ -62,7 +62,7 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/ActivityMediaUpload',
       },
-    ],
+    ]
   },
   {
     id: 'app',
@@ -189,6 +189,38 @@ const routesConfig = [
         type: 'item',
         icon: <BiAlignLeft />,
         url: '/sample/ImmunizationReport',
+      },
+      {
+        id: 'immunization',
+        title: 'Immunization',
+        messageId: 'Immunization',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/Immunization',
+      },
+    ]
+  },
+  {
+    id: 'app',
+    title: 'Sample',
+    messageId: 'Others',
+    type: 'collapse',
+    children: [
+      {
+        id: 'scheduler-settings',
+        title: 'Scheduler Settings',
+        messageId: 'Scheduler Settings',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/SchedulerSettings',
+      },
+      {
+        id: 'pdf-download',
+        title: 'PDF Download',
+        messageId: 'PDF Download',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/PDFDownload',
       },
     ]
   },
