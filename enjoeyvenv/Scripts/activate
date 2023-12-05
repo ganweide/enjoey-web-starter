@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\weide\Documents\Github\enjoey-web-starter\enjoeyvenv"
+VIRTUAL_ENV="D:\enjoey-web-starter\enjoeyvenv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

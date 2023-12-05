@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable
 
 class ActivityMediaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,6 +17,15 @@ class PDFFilesSerializer(serializers.ModelSerializer):
             'file',
             'stored_at',
             'updated_at',
+        ]
+
+class PaymentTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentTable
+        fields = [
+            'orderId',
+            'paymentId',
+            'signature',
         ]
 
 class ChildTableSerializer(serializers.ModelSerializer):

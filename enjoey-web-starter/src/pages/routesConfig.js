@@ -14,6 +14,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/Invoice',
       },
+      {
+        id: 'checkout',
+        title: 'Checkout',
+        messageId: 'Checkout',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/CheckoutForm',
+      },
     ],
   },
   {

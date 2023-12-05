@@ -39,6 +39,14 @@ class ActivityMediaTable(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+class PaymentTable(models.Model):
+    orderId         = models.CharField(max_length=250)
+    paymentId       = models.CharField(max_length=250)
+    signature       = models.CharField(max_length=250)
+    created_at      = models.DateTimeField("created_at", auto_now_add=True)
+    updated_at      = models.DateTimeField("updated_at", auto_now=True)
+    deleted_at      = models.DateTimeField("deleted_at", null=True, blank=True)
+
 class ChildTable(models.Model):
     childId         = models.CharField(primary_key=True, db_index=True, max_length=250)
     childNameENG    = models.CharField(max_length=250)

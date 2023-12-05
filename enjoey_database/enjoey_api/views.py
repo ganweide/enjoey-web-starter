@@ -1,8 +1,8 @@
 # from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.generics import CreateAPIView
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, PaymentTableSerializer
 from rest_framework.response import Response
 import datetime
 from django.views import View
@@ -23,6 +23,46 @@ from storages.backends.s3boto3 import S3Boto3Storage
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import razorpay
+from django.shortcuts import render
+
+client = razorpay.Client(auth=("rzp_test_3bw88hhzDiYA47", "UC5Q9p3aBA6UlQiPUG7maUHz"))
+def initiate_payment(amount, currency='MYR'):
+   data = {
+       'amount': amount * 100,
+       'currency': currency,
+       'payment_capture': '1'
+   }
+   response = client.order.create(data=data)
+   return response['id']
+
+@api_view(['POST'])
+def generate_order_id(request):
+   amount = 100
+   order_id = initiate_payment(amount)
+   context = {
+       'order_id': order_id,
+       'amount': amount,
+       'key': "rzp_test_3bw88hhzDiYA47"
+   }
+   return Response(context)
+
+@api_view(['POST'])
+def payment_success(request):
+    if request.method == 'POST':
+        try:
+            PaymentTable.objects.create(
+                orderId=request.data.get('orderId'),
+                paymentId=request.data.get('paymentId'),
+                signature=request.data.get('signature'),
+            )
+            print("request", request.data)
+            return JsonResponse({'success': True})
+        except Exception as e:
+            print('Error:', e)
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 
 class ImageUploadView(APIView):
     def post(self, request, *args, **kwargs):
