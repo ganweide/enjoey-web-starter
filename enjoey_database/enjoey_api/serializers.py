@@ -1,5 +1,36 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable
+
+class ActivityTagsTableSerializer(serializers.ModelSerializer):
+    tenantId = serializers.CharField(required=False)
+    branchId = serializers.CharField(required=False)
+    createdAt = serializers.DateTimeField(required=False)
+    class Meta:
+        model = ActivityTagsTable
+        fields = [
+            'tenantId',
+            'branchId',
+            'name',
+            'isActive',
+            'isArchived',
+            'createdAt',
+        ]
+
+class ActivityAreaTagsTableSerializer(serializers.ModelSerializer):
+    tenantId = serializers.CharField(required=False)
+    branchId = serializers.CharField(required=False)
+    createdAt = serializers.DateTimeField(required=False)
+    class Meta:
+        model = ActivityAreaTagsTable
+        fields = [
+            'tenantId',
+            'branchId',
+            'name',
+            'isActive',
+            'enterBy',
+            'isArchived',
+            'createdAt',
+        ]
 
 class ActivityMediaSerializer(serializers.ModelSerializer):
     class Meta:

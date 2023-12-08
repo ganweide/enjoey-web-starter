@@ -166,6 +166,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/ChargesForm',
       },
+      {
+        id: 'appointment-form',
+        title: 'Appointment Form',
+        messageId: 'Appointment Form',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/AppointmentForm',
+      },
     ]
   },
   {

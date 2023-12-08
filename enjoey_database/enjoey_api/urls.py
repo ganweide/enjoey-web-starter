@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView
 from . import views
 from rest_framework import routers
 
@@ -30,6 +30,9 @@ route8.register("", ImmunizationView, basename='immunizationview')
 route9 = routers.DefaultRouter()
 route9.register("", SurveySettingsView, basename='surveysettingsview')
 
+route10 = routers.DefaultRouter()
+route10.register("", ActivityTagsView, basename='activitytagsview')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -51,5 +54,6 @@ urlpatterns = [
     re_path(r'^get-presigned-url/(?P<file_key>.*)/$', get_presigned_url),
     path('order-id/', generate_order_id),
     path('payment-success/', payment_success, name='payment_success'),
+    path('activitytags/', include(route10.urls)),
 ]
 

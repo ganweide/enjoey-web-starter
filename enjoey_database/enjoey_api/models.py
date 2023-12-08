@@ -7,7 +7,55 @@ from django.utils.timezone import utc
 from django.conf import settings
 import uuid
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 
+class ActivityTagsTable(models.Model):
+    tenantId = models.CharField(max_length=250)
+    branchId = models.BigIntegerField()
+    name = models.CharField(max_length=250)
+    isActive = models.BooleanField(default=True)
+    enterBy = models.CharField(max_length=250, editable=True)
+    isArchived = models.BooleanField(default=False)
+    createdAt = models.DateTimeField(editable=False)
+    updatedAt = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.createdAt = timezone.now()
+        self.updatedAt = timezone.now()
+        return super(ActivityTagsTable, self).save(*args, **kwargs)
+                                              
+class ActivityAreaTagsTable(models.Model):
+    tenantId = models.CharField(max_length=250)
+    branchId = models.BigIntegerField()
+    name = models.CharField(max_length=250)
+    isActive = models.BooleanField(default=True)
+    enterBy = models.CharField(max_length=250, editable=True)
+    isArchived = models.BooleanField(default=False)
+    createdAt = models.DateTimeField(editable=False)
+    updatedAt = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.createdAt = timezone.now()
+        self.updatedAt = timezone.now()
+        return super(ActivityAreaTagsTable, self).save(*args, **kwargs)
+
+class ActivityMediaTable(models.Model):
+    file = models.ImageField(storage=ImageStorage())
+    hashtagValue = ArrayField(models.CharField(max_length=250), blank=True, default=list)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class PaymentTable(models.Model):
+    orderId         = models.CharField(max_length=250)
+    paymentId       = models.CharField(max_length=250)
+    signature       = models.CharField(max_length=250)
+    created_at      = models.DateTimeField("created_at", auto_now_add=True)
+    updated_at      = models.DateTimeField("updated_at", auto_now=True)
+    deleted_at      = models.DateTimeField("deleted_at", null=True, blank=True)
 
 class PDFFiles(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -24,28 +72,6 @@ class PDFFiles(models.Model):
             self.file.storage.location = \
                 f"{settings.PDF_LOCATION}/{self.id}"
         super(PDFFiles, self).save(*args, **kwargs)
-
-# class ActivityTable(models.Model):
-#     activityName    = models.CharField(max_length=250)
-#     activityType        = models.CharField(max_length=250)
-#     hashtagValue       = models.CharField(max_length=250)
-#     created_at      = models.DateTimeField("created_at", auto_now_add=True)
-#     updated_at      = models.DateTimeField("updated_at", auto_now=True)
-#     deleted_at      = models.DateTimeField("deleted_at", null=True, blank=True)
-
-class ActivityMediaTable(models.Model):
-    file = models.ImageField(storage=ImageStorage())
-    hashtagValue = ArrayField(models.CharField(max_length=250), blank=True, default=list)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class PaymentTable(models.Model):
-    orderId         = models.CharField(max_length=250)
-    paymentId       = models.CharField(max_length=250)
-    signature       = models.CharField(max_length=250)
-    created_at      = models.DateTimeField("created_at", auto_now_add=True)
-    updated_at      = models.DateTimeField("updated_at", auto_now=True)
-    deleted_at      = models.DateTimeField("deleted_at", null=True, blank=True)
 
 class ChildTable(models.Model):
     childId         = models.CharField(primary_key=True, db_index=True, max_length=250)
