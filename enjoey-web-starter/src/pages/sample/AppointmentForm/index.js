@@ -39,37 +39,63 @@ import Styles from "./style";
 
 // Global Constants
 const useStyles = makeStyles(Styles);
-const appointmentUrl = "https://127.0.0.1/api/appointment/";
+const appointmentUrl = "http://localhost:8000/api/appointment/";
+const timeSlotUrl = "http://localhost:8000/api/appointment-time-slots/";
 
 const Page2 = () => {
   const classes   = useStyles();
   const tableHead = [" ", "Parent", "Date", "Time", "Age Interest"];
   const [addAppointmentDialog, setAddAppointmentDialog]   = useState(false);
   const [createTimeSlotsDialog, setCreateTimeSlotsDialog] = useState(false);
-  const [child, setChild]                   = useState([]);
-  const [refreshData, setRefreshData]       = useState([]);
-  const [activity, setActivity]             = useState([]);
-  const [date, setDate]                     = useState([]);
-  const [time, setTime]                     = useState([]);
-  const [branch, setBranch]                 = useState([]);
-  const [phone, setPhone]                   = useState([]);
-  const [startTime, setStartTime]           = useState("09:00");
-  const [endTime, setEndTime]               = useState("17:00");
-  const [error, setError]                   = useState('');
-  const [name, setName]                     = useState([]);
-  const [ageInterest, setAgeInterest]       = useState([]);
+  const [appointments, setAppointments]                   = useState([]);
+  const [appointmentTimeSlots, setAppointmentTimeSlots]   = useState([]);
+  const [filteredTimeSlots, setFilteredTimeSlots] = useState([]);
+  const [refresh, setRefresh]                             = useState([]);
+  const [date, setDate]                                   = useState([]);
+  const [time, setTime]                                   = useState([]);
+  const [branch, setBranch]                               = useState([]);
+  const [phone, setPhone]                                 = useState([]);
+  const [startTime, setStartTime]                         = useState("09:00");
+  const [endTime, setEndTime]                             = useState("17:00");
+  const [error, setError]                                 = useState('');
+  const [name, setName]                                   = useState([]);
+  const [ageInterest, setAgeInterest]                     = useState([]);
+  const [ageInterestTimeSlots, setAgeInterestTimeSlots]   = useState([]);
+
+  useEffect(() => {
+    try {
+      Axios.get("http://127.0.0.1:8000/api/appointment/").then((response) => {
+        setAppointments(response.data);
+      });
+
+      Axios.get("http://127.0.0.1:8000/api/appointment-time-slots/").then((response) => {
+        setAppointmentTimeSlots(response.data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, [refresh]);
 
   const openAddAppointmentDialog = async () => {
     setAddAppointmentDialog (true);
+  };
+
+  useEffect(() => {
+    if (ageInterest) {
+      const newFilteredTimeSlots = appointmentTimeSlots.filter(slot => slot.ageInterest === ageInterest);
+      setFilteredTimeSlots(newFilteredTimeSlots);
+    } else {
+      setFilteredTimeSlots([]);
+    }
+  }, [ageInterest]);
+
+  const closeAddAppointmentDialog = async () => {
     setDate                 ("");
     setTime                 ("");
     setBranch               ("");
     setName                 ("");
     setPhone                ("");
     setAgeInterest          ("");
-  };
-
-  const closeAddAppointmentDialog = async () => {
     setAddAppointmentDialog(false);
   }
 
@@ -99,16 +125,20 @@ const Page2 = () => {
   };
 
   const closeCreateTimeSlotsDialog = () => {
+    setBranch     ("");
+    setAgeInterestTimeSlots("");
+    setStartTime  ("");
+    setEndTime    ("");
     setCreateTimeSlotsDialog (false);
   }
 
   const newAppointment = async () => {
     const appointmentData = new FormData();
-    appointmentData.append("ageInterest", ageInterest);
-    appointmentData.append("branch", branch);
-    appointmentData.append("date", date);
-    appointmentData.append("time", time);
     appointmentData.append("name", name);
+    appointmentData.append("ageInterest", ageInterest);
+    appointmentData.append("branchId", branch);
+    appointmentData.append("time", time);
+    appointmentData.append("date", date);
     appointmentData.append("phone", phone);
 
     try {
@@ -123,6 +153,27 @@ const Page2 = () => {
       console.log("error", error);
     }
     setAddAppointmentDialog(false);
+  };
+
+  const newTimeSlot = async () => {
+    const timeSlotData = new FormData();
+    timeSlotData.append("branchId", branch);
+    timeSlotData.append("ageInterest", ageInterestTimeSlots);
+    timeSlotData.append("startTime", startTime);
+    timeSlotData.append("endTime", endTime);
+
+    try {
+      const response = await Axios({
+        method  : "POST",
+        url     : timeSlotUrl,
+        data    : timeSlotData,
+        headers : {"Content-Type": "multipart/form-data"},
+      });
+      setRefresh(response.data)
+    } catch (error) {
+      console.log("error", error);
+    }
+    setCreateTimeSlotsDialog(false);
   };
 
   return (
@@ -219,9 +270,11 @@ const Page2 = () => {
                   label   ="Time"
                   onChange={(e) => {setTime(e.target.value)}}
                 >
-                  <MenuItem value="6-12 months">9:00 a.m</MenuItem>
-                  <MenuItem value="1-4 years">12:00 p.m</MenuItem>
-                  <MenuItem value="5-7 years">3:00 p.m</MenuItem>
+                  {filteredTimeSlots.map((slot) => (
+                    <MenuItem key={slot.startTime} value={slot.startTime}>
+                      {slot.startTime}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -255,7 +308,7 @@ const Page2 = () => {
       </Dialog>
       <Dialog
         fullWidth
-        maxWidth="sm"
+        maxWidth          ="sm"
         open              ={createTimeSlotsDialog}
         onClose           ={closeCreateTimeSlotsDialog}
         aria-labelledby   ="alert-dialog-title"
@@ -290,7 +343,7 @@ const Page2 = () => {
                   id      ="age-interest-select"
                   value   ={ageInterest}
                   label   ="Age Interest"
-                  onChange={(e) => {setAgeInterest(e.target.value)}}
+                  onChange={(e) => {setAgeInterestTimeSlots(e.target.value)}}
                 >
                   <MenuItem value="6-12 months">6 - 12 months</MenuItem>
                   <MenuItem value="1-4 years">1 - 4 years</MenuItem>
@@ -332,7 +385,7 @@ const Page2 = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button>Save</Button>
+          <Button onClick={newTimeSlot}>Save</Button>
         </DialogActions>
       </Dialog>
       <Card>
@@ -353,13 +406,15 @@ const Page2 = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow>
-              <TableCell style={{textAlign: "center"}}>1</TableCell>
-              <TableCell style={{textAlign: "center"}}>test 1</TableCell>
-              <TableCell style={{textAlign: "center"}}>2</TableCell>
-              <TableCell style={{textAlign: "center"}}>3</TableCell>
-              <TableCell style={{textAlign: "center"}}>4</TableCell>
-            </TableRow>
+            {appointments.map((prop, index) => (
+              <TableRow key={index}>
+                <TableCell style={{textAlign: "center"}}>{index + 1}</TableCell>
+                <TableCell style={{textAlign: "center"}}>{prop.name}</TableCell>
+                <TableCell style={{textAlign: "center"}}>{prop.date}</TableCell>
+                <TableCell style={{textAlign: "center"}}>{prop.time}</TableCell>
+                <TableCell style={{textAlign: "center"}}>{prop.ageInterest}</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </Card>

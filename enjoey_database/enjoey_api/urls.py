@@ -61,7 +61,7 @@ urlpatterns = [
     path('order-id/', generate_order_id),
     path('payment-success/', payment_success, name='payment_success'),
     path('activitytags/', include(route10.urls)),
-    path('appointmet-view/', include(route11.urls)),
-    path('appointmetn-time-slots/', include(route12.urls)),
+    path('appointment/', include(route11.urls)),
+    path('appointment-time-slots/', include(route12.urls)),
 ]
 
