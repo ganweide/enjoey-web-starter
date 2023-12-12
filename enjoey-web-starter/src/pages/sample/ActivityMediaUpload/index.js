@@ -39,6 +39,7 @@ const Page2 = () => {
   const [dialogValue, setDialogValue] = useState({ name: '' });
   const [tenant, setTenant]           = useState('');
   const [branch, setBranch]           = useState('');
+  const [refresh, setRefresh]         = useState('');
 
   useEffect(() => {
     try {
@@ -49,7 +50,7 @@ const Page2 = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [dialogValue]);
+  }, [dialogValue, refresh]);
 
   const handleSelectChange = (e, newValue) => {
     const newValues = newValue
@@ -78,12 +79,11 @@ const Page2 = () => {
         name: dialogValue.name,
       });
       const newCategory = response.data;
-  
+      setRefresh(newCategory);
       console.log("New category added:", newCategory);
     } catch (error) {
       console.error("Error adding new category:", error);
     }
-  
     setOpenDialog(false);
   };
 

@@ -1,5 +1,31 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable
+
+class AppointmentTableSerializer(serializers.ModelSerializer):
+    createdAt = serializers.DateTimeField(required=False)
+    class Meta:
+        model = AppointmentTable
+        fields = [
+            'name',
+            'ageInterest',
+            'branchId',
+            'time',
+            'date',
+            'phone',
+            'createdAt',
+        ]
+
+class AppointmentTimeSlotsTableSerializer(serializers.ModelSerializer):
+    createdAt = serializers.DateTimeField(required=False)
+    class Meta:
+        model = AppointmentTimeSlotsTable
+        fields = [
+            'branchId',
+            'ageInterest',
+            'startTime',
+            'endTime',
+            'createdAt',
+        ]
 
 class ActivityTagsTableSerializer(serializers.ModelSerializer):
     tenantId = serializers.CharField(required=False)

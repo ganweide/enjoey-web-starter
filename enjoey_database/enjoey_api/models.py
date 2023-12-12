@@ -9,6 +9,26 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
+class AppointmentTimeSlotsTable(models.Model):
+    branchId    = models.CharField(primary_key=True, db_index=True, max_length=250)
+    ageInterest = models.CharField(max_length=250)
+    startTime   = models.CharField(max_length=250)
+    endTime     = models.CharField(max_length=250)
+    createdAt  = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt  = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt  = models.DateTimeField("deleted_at", null=True, blank=True)
+
+class AppointmentTable(models.Model):
+    name    = models.CharField(primary_key=True, db_index=True, max_length=250)
+    ageInterest = models.CharField(max_length=250)
+    branchId   = models.CharField(max_length=250)
+    time     = models.CharField(max_length=250)
+    date     = models.CharField(max_length=250)
+    phone     = models.CharField(max_length=250)
+    createdAt  = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt  = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt  = models.DateTimeField("deleted_at", null=True, blank=True)
+
 class ActivityTagsTable(models.Model):
     tenantId = models.CharField(max_length=250)
     branchId = models.BigIntegerField()

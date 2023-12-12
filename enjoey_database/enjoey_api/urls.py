@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView
 from . import views
 from rest_framework import routers
 
@@ -33,6 +33,12 @@ route9.register("", SurveySettingsView, basename='surveysettingsview')
 route10 = routers.DefaultRouter()
 route10.register("", ActivityTagsView, basename='activitytagsview')
 
+route11 = routers.DefaultRouter()
+route11.register("", AppointmentView, basename='appointmentview')
+
+route12 = routers.DefaultRouter()
+route12.register("", AppointmentTimeSlotsView, basename='appointmenttimeslotsview')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -55,5 +61,7 @@ urlpatterns = [
     path('order-id/', generate_order_id),
     path('payment-success/', payment_success, name='payment_success'),
     path('activitytags/', include(route10.urls)),
+    path('appointmet-view/', include(route11.urls)),
+    path('appointmetn-time-slots/', include(route12.urls)),
 ]
 
