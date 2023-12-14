@@ -1,11 +1,26 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable
+
+class BranchTableSerializer(serializers.ModelSerializer):
+    createdAt   = serializers.DateTimeField(required=False)
+    branchId    = serializers.CharField(required=False)
+    class Meta:
+        model = BranchTable
+        fields = [
+            'branchId',
+            'branchName',
+            'branchLocation',
+            'branchPrograms',
+            'createdAt',
+        ]
 
 class AppointmentTableSerializer(serializers.ModelSerializer):
     createdAt = serializers.DateTimeField(required=False)
+    appointmentId    = serializers.CharField(required=False)
     class Meta:
         model = AppointmentTable
         fields = [
+            'appointmentId'
             'name',
             'ageInterest',
             'branchId',
@@ -17,9 +32,11 @@ class AppointmentTableSerializer(serializers.ModelSerializer):
 
 class AppointmentTimeSlotsTableSerializer(serializers.ModelSerializer):
     createdAt = serializers.DateTimeField(required=False)
+    timeSlotsId    = serializers.CharField(required=False)
     class Meta:
         model = AppointmentTimeSlotsTable
         fields = [
+            'timeSlotsId',
             'branchId',
             'ageInterest',
             'startTime',

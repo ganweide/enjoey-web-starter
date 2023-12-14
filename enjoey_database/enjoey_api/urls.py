@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView
 from . import views
 from rest_framework import routers
 
@@ -39,6 +39,9 @@ route11.register("", AppointmentView, basename='appointmentview')
 route12 = routers.DefaultRouter()
 route12.register("", AppointmentTimeSlotsView, basename='appointmenttimeslotsview')
 
+route13 = routers.DefaultRouter()
+route13.register("", BranchView, basename='branchview')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -63,5 +66,6 @@ urlpatterns = [
     path('activitytags/', include(route10.urls)),
     path('appointment/', include(route11.urls)),
     path('appointment-time-slots/', include(route12.urls)),
+    path('branch/', include(route13.urls)),
 ]
 

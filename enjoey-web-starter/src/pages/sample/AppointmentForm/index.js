@@ -20,14 +20,9 @@ import {
   TableRow,
   TextField,
   FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   InputLabel,
   Select,
   MenuItem,
-  Divider,
   Grid,
   Box,
   Typography,
@@ -39,8 +34,9 @@ import Styles from "./style";
 
 // Global Constants
 const useStyles = makeStyles(Styles);
-const appointmentUrl = "http://localhost:8000/api/appointment/";
-const timeSlotUrl = "http://localhost:8000/api/appointment-time-slots/";
+const appointmentUrl  = "http://localhost:8000/api/appointment/";
+const timeSlotUrl     = "http://localhost:8000/api/appointment-time-slots/";
+const branchUrl       = "http://localhost:8000/api/branch/";
 
 const Page2 = () => {
   const classes   = useStyles();
@@ -49,27 +45,32 @@ const Page2 = () => {
   const [createTimeSlotsDialog, setCreateTimeSlotsDialog] = useState(false);
   const [appointments, setAppointments]                   = useState([]);
   const [appointmentTimeSlots, setAppointmentTimeSlots]   = useState([]);
-  const [filteredTimeSlots, setFilteredTimeSlots] = useState([]);
+  const [branchData, setBranchData]                       = useState([]);
+  const [filteredTimeSlots, setFilteredTimeSlots]         = useState([]);
+  const [filteredAgeInterest, setFilteredAgeInterest]     = useState([]);
+  const [filteredBranch, setFilteredBranch]               = useState([]);
   const [refresh, setRefresh]                             = useState([]);
   const [date, setDate]                                   = useState([]);
-  const [time, setTime]                                   = useState([]);
+  const [time, setTime]                                   = useState("");
   const [branch, setBranch]                               = useState([]);
   const [phone, setPhone]                                 = useState([]);
   const [startTime, setStartTime]                         = useState("09:00");
   const [endTime, setEndTime]                             = useState("17:00");
   const [error, setError]                                 = useState('');
   const [name, setName]                                   = useState([]);
-  const [ageInterest, setAgeInterest]                     = useState([]);
-  const [ageInterestTimeSlots, setAgeInterestTimeSlots]   = useState([]);
+  const [ageInterest, setAgeInterest]                     = useState("");
+  const [ageInterestTimeSlots, setAgeInterestTimeSlots]   = useState("");
 
   useEffect(() => {
     try {
       Axios.get("http://127.0.0.1:8000/api/appointment/").then((response) => {
         setAppointments(response.data);
       });
-
       Axios.get("http://127.0.0.1:8000/api/appointment-time-slots/").then((response) => {
         setAppointmentTimeSlots(response.data);
+      });
+      Axios.get(branchUrl).then((response) => {
+        setBranchData(response.data);
       });
     } catch (error) {
       console.log(error);
@@ -83,11 +84,37 @@ const Page2 = () => {
   useEffect(() => {
     if (ageInterest) {
       const newFilteredTimeSlots = appointmentTimeSlots.filter(slot => slot.ageInterest === ageInterest);
-      setFilteredTimeSlots(newFilteredTimeSlots);
+      if (branch) {
+        const newFilteredTimeSlotsWithBranch = newFilteredTimeSlots.filter(slot => slot.branchId === branch);
+        setFilteredTimeSlots(newFilteredTimeSlotsWithBranch);
+      } else {
+        setFilteredTimeSlots(newFilteredTimeSlots);
+      }
     } else {
       setFilteredTimeSlots([]);
     }
+  }, [ageInterest, branch]);
+  
+  useEffect(() => {
+    if (ageInterest) {
+      const newFilteredBranch = branchData.filter((slot) => {
+        const programsArray = slot.branchPrograms.split(',').map((program) => program.trim());
+        return programsArray.includes(ageInterest);
+      });
+      setFilteredBranch(newFilteredBranch);
+    } else {
+      setFilteredBranch([]);
+    }
   }, [ageInterest]);
+
+  useEffect(() => {
+    if (branch) {
+      const newFilteredAgeInterest = branchData.filter(slot => slot.branchId === branch);
+      setFilteredAgeInterest(newFilteredAgeInterest);
+    } else {
+      setFilteredAgeInterest([]);
+    }
+  }, [branch]);
 
   const closeAddAppointmentDialog = async () => {
     setDate                 ("");
@@ -125,11 +152,11 @@ const Page2 = () => {
   };
 
   const closeCreateTimeSlotsDialog = () => {
-    setBranch     ("");
-    setAgeInterestTimeSlots("");
-    setStartTime  ("");
-    setEndTime    ("");
-    setCreateTimeSlotsDialog (false);
+    setBranch               ("");
+    setAgeInterestTimeSlots ("");
+    setStartTime            ("09:00");
+    setEndTime              ("17:00");
+    setCreateTimeSlotsDialog(false);
   }
 
   const newAppointment = async () => {
@@ -152,7 +179,7 @@ const Page2 = () => {
     } catch (error) {
       console.log("error", error);
     }
-    setAddAppointmentDialog(false);
+    closeAddAppointmentDialog();
   };
 
   const newTimeSlot = async () => {
@@ -173,7 +200,7 @@ const Page2 = () => {
     } catch (error) {
       console.log("error", error);
     }
-    setCreateTimeSlotsDialog(false);
+    closeCreateTimeSlotsDialog();
   };
 
   return (
@@ -226,9 +253,9 @@ const Page2 = () => {
                   label   ="Age Interest"
                   onChange={(e) => {setAgeInterest(e.target.value)}}
                 >
-                  <MenuItem value="6-12 months">6 - 12 months</MenuItem>
-                  <MenuItem value="1-4 years">1 - 4 years</MenuItem>
-                  <MenuItem value="5-7 years">5 - 7 years</MenuItem>
+                  <MenuItem value="6 - 12 months">6 - 12 months</MenuItem>
+                  <MenuItem value="1 - 4 years">1 - 4 years</MenuItem>
+                  <MenuItem value="5 - 7 years">5 - 7 years</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -242,13 +269,41 @@ const Page2 = () => {
                   label="Branch"
                   onChange={(e) => setBranch(e.target.value)}
                 >
-                  <MenuItem value="1">Branch 1</MenuItem>
-                  <MenuItem value="2">Branch 2</MenuItem>
-                  <MenuItem value="3">Branch 3</MenuItem>
+                  {filteredBranch.map((prop) => (
+                    <MenuItem key={prop.branchId} value={prop.branchId}>{prop.branchName}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={12}>
+              <Typography variant="h3">Details</Typography>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange={(e) => setName(e.target.value)}
+                margin="dense"
+                label="Parent's Name"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={name}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                onChange={(e) => setPhone(e.target.value)}
+                margin="dense"
+                label="Handphone No."
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={phone}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Typography variant="h3">Appointment Date & Time</Typography>
+            </Grid>
+            <Grid item xs={6} md={6}>
               <TextField
                 onChange        ={(e) => setDate(e.target.value)}
                 InputLabelProps ={{ shrink: true }}
@@ -260,15 +315,24 @@ const Page2 = () => {
                 value           ={date}
               />
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid item xs={6} md={6}>            
               <FormControl fullWidth margin="dense">
-                <InputLabel id="time-select">Time</InputLabel>
+                {
+                  ageInterest === "" && branch === "" ? (
+                    <InputLabel id="time-select">Please select an Age Interest</InputLabel>
+                  ) : ageInterest !== "" && branch === "" ? (
+                    <InputLabel id="time-select">Please select a Branch</InputLabel>
+                  ) : (
+                    <InputLabel id="time-select">Time (24 Hour Format)</InputLabel>
+                  )
+                }
                 <Select
                   labelId ="time-select"
                   id      ="time-select"
                   value   ={time}
-                  label   ="Time"
+                  label   ={ageInterest === "" && branch === "" ? ("Please select an Age Interest") : ageInterest !== "" && branch === "" ? ("Please select a Branch") : ("Time (24 Hour Format)")}
                   onChange={(e) => {setTime(e.target.value)}}
+                  disabled={ageInterest === "" || branch === ""}
                 >
                   {filteredTimeSlots.map((slot) => (
                     <MenuItem key={slot.startTime} value={slot.startTime}>
@@ -277,28 +341,6 @@ const Page2 = () => {
                   ))}
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={6} md={6}>
-              <TextField
-                onChange={(e) => setName(e.target.value)}
-                margin="dense"
-                label="Parent's Name"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={name}
-              />
-            </Grid>
-            <Grid item xs={6} md={6}>
-              <TextField
-                onChange={(e) => setPhone(e.target.value)}
-                margin="dense"
-                label="Handphone No."
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={phone}
-              />
             </Grid>
           </Grid>
         </DialogContent>
@@ -329,25 +371,36 @@ const Page2 = () => {
                   label="Branch"
                   onChange={(e) => setBranch(e.target.value)}
                 >
-                  <MenuItem value="1">Branch 1</MenuItem>
-                  <MenuItem value="2">Branch 2</MenuItem>
-                  <MenuItem value="3">Branch 3</MenuItem>
+                  {branchData.map((prop) => (
+                    <MenuItem key={prop.branchId} value={prop.branchId}>{prop.branchName}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={12}>
               <FormControl fullWidth margin="dense">
-                <InputLabel id="age-interest-select">Age Interest</InputLabel>
+                {branch === ""
+                  ? 
+                    <InputLabel id="age-interest-select">Please select a Branch</InputLabel>
+                  : 
+                    <InputLabel id="age-interest-select">Age Interest</InputLabel>}
                 <Select
                   labelId ="age-interest-select"
                   id      ="age-interest-select"
-                  value   ={ageInterest}
-                  label   ="Age Interest"
+                  value   ={ageInterestTimeSlots}
+                  label   ={branch === "" ? "Please select a Branch" : "Age Interest"}
                   onChange={(e) => {setAgeInterestTimeSlots(e.target.value)}}
+                  disabled={branch === ""}
                 >
-                  <MenuItem value="6-12 months">6 - 12 months</MenuItem>
-                  <MenuItem value="1-4 years">1 - 4 years</MenuItem>
-                  <MenuItem value="5-7 years">5 - 7 years</MenuItem>
+                  {filteredAgeInterest.map((slot) => {
+                    const programsArray = slot.branchPrograms.split(',');
+                    console.log(programsArray)
+                    return programsArray.map((program, index) => (
+                      <MenuItem key={`${slot.branchId}-${index}`} value={program}>
+                        {program}
+                      </MenuItem>
+                    ));
+                  })}
                 </Select>
               </FormControl>
             </Grid>

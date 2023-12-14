@@ -9,25 +9,57 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
+class BranchTable(models.Model):
+    branchId        = models.CharField(max_length=250)
+    branchName      = models.CharField(max_length=250)
+    branchLocation  = models.CharField(max_length=250)
+    branchPrograms  = models.CharField(max_length=250)
+    createdAt       = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt       = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt       = models.DateTimeField("deleted_at", null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.branchId:
+            self.branchId = slugify(self.branchName + "-" + self.branchLocation)
+        super().save(*args, **kwargs)
+
 class AppointmentTimeSlotsTable(models.Model):
-    branchId    = models.CharField(primary_key=True, db_index=True, max_length=250)
+    timeSlotsId = models.CharField(max_length=250)
+    branchId    = models.CharField(max_length=250)
     ageInterest = models.CharField(max_length=250)
     startTime   = models.CharField(max_length=250)
     endTime     = models.CharField(max_length=250)
-    createdAt  = models.DateTimeField("created_at", auto_now_add=True)
-    updatedAt  = models.DateTimeField("updated_at", auto_now=True)
-    deletedAt  = models.DateTimeField("deleted_at", null=True, blank=True)
+    createdAt   = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt   = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt   = models.DateTimeField("deleted_at", null=True, blank=True)
+    
+    def __str__(self):
+        return self.timeSlotsId
+    
+    def save(self, *args, **kwargs):
+        if not self.timeSlotsId:
+            self.timeSlotsId = slugify(self.branchId + "-" + self.startTime + "-" + self.endTime)
+        super().save(*args, **kwargs)
 
 class AppointmentTable(models.Model):
-    name    = models.CharField(primary_key=True, db_index=True, max_length=250)
-    ageInterest = models.CharField(max_length=250)
-    branchId   = models.CharField(max_length=250)
-    time     = models.CharField(max_length=250)
-    date     = models.CharField(max_length=250)
-    phone     = models.CharField(max_length=250)
-    createdAt  = models.DateTimeField("created_at", auto_now_add=True)
-    updatedAt  = models.DateTimeField("updated_at", auto_now=True)
-    deletedAt  = models.DateTimeField("deleted_at", null=True, blank=True)
+    appointmentId   = models.CharField(max_length=250)
+    name            = models.CharField(max_length=250)
+    ageInterest     = models.CharField(max_length=250)
+    branchId        = models.CharField(max_length=250)
+    time            = models.CharField(max_length=250)
+    date            = models.CharField(max_length=250)
+    phone           = models.CharField(max_length=250)
+    createdAt       = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt       = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt       = models.DateTimeField("deleted_at", null=True, blank=True)
+
+    def __str__(self):
+        return self.appointmentId
+    
+    def save(self, *args, **kwargs):
+        if not self.appointmentId:
+            self.appointmentId = slugify(self.name + "-" + self.branchId + "-" + self.ageInterest)
+        super().save(*args, **kwargs)
 
 class ActivityTagsTable(models.Model):
     tenantId = models.CharField(max_length=250)
