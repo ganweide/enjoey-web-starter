@@ -20,7 +20,7 @@ class AppointmentTableSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppointmentTable
         fields = [
-            'appointmentId'
+            'appointmentId',
             'name',
             'ageInterest',
             'branchId',

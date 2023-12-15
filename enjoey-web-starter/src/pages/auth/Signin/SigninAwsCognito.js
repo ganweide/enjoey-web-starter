@@ -1,3 +1,4 @@
+import Axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import {Form, Formik} from 'formik';
 import * as yup from 'yup';
@@ -42,6 +43,10 @@ const validationSchema = yup.object({
     .required(<IntlMessages id='validation.passwordRequired' />),
 });
 
+const appointmentUrl  = "http://localhost:8000/api/appointment/";
+const timeSlotUrl     = "http://localhost:8000/api/appointment-time-slots/";
+const branchUrl       = "http://localhost:8000/api/branch/";
+
 const SigninAwsCognito = () => {
   const {auth}                                          = useAuthUser();
   const {signIn}                                        = useAuthMethod();
@@ -49,7 +54,9 @@ const SigninAwsCognito = () => {
   const [showPassword, setShowPassword]                 = useState(false);
   const [makeAppointment, setMakeAppointment]           = useState(false);
   const [appointmentTimeSlots, setAppointmentTimeSlots] = useState([]);
+  const [branchData, setBranchData]                     = useState([]);
   const [filteredTimeSlots, setFilteredTimeSlots]       = useState([]);
+  const [filteredBranch, setFilteredBranch]               = useState([]);
   const [date, setDate]                                 = useState("");
   const [time, setTime]                                 = useState("");
   const [branch, setBranch]                             = useState("");
@@ -69,8 +76,11 @@ const SigninAwsCognito = () => {
 
   useEffect(() => {
     try {
-      Axios.get("http://127.0.0.1:8000/api/appointment-time-slots/").then((response) => {
+      Axios.get(timeSlotUrl).then((response) => {
         setAppointmentTimeSlots(response.data);
+      });
+      Axios.get(branchUrl).then((response) => {
+        setBranchData(response.data);
       });
     } catch (error) {
       console.log(error);
@@ -84,14 +94,62 @@ const SigninAwsCognito = () => {
   useEffect(() => {
     if (ageInterest) {
       const newFilteredTimeSlots = appointmentTimeSlots.filter(slot => slot.ageInterest === ageInterest);
-      setFilteredTimeSlots(newFilteredTimeSlots);
+      if (branch) {
+        const newFilteredTimeSlotsWithBranch = newFilteredTimeSlots.filter(slot => slot.branchId === branch);
+        setFilteredTimeSlots(newFilteredTimeSlotsWithBranch);
+      } else {
+        setFilteredTimeSlots(newFilteredTimeSlots);
+      }
     } else {
       setFilteredTimeSlots([]);
     }
+  }, [ageInterest, branch]);
+  
+  useEffect(() => {
+    if (ageInterest) {
+      const newFilteredBranch = branchData.filter((slot) => {
+        const programsArray = slot.branchPrograms.split(',').map((program) => program.trim());
+        console.log("programs", programsArray);
+        return programsArray.includes(ageInterest);
+      });
+      console.log(newFilteredBranch);
+      setFilteredBranch(newFilteredBranch);
+    } else {
+      setFilteredBranch([]);
+    }
   }, [ageInterest]);
 
+  const newAppointment = async () => {
+    const appointmentData = new FormData();
+    appointmentData.append("name", name);
+    appointmentData.append("ageInterest", ageInterest);
+    appointmentData.append("branchId", branch);
+    appointmentData.append("time", time);
+    appointmentData.append("date", date);
+    appointmentData.append("phone", phone);
+
+    try {
+      const response = await Axios({
+        method  : "POST",
+        url     : appointmentUrl,
+        data    : appointmentData,
+        headers : {"Content-Type": "multipart/form-data"},
+      });
+      setRefresh(response.data)
+    } catch (error) {
+      console.log("error", error);
+    }
+    closeAddAppointmentDialog();
+  };
+
   const closeAppointmentSignInPage = async () => {
-    setMakeAppointment (false);
+    setDate                 ("");
+    setTime                 ("");
+    setBranch               ("");
+    setName                 ("");
+    setPhone                ("");
+    setAgeInterest          ("");
+    setMakeAppointment      (false);
   }
 
   return (
@@ -237,6 +295,7 @@ const SigninAwsCognito = () => {
           </Link>
         </Box>
       </Box>
+
       <Box
         component='span'
         sx={{
@@ -279,9 +338,9 @@ const SigninAwsCognito = () => {
                   label   ="Age Interest"
                   onChange={(e) => {setAgeInterest(e.target.value)}}
                 >
-                  <MenuItem value="6-12 months">6 - 12 months</MenuItem>
-                  <MenuItem value="1-4 years">1 - 4 years</MenuItem>
-                  <MenuItem value="5-7 years">5 - 7 years</MenuItem>
+                  <MenuItem value="6 - 12 months">6 - 12 months</MenuItem>
+                  <MenuItem value="1 - 4 years">1 - 4 years</MenuItem>
+                  <MenuItem value="5 - 7 years">5 - 7 years</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -295,9 +354,9 @@ const SigninAwsCognito = () => {
                   label="Branch"
                   onChange={(e) => setBranch(e.target.value)}
                 >
-                  <MenuItem value="1">Branch 1</MenuItem>
-                  <MenuItem value="2">Branch 2</MenuItem>
-                  <MenuItem value="3">Branch 3</MenuItem>
+                  {filteredBranch.map((prop) => (
+                    <MenuItem key={prop.branchId} value={prop.branchId}>{prop.branchName}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -343,18 +402,22 @@ const SigninAwsCognito = () => {
             </Grid>
             <Grid item xs={6} md={6}>            
               <FormControl fullWidth margin="dense">
-                {ageInterest === ""
-                  ? 
+                {
+                  ageInterest === "" && branch === "" ? (
                     <InputLabel id="time-select">Please select an Age Interest</InputLabel>
-                  : 
-                    <InputLabel id="time-select">Time (24 Hour Format)</InputLabel>}
+                  ) : ageInterest !== "" && branch === "" ? (
+                    <InputLabel id="time-select">Please select a Branch</InputLabel>
+                  ) : (
+                    <InputLabel id="time-select">Time (24 Hour Format)</InputLabel>
+                  )
+                }
                 <Select
                   labelId ="time-select"
                   id      ="time-select"
                   value   ={time}
-                  label   ={ageInterest === "" ? "Please select an Age Interest" : "Time (24 Hour Format)"}
+                  label   ={ageInterest === "" && branch === "" ? ("Please select an Age Interest") : ageInterest !== "" && branch === "" ? ("Please select a Branch") : ("Time (24 Hour Format)")}
                   onChange={(e) => {setTime(e.target.value)}}
-                  disabled={ageInterest === ""}
+                  disabled={ageInterest === "" || branch === ""}
                 >
                   {filteredTimeSlots.map((slot) => (
                     <MenuItem key={slot.startTime} value={slot.startTime}>
@@ -367,7 +430,7 @@ const SigninAwsCognito = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={openAppointmentSignInPage}>Sent</Button>
+          <Button onClick={newAppointment}>Sent</Button>
         </DialogActions>
       </Dialog>
 
