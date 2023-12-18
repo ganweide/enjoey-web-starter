@@ -6,9 +6,6 @@ import Axios from "axios";
 
 // Material UI Imports
 import { makeStyles } from "@material-ui/core/styles";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import EditIcon from '@mui/icons-material/Edit';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import {
@@ -91,6 +88,7 @@ const Page2 = () => {
   const [actionMenu, setActionMenu]                       = useState(null);
   const [addAppointmentDialog, setAddAppointmentDialog]   = useState(false);
   const [createTimeSlotsDialog, setCreateTimeSlotsDialog] = useState(false);
+  const [customDateOpen, setCustomDateOpen]               = useState(false);
   const [appointments, setAppointments]                   = useState([]);
   const [appointmentTimeSlots, setAppointmentTimeSlots]   = useState([]);
   const [branchData, setBranchData]                       = useState([]);
@@ -108,10 +106,111 @@ const Page2 = () => {
   const [name, setName]                                   = useState([]);
   const [ageInterest, setAgeInterest]                     = useState("");
   const [ageInterestTimeSlots, setAgeInterestTimeSlots]   = useState("");
-  const [fromDate, setFromDate]                           = useState("");
-  const [tillDate, setTillDate]                           = useState("");
+  const [filterDate, setFilterDate]                       = useState("");
   const [filterAgeInterest, setFilterAgeInterest]         = useState("");
   const [filterTime, setFilterTime]                       = useState("");
+  const [filteredAppointments, setFilteredAppointments]   = useState([]);
+
+  const handleFilterDateChange = (e) => {
+    const selectedValue = e.target.value;
+    setFilterDate(selectedValue);
+
+    if (selectedValue === 'custom') {
+      setCustomDateOpen(true);
+    } else {
+      setCustomDateOpen(false);
+    }
+  };
+
+  const handleCustomDateClose = () => {
+    setCustomDateOpen(false);
+  };
+
+  const handleFilterAgeInterestChange = (e) => {
+    setFilterAgeInterest(e.target.value);
+  };
+
+  const handleFilterTimeChange = (e) => {
+    setFilterTime(e.target.value);
+  };
+
+  const filterAppointments = () => {
+    let filteredData = appointments;
+
+    if (filterAgeInterest) {
+      filteredData = filteredData.filter(appointment => appointment.ageInterest === filterAgeInterest);
+    }
+
+    if (filterTime) {
+      filteredData = filteredData.filter(appointment => appointment.time === filterTime);
+    }
+
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const startDate = new Date(currentYear, currentMonth, 1);
+    const endDate = new Date(currentYear, currentMonth + 1, 0);
+
+    switch (filterDate) {
+      case 'this month':
+        filteredData = filteredData.filter(appointment => {
+          const appointmentDate = new Date(appointment.date);
+          return appointmentDate >= startDate && appointmentDate <= endDate;
+        });
+        break;
+      case 'last month':
+        const lastMonthStartDate = new Date(currentYear, currentMonth - 1, 1);
+        const lastMonthEndDate = new Date(currentYear, currentMonth, 0);
+        filteredData = filteredData.filter(appointment => {
+          const appointmentDate = new Date(appointment.date);
+          return appointmentDate >= lastMonthStartDate && appointmentDate <= lastMonthEndDate;
+        });
+        break;
+      case 'next month':
+        const nextMonthStartDate = new Date(currentYear, currentMonth + 1, 1);
+        const nextMonthEndDate = new Date(currentYear, currentMonth + 2, 0);
+        filteredData = filteredData.filter(appointment => {
+          const appointmentDate = new Date(appointment.date);
+          return appointmentDate >= nextMonthStartDate && appointmentDate <= nextMonthEndDate;
+        });
+        break;
+      case 'this year':
+        filteredData = filteredData.filter(appointment => {
+          const appointmentDate = new Date(appointment.date);
+          return appointmentDate.getFullYear() === currentYear;
+        });
+        break;
+      case 'year to date':
+        filteredData = filteredData.filter(appointment => {
+          const appointmentDate = new Date(appointment.date);
+          return appointmentDate >= startDate && appointmentDate <= currentDate;
+        });
+        break;
+      case 'last year':
+        filteredData = filteredData.filter(appointment => {
+          const appointmentDate = new Date(appointment.date);
+          return appointmentDate.getFullYear() === currentYear - 1;
+        });
+        break;
+      case 'custom':
+        // Handle custom date range logic here if needed
+        break;
+      default:
+        // No filter selected
+    }
+    setFilteredAppointments(filteredData);
+  };
+
+  useEffect(() => {
+    filterAppointments(); // Trigger filtering logic when filter values change
+  }, [filterAgeInterest, filterTime, filterDate]);
+
+  const handleReset = () => {
+    setFilterDate('');
+    setFilterAgeInterest('');
+    setFilterTime('');
+  };
+
 
   const handleChange = (event, newValue) => {
     setTab(newValue);
@@ -134,6 +233,7 @@ const Page2 = () => {
     try {
       Axios.get("http://127.0.0.1:8000/api/appointment/").then((response) => {
         setAppointments(response.data);
+        setFilteredAppointments(response.data);
       });
       Axios.get("http://127.0.0.1:8000/api/appointment-time-slots/").then((response) => {
         setAppointmentTimeSlots(response.data);
@@ -318,36 +418,24 @@ const Page2 = () => {
           </Box>
           <Grid container spacing={2} sx={{ my: 2 }}alignItems="center">
             <Grid item xs={3.9} md={3.9}>
-              <Grid container spacing={2}>
-                <Grid item xs={6} md={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="from-date-picker-label">From</InputLabel>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker
-                        labelId="from-date-picker-label"
-                        value={fromDate}
-                        onChange={(date) => setFromDate(date)}
-                        format="dd/MM/yyyy"
-                        variant="outlined"
-                      />
-                    </LocalizationProvider>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={6} md={6}>
-                  <FormControl fullWidth>
-                    <InputLabel id="till-date-picker-label">Till</InputLabel>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DatePicker
-                        labelId="till-date-picker-label"
-                        value={tillDate}
-                        onChange={(date) => setTillDate(date)}
-                        format="dd/MM/yyyy"
-                        variant="outlined"
-                      />
-                    </LocalizationProvider>
-                  </FormControl>
-                </Grid>
-              </Grid>
+              <FormControl fullWidth>
+                <InputLabel id="date-filter-label">Filter Date</InputLabel>
+                <Select
+                  labelId={'date-filter-select'}
+                  id={'date-filter-select'}
+                  label="Filter Date"
+                  value={filterDate}
+                  onChange={handleFilterDateChange}
+                >
+                  <MenuItem value="this month">This Month</MenuItem>
+                  <MenuItem value="next month">Next Month</MenuItem>
+                  <MenuItem value="last month">Last Month</MenuItem>
+                  <MenuItem value="this year">This Year</MenuItem>
+                  <MenuItem value="year to date">Year to Date</MenuItem>
+                  <MenuItem value="last year">Last Year</MenuItem>
+                  <MenuItem value="custom">Custom</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={3.9} md={3.9}>
               <FormControl fullWidth>
@@ -357,7 +445,7 @@ const Page2 = () => {
                   id={'age-interest-filter-select'}
                   label="Filter Age Interest"
                   value={filterAgeInterest}
-                  onChange={(e) => setFilterAgeInterest(e.target.value)}
+                  onChange={handleFilterAgeInterestChange}
                 >
                   <MenuItem value="6 - 12 months">6 - 12 months</MenuItem>
                   <MenuItem value="1 - 4 years">1 - 4 years</MenuItem>
@@ -373,7 +461,7 @@ const Page2 = () => {
                   id={'time-filter-select'}
                   label="Filter Time"
                   value={filterTime}
-                  onChange={(e) => setFilterTime(e.target.value)}
+                  onChange={handleFilterTimeChange}
                 >
                   {appointmentTimeSlots.map((prop) => (
                     <MenuItem key={prop.appointmentId} value={prop.startTime}>{prop.startTime}</MenuItem>
@@ -382,7 +470,7 @@ const Page2 = () => {
               </FormControl>
             </Grid>
             <Grid item xs={0.3} md={0.3}>
-              <IconButton aria-label="reset" fullWidth>
+              <IconButton aria-label="reset" fullWidth onClick={handleReset}>
                 <RestartAltIcon />
               </IconButton>
             </Grid>
@@ -404,7 +492,7 @@ const Page2 = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {appointments.map((prop, index) => (
+              {filteredAppointments.map((prop, index) => (
                 <TableRow key={index}>
                   <TableCell style={{textAlign: "center", width: "5%"}}>{index + 1}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{prop.name}</TableCell>
@@ -740,6 +828,29 @@ const Page2 = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={newTimeSlot}>Save</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Custom Date Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={customDateOpen}
+        onClose           ={handleCustomDateClose}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>Custom Date Selection</h2>
+        </DialogTitle>
+        <DialogContent>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCustomDateClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleCustomDateClose} color="primary">
+            Apply
+          </Button>
         </DialogActions>
       </Dialog>
     </Card>
