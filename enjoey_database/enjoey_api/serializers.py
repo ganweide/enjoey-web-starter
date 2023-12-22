@@ -1,5 +1,25 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable
+
+class EmailTemplateHtmlTableSerializer(serializers.ModelSerializer):
+    createdAt   = serializers.DateTimeField(required=False)
+    class Meta:
+        model = EmailTemplateHtmlTable
+        fields = [
+            'templateName',
+            'htmlFormat',
+            'createdAt',
+        ]
+
+class EmailTemplateJsonTableSerializer(serializers.ModelSerializer):
+    createdAt   = serializers.DateTimeField(required=False)
+    class Meta:
+        model = EmailTemplateJsonTable
+        fields = [
+            'templateName',
+            'jsonFormat',
+            'createdAt',
+        ]
 
 class BranchTableSerializer(serializers.ModelSerializer):
     createdAt   = serializers.DateTimeField(required=False)

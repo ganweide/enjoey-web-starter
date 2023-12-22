@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView
 from . import views
 from rest_framework import routers
 
@@ -42,6 +42,12 @@ route12.register("", AppointmentTimeSlotsView, basename='appointmenttimeslotsvie
 route13 = routers.DefaultRouter()
 route13.register("", BranchView, basename='branchview')
 
+route14 = routers.DefaultRouter()
+route14.register("", EmailTemplateJsonView, basename='emailtemplatejsonview')
+
+route15 = routers.DefaultRouter()
+route15.register("", EmailTemplateHtmlView, basename='emailtemplatehtmlview')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -67,5 +73,8 @@ urlpatterns = [
     path('appointment/', include(route11.urls)),
     path('appointment-time-slots/', include(route12.urls)),
     path('branch/', include(route13.urls)),
+    path('email-editor-json/', include(route14.urls)),
+    path('email-editor-html/', include(route15.urls)),
+    path('html-upload-image/', HtmlImageUploadView.as_view(), name='html_upload_image'),
 ]
 

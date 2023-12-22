@@ -1,8 +1,8 @@
 # from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.generics import CreateAPIView
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer
 from rest_framework.response import Response
 import datetime
 from django.views import View
@@ -25,6 +25,124 @@ from rest_framework.response import Response
 from rest_framework import status
 import razorpay
 from django.shortcuts import render
+from django.core.files.base import ContentFile
+import requests
+import json
+from rest_framework.parsers import MultiPartParser, FormParser
+
+class HtmlImageUploadView(APIView):
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            try:
+                image_sources = request.data.get('image', [])
+                name = request.data.get('name', [])
+                uploadedUrls = []
+                for image_url in enumerate(image_sources):
+                    response = requests.get(image_url)
+                    if response.status_code == 200:
+                        image_content = response.content
+
+                        storage = S3Boto3Storage()
+                        image_name = f"{name}.jpg"  # Modify as needed
+                        image_path = f"{settings.IMG_LOCATION}/{image_name}"
+                        storage.save(image_path, ContentFile(image_content))
+
+                        url = storage.url(image_path)
+                        uploadedUrls.append(url)
+                        print(f'Image {name} uploaded. URL: {url}')
+                    else:
+                        print(f'Failed to download image {name} from URL: {image_url}')
+
+                return JsonResponse({'success': True, 'uploadedUrls': uploadedUrls})
+            except Exception as e:
+                print('Error:', e)
+                return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+class EmailTemplateHtmlView(viewsets.ModelViewSet):
+    queryset = EmailTemplateHtmlTable.objects.all().order_by('-createdAt')
+    serializer_class = EmailTemplateHtmlTableSerializer
+    #all
+    def list(self, request):
+        queryset = EmailTemplateHtmlTable.objects.all().order_by('createdAt')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = EmailTemplateHtmlTableSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = EmailTemplateHtmlTableSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = EmailTemplateHtmlTableSerializer(data=request.data)
+        if serializer.is_valid():
+            html_data=serializer.validated_data
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class EmailTemplateJsonView(viewsets.ModelViewSet):
+    queryset = EmailTemplateJsonTable.objects.all().order_by('-createdAt')
+    serializer_class = EmailTemplateJsonTableSerializer
+    #all
+    def list(self, request):
+        queryset = EmailTemplateJsonTable.objects.all().order_by('createdAt')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = EmailTemplateJsonTableSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = EmailTemplateJsonTableSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = EmailTemplateJsonTableSerializer(data=request.data)
+        if serializer.is_valid():
+            json_data = serializer.validated_data
+            self.traverse_and_process(json_data)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def traverse_and_process(self, data):
+        print(data);
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if key == 'jsonFormat':
+                    try:
+                        json_data = json.loads(value)
+                        self.traverse_and_process(json_data)
+                    except json.JSONDecodeError:
+                        print("Error decoding JSON in 'jsonFormat'")
+                elif key == 'values' and isinstance(value, dict):
+                    if 'src' in value and isinstance(value['src'], dict) and 'url' in value['src']:
+                        print("Processing 'src' within 'values'")
+                        new_url = self.process_and_upload_image(value['src']['url'])
+                        value['src']['url'] = new_url
+                    self.traverse_and_process(value)
+                else:
+                    self.traverse_and_process(value)
+        elif isinstance(data, list):
+            for item in data:
+                self.traverse_and_process(item)
+
+    def process_and_upload_image(self, old_url):
+        print("process and upload image")
+        try:
+            storage = S3Boto3Storage()
+            image_name = old_url.split('/')[-1]
+            image_path = f"{settings.IMG_LOCATION}/{image_name}"
+
+            response = requests.get(old_url)
+            if response.status_code == 200:
+                storage.save(image_path, ContentFile(response.content))
+                new_url = storage.url(image_path)
+                return new_url
+
+            raise Exception(f"Failed to download image from {old_url}")
+        except Exception as e:
+            print('Error uploading image:', e)
+            return old_url  # Return the original URL in case of an error
 
 class AppointmentTimeSlotsView(viewsets.ModelViewSet):
     queryset = AppointmentTimeSlotsTable.objects.all().order_by('-createdAt')

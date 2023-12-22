@@ -416,7 +416,7 @@ const Page2 = () => {
               </Button>
             </Box>
           </Box>
-          <Grid container spacing={2} sx={{ my: 2 }}alignItems="center">
+          <Grid container spacing={2} sx={{ my: 2 }} alignItems="center">
             <Grid item xs={3.9} md={3.9}>
               <FormControl fullWidth>
                 <InputLabel id="date-filter-label">Filter Date</InputLabel>

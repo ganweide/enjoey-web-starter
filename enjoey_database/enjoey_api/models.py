@@ -9,6 +9,20 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
+class EmailTemplateJsonTable(models.Model):
+    templateName   = models.CharField(max_length=250)
+    jsonFormat     = models.CharField()
+    createdAt      = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt      = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt      = models.DateTimeField("deleted_at", null=True, blank=True)
+
+class EmailTemplateHtmlTable(models.Model):
+    templateName   = models.CharField(max_length=250)
+    htmlFormat     = models.CharField()
+    createdAt      = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt      = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt      = models.DateTimeField("deleted_at", null=True, blank=True)
+
 class BranchTable(models.Model):
     branchId        = models.CharField(max_length=250)
     branchName      = models.CharField(max_length=250)

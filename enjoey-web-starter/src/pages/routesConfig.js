@@ -238,6 +238,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/PDFDownload',
       },
+      {
+        id: 'email-editor',
+        title: 'Email Editor',
+        messageId: 'Email Editor',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/EmailEditor',
+      },
     ]
   },
 ];
