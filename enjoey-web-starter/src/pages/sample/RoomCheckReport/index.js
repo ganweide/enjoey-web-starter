@@ -5,41 +5,70 @@ import React, { useEffect, useState } from "react";
 import Axios from "axios";
 
 // Material UI Imports
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Card,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Divider,
   Box,
   Typography,
 } from "@mui/material";
+import { DataGrid } from '@mui/x-data-grid';
 
 // Local Imports
 import Styles from "./style";
 
 // Global Constants
-const useStyles = makeStyles(Styles);
+const calculateRatio = (student, staff) => {
+  if (staff === 0) {
+    return student;
+  }
+  return calculateRatio(staff, student % staff);
+}
+
+const columns = [
+  { field: 'id', headerName: 'ID', flex: 0.5 },
+  {
+    field: 'room',
+    headerName: 'ROOM',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'studentsIn',
+    headerName: 'STUDENTS IN',
+    type: 'number',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'staffsIn',
+    headerName: 'STAFFS IN',
+    type: 'number',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'ratio',
+    headerName: 'RATIO',
+    type: 'number',
+    editable: false,
+    sortable: false,
+    flex: 1,
+    valueGetter: (params) => {
+      const gcd = calculateRatio(params.row.studentsIn, params.row.staffsIn);
+      const ratio = `${params.row.studentsIn/gcd}:${params.row.staffsIn/gcd}`;
+      return ratio
+    }
+  },
+];
+
+const rows = [
+  { id: 1, room: 'All Rooms', studentsIn: 13, staffsIn: 6 },
+  { id: 2, room: 'Hibiscus Room', studentsIn: 6, staffsIn: 3 },
+  { id: 3, room: 'Banana Room', studentsIn: 4, staffsIn: 2 },
+  { id: 4, room: 'Kitty Room', studentsIn: 5, staffsIn: 3 },
+];
 
 const Page2 = () => {
-  const classes   = useStyles();
-  const tableHead = ["ROOM", "STUDENTS IN", "STAFF IN", "RATIO"];
-  const tableData = [
-    ["All Rooms", 13, 6],
-    ["Hibiscus Rooms", 6, 3],
-    ["Banana Rooms", 4, 2],
-    ["Kitty Rooms", 5, 3],
-  ];
-  const calculateRatio = (student, staff) => {
-    if (staff === 0) {
-      return student;
-    }
-    return calculateRatio(staff, student % staff);
-  }
-
   return (
     <div>
       <Box 
@@ -63,36 +92,21 @@ const Page2 = () => {
         </Typography>
       </Box>
       <Card>
-        <Table>
-          <TableHead>
-            <TableRow className={classes.tableHeadRow}>
-              {tableHead.map((prop) => (
-                  <TableCell
-                    className={classes.tableCell + classes.tableHeadCell}
-                    key={prop}
-                  >
-                    {prop}
-                  </TableCell>
-                ))
-              }
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tableData.map((prop) => {
-              const [room, student, staff] = prop;
-              const gcd = calculateRatio(student, staff);
-              const ratio = `${student / gcd}:${staff / gcd}`;
-              return(
-                <TableRow key={prop}>
-                  <TableCell>{room}</TableCell>
-                  <TableCell>{student}</TableCell>
-                  <TableCell>{staff}</TableCell>
-                  <TableCell>{ratio}</TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+        <DataGrid
+          sx={{ m: 5 }}
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 5,
+              },
+            },
+          }}
+          pageSizeOptions={[5]}
+          checkboxSelection
+          disableRowSelectionOnClick
+        />
       </Card>
     </div>
   );
