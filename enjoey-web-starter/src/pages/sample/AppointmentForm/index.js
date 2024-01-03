@@ -118,6 +118,7 @@ const Page2 = () => {
   const [filterAgeInterest, setFilterAgeInterest]         = useState("");
   const [filterTime, setFilterTime]                       = useState("");
   const [filteredAppointments, setFilteredAppointments]   = useState([]);
+  const [events, setEvents]                               = useState([]);
 
   const handleFilterDateChange = (e) => {
     const selectedValue = e.target.value;
@@ -242,6 +243,7 @@ const Page2 = () => {
       Axios.get("http://127.0.0.1:8000/api/appointment/").then((response) => {
         setAppointments(response.data);
         setFilteredAppointments(response.data);
+        console.log(response.data);
       });
       Axios.get("http://127.0.0.1:8000/api/appointment-time-slots/").then((response) => {
         setAppointmentTimeSlots(response.data);
@@ -394,24 +396,45 @@ const Page2 = () => {
     closeCreateTimeSlotsDialog();
   };
 
-  const event = {
-    events: [
-      {
-        start: moment().toDate(),
-        end: moment().add(1, "days").toDate(),
-        title: "Some title",
-      },
-    ],
+  useEffect(() => {
+    const bigCalendarEvents = appointments.map(appointment => {
+      const start = moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").toDate();
+      const end = moment(start).add(1, "hours").toDate();
+      const title = appointment.name;
+      const time = appointment.time;
+      const program = appointment.ageInterest;
+
+      return { start, end, title, program, time };
+    })
+    setEvents(bigCalendarEvents);
+  }, [appointments]);
+
+  const EventComponent = ({ event }) => (
+    <div>
+      <strong>{event.title}</strong>
+      <div>{event.time}</div>
+      <div>{event.program}</div>
+    </div>
+  );
+
+  EventComponent.propTypes = {
+    event: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      program: PropTypes.string.isRequired,
+      time: PropTypes.string.isRequired,
+    }).isRequired,
   };
 
   const onEventResize = (data) => {
     const { start, end } = data;
 
-    this.setState((state) => {
-      state.events[0].start = start;
-      state.events[0].end = end;
-      return { events: [...state.events] };
-    });
+    setEvents((prevEvents) => [
+      {
+        ...prevEvents[0],
+        start,
+        end,
+      },
+    ]);
   };
 
   const onEventDrop = (data) => {
@@ -448,125 +471,14 @@ const Page2 = () => {
               </Button>
             </Box>
           </Box>
-          <Grid container spacing={2} sx={{ my: 2 }} alignItems="center">
-            <Grid item xs={3.9} md={3.9}>
-              <FormControl fullWidth>
-                <InputLabel id="date-filter-label">Filter Date</InputLabel>
-                <Select
-                  labelId={'date-filter-select'}
-                  id={'date-filter-select'}
-                  label="Filter Date"
-                  value={filterDate}
-                  onChange={handleFilterDateChange}
-                >
-                  <MenuItem value="this month">This Month</MenuItem>
-                  <MenuItem value="next month">Next Month</MenuItem>
-                  <MenuItem value="last month">Last Month</MenuItem>
-                  <MenuItem value="this year">This Year</MenuItem>
-                  <MenuItem value="year to date">Year to Date</MenuItem>
-                  <MenuItem value="last year">Last Year</MenuItem>
-                  <MenuItem value="custom">Custom</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={3.9} md={3.9}>
-              <FormControl fullWidth>
-                <InputLabel id={"age-interest-filter-select"}>Filter Age Interest</InputLabel>
-                <Select
-                  labelId={'age-interest-filter-select'}
-                  id={'age-interest-filter-select'}
-                  label="Filter Age Interest"
-                  value={filterAgeInterest}
-                  onChange={handleFilterAgeInterestChange}
-                >
-                  <MenuItem value="6 - 12 months">6 - 12 months</MenuItem>
-                  <MenuItem value="1 - 4 years">1 - 4 years</MenuItem>
-                  <MenuItem value="5 - 7 years">5 - 7 years</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={3.9} md={3.9}>
-              <FormControl fullWidth>
-                <InputLabel id={"skill-select"}>Filter Time</InputLabel>
-                <Select
-                  labelId={'time-filter-select'}
-                  id={'time-filter-select'}
-                  label="Filter Time"
-                  value={filterTime}
-                  onChange={handleFilterTimeChange}
-                >
-                  {appointmentTimeSlots.map((prop) => (
-                    <MenuItem key={prop.appointmentId} value={prop.startTime}>{prop.startTime}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={0.3} md={0.3}>
-              <IconButton aria-label="reset" fullWidth onClick={handleReset}>
-                <RestartAltIcon />
-              </IconButton>
-            </Grid>
-          </Grid>
-          <Table>
-            <TableHead>
-              <TableRow className={classes.tableHeadRow}>
-                {tableHeadAppointments.map((prop) => (
-                  <TableCell
-                    className ={classes.tableCell + classes.tableHeadCell}
-                    key       ={prop}
-                    style     ={{
-                      textAlign: "center",
-                    }}
-                  >
-                    {prop}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredAppointments.map((prop, index) => (
-                <TableRow key={index}>
-                  <TableCell style={{textAlign: "center", width: "5%"}}>{index + 1}</TableCell>
-                  <TableCell style={{textAlign: "center"}}>{prop.name}</TableCell>
-                  <TableCell style={{textAlign: "center"}}>{prop.ageInterest}</TableCell>
-                  <TableCell style={{textAlign: "center", width: "10%"}}>{prop.date}</TableCell>
-                  <TableCell style={{textAlign: "center", width: "10%"}}>{prop.time}</TableCell>
-                  <TableCell style={{textAlign: "center", width: "10%"}}>
-                    {getBranchNameById(prop.branchId)}
-                  </TableCell>
-                  <TableCell style={{textAlign: "center", width: "10%"}}>{prop.phone}</TableCell>
-                  <TableCell style={{textAlign: "center", width: "10%"}}>
-                    <Button
-                      id="basic-button"
-                      aria-controls={actionMenu ? 'basic-menu' : undefined}
-                      aria-haspopup="true"
-                      aria-expanded={Boolean(actionMenu) ? 'true' : undefined}
-                      onClick={handleOpenMenu}
-                    >
-                      <EditIcon />
-                    </Button>
-                    <Menu
-                      id="basic-menu"
-                      anchorEl={actionMenu}
-                      open={Boolean(actionMenu)}
-                      onClose={handleCloseMenu}
-                      MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                      }}
-                    >
-                      <MenuItem>Edit</MenuItem>
-                      <MenuItem>Delete</MenuItem>
-                    </Menu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
           <DnDCalendar
             defaultDate={moment().toDate()}
             defaultView="month"
-            events={event.events}
+            events={events}
             localizer={localizer}
+            components={{
+              event: EventComponent,
+            }}
             onEventDrop={onEventDrop}
             onEventResize={onEventResize}
             resizable
