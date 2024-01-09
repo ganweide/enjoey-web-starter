@@ -36,6 +36,64 @@ import Styles from "./style";
 // Global Constants
 const useStyles = makeStyles(Styles);
 
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+
+const columns = [
+  { field: 'id', headerName: 'ID', flex: 0.5 },
+  {
+    field: 'student',
+    headerName: 'STUDENT',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'room',
+    headerName: 'ROOM',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'checkin',
+    headerName: 'CHECK-IN',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'healthscreen',
+    headerName: 'HEALTH SCREEN',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'signedinby',
+    headerName: 'SIGNED IN BY',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'checkout',
+    headerName: 'CHECKOUT',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'signedoutby',
+    headerName: 'SIGNED OUT BY',
+    editable: true,
+    flex: 1,
+  },
+  {
+    field: 'totalhours',
+    headerName: 'TOTAL HOURS',
+    editable: true,
+    flex: 1,
+  },
+];
+
+const rows = [
+  { id: 1, student: 'Student 1', room: "Hibiscus Room", checkin: "11/09/2023 '/n' 11:46am", healthscreen: "Healthy", signedinby: "Jane Lead Staff", checkout: "11/09/2023 11:49am", signedoutby: "Jane Lead Staff", totalhours: "00:02:53"},
+];
+
 const Page2 = () => {
   const classes   = useStyles();
   const tableHead = ["Student", " ", "Room", "Check-In", "Health Screen", "Signed In by", "Check-Out", "Signed Out by", "Total Hours"];
@@ -44,6 +102,18 @@ const Page2 = () => {
   const handleCheckboxChange = (event) => {
     setShowHealthScreen(event.target.checked);
   };
+
+  const CustomToolbar = () => (
+    <GridToolbar
+      csvOptions={{
+        fileName: (() => {
+          const currentDate = new Date();
+          const formattedDate = currentDate.toISOString().slice(0, 19).replace(/[-T]/g, '').replace(':', '');
+          return `check_in_report_${formattedDate}`;
+        })(),
+      }}
+    />
+  );
 
   return (
     <div>
@@ -150,6 +220,21 @@ const Page2 = () => {
         />
       </FormGroup>
       <Card>
+        <DataGrid
+          sx={{ m: 5 }}
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 5,
+              },
+            },
+          }}
+          slots={{toolbar: CustomToolbar}} 
+          pageSizeOptions={[5]}
+          disableRowSelectionOnClick
+        />
         <Table>
           <TableHead>
             <TableRow className={classes.tableHeadRow}>

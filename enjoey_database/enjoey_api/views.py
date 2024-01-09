@@ -28,7 +28,10 @@ from django.shortcuts import render
 from django.core.files.base import ContentFile
 import requests
 import json
-from rest_framework.parsers import MultiPartParser, FormParser
+from xhtml2pdf import pisa
+from reportlab.pdfgen import canvas
+from django.template import Context, Template
+
 
 class HtmlImageUploadView(APIView):
     def post(self, request, *args, **kwargs):
@@ -37,7 +40,7 @@ class HtmlImageUploadView(APIView):
                 image_sources = request.data.get('image', [])
                 name = request.data.get('name', [])
                 uploadedUrls = []
-                for image_url in enumerate(image_sources):
+                for index, image_url in enumerate(image_sources):
                     response = requests.get(image_url)
                     if response.status_code == 200:
                         image_content = response.content
@@ -186,6 +189,18 @@ class AppointmentView(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    def update(self, request, pk=None):
+        try:
+            user = AppointmentTable.objects.get(id=pk)
+        except AppointmentTable.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AppointmentTableSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class BranchView(viewsets.ModelViewSet):
     queryset = BranchTable.objects.all().order_by('-createdAt')
     serializer_class = BranchTableSerializer
@@ -318,6 +333,48 @@ def check_scheduler_status(request):
     else:
         return Response({'status': 'false'})
 
+class PDFGenerationAndUploadView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            today = datetime.date.today().strftime("%Y-%m-%d")
+            data = {
+                'data' : 'test',
+            }
+
+            template_instance = EmailTemplateHtmlTable.objects.get(pk=67)  # Adjust the ID as needed
+            serializer = EmailTemplateHtmlTableSerializer(template_instance)
+            html_code = serializer.data.get('htmlFormat', '')
+            template = Template(html_code)
+            html = template.render(Context(data))
+
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="output.pdf"'
+
+            buffer = BytesIO()
+            p = canvas.Canvas(buffer)
+
+            # Create a PDF from the HTML content
+            p.drawString(100, 100, html)  # You may need to adjust the coordinates and layout
+
+            p.showPage()
+            p.save()
+
+            pdf = buffer.getvalue()
+            buffer.close()
+
+            response.write(pdf)
+
+            storage = S3Boto3Storage()
+            storage_path = f"{settings.PDF_LOCATION}/testTemplate.pdf"
+            storage.save(storage_path, ContentFile(buffer.getvalue()))
+
+            return response
+
+        except Exception as e:
+            print('Error:', e)
+
+        return JsonResponse({'error': 'Error generating and uploading PDF'}, status=500)
+
 class PdfFileApiView(View):
     def get(self, request, *args, **kwargs):
         today = datetime.date.today().strftime("%Y-%m-%d")
@@ -328,7 +385,7 @@ class PdfFileApiView(View):
             'invoice_number': 1234567,
         }
 
-        template = get_template('pdf/pdf.html')
+        template = get_template('pdf/temp.html')
         html = template.render(data)
         result = BytesIO()
 

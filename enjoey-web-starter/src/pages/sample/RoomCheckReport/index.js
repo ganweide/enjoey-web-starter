@@ -11,7 +11,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar, GridToolbarExport } from '@mui/x-data-grid';
 
 // Local Imports
 import Styles from "./style";
@@ -69,6 +69,17 @@ const rows = [
 ];
 
 const Page2 = () => {
+  const CustomToolbar = () => (
+    <GridToolbar
+      csvOptions={{
+        fileName: (() => {
+          const currentDate = new Date();
+          const formattedDate = currentDate.toISOString().slice(0, 19).replace(/[-T]/g, '').replace(':', '');
+          return `room_check_report_${formattedDate}`;
+        })(),
+      }}
+    />
+  );
   return (
     <div>
       <Box 
@@ -103,6 +114,7 @@ const Page2 = () => {
               },
             },
           }}
+          slots={{toolbar: CustomToolbar}} 
           pageSizeOptions={[5]}
           checkboxSelection
           disableRowSelectionOnClick

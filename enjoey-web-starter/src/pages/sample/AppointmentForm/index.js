@@ -243,7 +243,6 @@ const Page2 = () => {
       Axios.get("http://127.0.0.1:8000/api/appointment/").then((response) => {
         setAppointments(response.data);
         setFilteredAppointments(response.data);
-        console.log(response.data);
       });
       Axios.get("http://127.0.0.1:8000/api/appointment-time-slots/").then((response) => {
         setAppointmentTimeSlots(response.data);
@@ -403,8 +402,9 @@ const Page2 = () => {
       const title = appointment.name;
       const time = appointment.time;
       const program = appointment.ageInterest;
+      const id = appointment.id;
 
-      return { start, end, title, program, time };
+      return { start, end, title, program, time, id };
     })
     setEvents(bigCalendarEvents);
   }, [appointments]);
@@ -437,8 +437,31 @@ const Page2 = () => {
     ]);
   };
 
-  const onEventDrop = (data) => {
-    console.log(data);
+  const onEventDrop = async (data) => {
+    const { start, end } = data;
+  
+    // Assuming you are only updating the first event
+    const formattedDate = moment(start).format("YYYY-MM-DD");
+    const updatedEvent = {
+      ...events[0],
+      date: formattedDate,
+      start,
+      end,
+    };
+  
+    try {
+      // Update the server with the new event information
+      await Axios({
+        method: "PUT", // Use the appropriate HTTP method for updating
+        url: `${appointmentUrl}${updatedEvent.id}/`, // Adjust the URL based on your server API
+        data: updatedEvent,
+      });
+  
+      // Update the local state with the new event
+      setEvents([updatedEvent, ...events.slice(1)]); // Assuming you are only updating the first event
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
   };
 
   return (

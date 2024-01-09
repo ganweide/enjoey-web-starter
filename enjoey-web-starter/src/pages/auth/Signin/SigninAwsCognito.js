@@ -309,7 +309,7 @@ const SigninAwsCognito = () => {
         }}
       >
         <span style={{marginRight: 4}}>
-          <IntlMessages id='common.dontHaveAccount' />
+          <IntlMessages id='Make an Appointment'/>
         </span>
         <Button onClick={openAppointmentSignInPage}>
           Appointment
