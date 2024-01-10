@@ -30,6 +30,7 @@ import json
 from xhtml2pdf import pisa
 import pdfkit
 from django.template import Context, Template
+from bs4 import BeautifulSoup, Comment
 
 
 class HtmlImageUploadView(APIView):
@@ -352,7 +353,28 @@ class PDFGenerationAndUploadView(APIView):
             template_instance = EmailTemplateHtmlTable.objects.get(pk=63)
             serializer = EmailTemplateHtmlTableSerializer(template_instance)
             html_code = serializer.data.get('htmlFormat', '')
-            template = Template(html_code)
+
+             # Parse HTML content using BeautifulSoup
+            soup = BeautifulSoup(html_code, 'html.parser')
+
+            # Remove comments from the HTML
+            comments = soup.find_all(text=lambda text: isinstance(text, Comment))
+            for comment in comments:
+                comment.extract()
+
+            # Remove media query styles
+            for style_tag in soup.find_all('style'):
+                style_text = str(style_tag.string)
+                if '@media' in style_text:
+                    style_tag.extract()
+
+            for u_row_div in soup.find_all('div', class_='u-row'):
+                u_row_div['style'] = str(u_row_div.get('style', '')) + 'max-width: 100%;'
+
+            # Get the cleaned HTML code
+            cleaned_html = str(soup)
+
+            template = Template(cleaned_html)
             html = template.render(Context(data))
 
             file_path = os.path.join('enjoey_api', 'templates', 'pdf', 'template.html')
