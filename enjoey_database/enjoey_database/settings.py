@@ -32,6 +32,7 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 PDF_STORAGE = 'enjoey_api.storagebackend.PDFStorage'
 PDF_LOCATION = 'pdf'
 IMG_LOCATION = 'images'
+WKHTMLTOPDF_CMD = 'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
 
 
 # Quick-start development settings - unsuitable for production

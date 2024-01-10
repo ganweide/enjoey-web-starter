@@ -24,12 +24,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import razorpay
-from django.shortcuts import render
 from django.core.files.base import ContentFile
 import requests
 import json
 from xhtml2pdf import pisa
-from reportlab.pdfgen import canvas
+import pdfkit
 from django.template import Context, Template
 
 
@@ -338,37 +337,37 @@ class PDFGenerationAndUploadView(APIView):
         try:
             today = datetime.date.today().strftime("%Y-%m-%d")
             data = {
-                'data' : 'test',
+                'invoice_date': today,
+                'amount': 1000.00,
+                'student_name': 'Testing 43434',
+                'invoice_no': '1234567',
+                'payment_name': 'Payment 123',
+                'program': 'Infant Care Program',
+                'fee_description': 'First payment',
+                'subtotal': 1000.00,
+                'gst': 60.00,
+                'total': 1060.00,
             }
 
-            template_instance = EmailTemplateHtmlTable.objects.get(pk=67)  # Adjust the ID as needed
+            template_instance = EmailTemplateHtmlTable.objects.get(pk=63)
             serializer = EmailTemplateHtmlTableSerializer(template_instance)
             html_code = serializer.data.get('htmlFormat', '')
             template = Template(html_code)
             html = template.render(Context(data))
 
-            response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="output.pdf"'
+            file_path = os.path.join('enjoey_api', 'templates', 'pdf', 'template.html')
+            with open(file_path, 'w') as file:
+                file.write(html)
 
-            buffer = BytesIO()
-            p = canvas.Canvas(buffer)
+            pdf_output_path = os.path.join('pdf', 'template.pdf')
+            config = pdfkit.configuration(wkhtmltopdf='C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe')
+            pdfkit.from_string(html, pdf_output_path, configuration=config)
 
-            # Create a PDF from the HTML content
-            p.drawString(100, 100, html)  # You may need to adjust the coordinates and layout
-
-            p.showPage()
-            p.save()
-
-            pdf = buffer.getvalue()
-            buffer.close()
-
-            response.write(pdf)
-
-            storage = S3Boto3Storage()
+            s3 = S3Boto3Storage()
             storage_path = f"{settings.PDF_LOCATION}/testTemplate.pdf"
-            storage.save(storage_path, ContentFile(buffer.getvalue()))
+            s3.save(storage_path, open(pdf_output_path, 'rb'))
 
-            return response
+            return JsonResponse({'success': 'PDF generated and uploaded to S3'}, status=200)
 
         except Exception as e:
             print('Error:', e)
