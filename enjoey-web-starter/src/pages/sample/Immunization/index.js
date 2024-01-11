@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import Axios from "axios";
 
 // Material UI Imports
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
   Card,
@@ -13,11 +12,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   FormControl,
   FormControlLabel,
@@ -28,33 +22,94 @@ import {
   MenuItem,
   Divider,
   Grid,
-  Chip,
   Box,
   Typography,
 } from "@mui/material";
 
-// Local Imports
-import Styles from "./style";
+// Material UI X Imports
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 // Global Constants
-const useStyles = makeStyles(Styles);
+const columns = [
+  { field: 'id', headerName: 'ID', flex: 0.5 },
+  {
+    field: 'student',
+    headerName: 'STUDENT',
+    editable: true,
+  },
+  {
+    field: 'hepa',
+    headerName: 'HEP A',
+    editable: true,
+  },
+  {
+    field: 'hepb',
+    headerName: 'HEP B',
+    editable: true,
+  },
+  {
+    field: 'dtap',
+    headerName: 'DTAP',
+    editable: true,
+  },
+  {
+    field: 'hib',
+    headerName: 'HIB',
+    editable: true,
+  },
+  {
+    field: 'pcv',
+    headerName: 'PCV',
+    editable: true,
+  },
+  {
+    field: 'polio',
+    headerName: 'POLIO',
+    editable: true,
+  },
+  {
+    field: 'rotavirus',
+    headerName: 'ROTAVIRUS',
+    editable: true,
+  },
+  {
+    field: 'flu',
+    headerName: 'FLU',
+    editable: true,
+  },
+  {
+    field: 'mmr',
+    headerName: 'MMR',
+    editable: true,
+  },
+  {
+    field: 'var',
+    headerName: 'VAR',
+    editable: true,
+  },
+];
+
+const rows = [
+  { id: 1, student: 'Student 1', hepa: "taken", hepb: "not taken", dtap: "taken", hib: "taken", pcv: "taken", polio: "not taken", rotavirus: "taken", flu: "not taken", mmr: "not taken", var: "not taken"},
+  { id: 2, student: 'Student 2', hepa: "not taken", hepb: "not taken", dtap: "taken", hib: "not taken", pcv: "not taken", polio: "taken", rotavirus: "taken", flu: "not taken", mmr: "not taken", var: "not taken"},
+];
+
+const CustomToolbar = () => (
+  <GridToolbar
+    csvOptions={{
+      fileName: (() => {
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().slice(0, 19).replace(/[-T]/g, '').replace(':', '');
+        return `immunization_${formattedDate}`;
+      })(),
+    }}
+  />
+);
+
 const childUrl  = "http://127.0.0.1:8000/api/child/";
 
 const Page2 = () => {
-  const classes   = useStyles();
-  const tableHead = [" ", "Student", "Hep B", "DTaP", "Hib", "PCV", "Polio", "Rotavirus", "Flu", "MMR", "VAR", "Hep A"];
-  const [checkedItems, setCheckedItems] = useState({
-    'Hep B': true,
-    'DTaP': true,
-    'Hib': true,
-    'PCV': true,
-    'Polio': true,
-    'Rotavirus': true,
-    'Flu': true,
-    'MMR': true,
-    'VAR': true,
-    'Hep A': true
-  });
+  // Create Record Dialog Constants -- Start
   const [recordItems, setRecordItems] = useState({
     'Hep B': false,
     'DTaP': false,
@@ -80,11 +135,13 @@ const Page2 = () => {
     "Hep A": ""
   });
   const [open, setOpen]                     = useState(false);
-  const [openEdit, setOpenEdit]             = useState(false);
   const [child, setChild]                   = useState([]);
   const [student, setStudent]               = useState([]);
   const [recordDate, setRecordDate]         = useState([]);
+  // Create Record Dialog Constants -- End
 
+
+  // For Create Record Dialog --Start
   useEffect(() => {
     try {
       Axios.get(childUrl).then((response) => {
@@ -95,19 +152,6 @@ const Page2 = () => {
     }
   }, []);
 
-  const openEditDialog = async () => {
-    setOpenEdit(true);
-  }
-  const closeEditDialog = async () => {
-    setOpenEdit(false);
-  }
-  const handleCheckboxChange = (event) => {
-    const { name, checked } = event.target;
-    setCheckedItems((prevCheckedItems) => ({
-      ...prevCheckedItems,
-      [name]: checked
-    }));
-  };
   const handleRecordCheckbox = (event) => {
     const { name, checked } = event.target;
     setRecordItems((prevRecordItems) => ({
@@ -115,6 +159,7 @@ const Page2 = () => {
       [name]: checked
     }));
   };
+
   const handleRecordDateChange = (event) => {
     const { name, value } = event.target;
     setVacineDate((prevVacineDate) => ({
@@ -122,21 +167,24 @@ const Page2 = () => {
       [name]: value
     }));
   };
-  const handleCreate = () => {
+
+  const handleCreateRecord = () => {
     console.log('vacineDate:', vacineDate);
     console.log('recordItems:', recordItems);
+    setOpen(false);
   };
 
-  const openDialog = async () => {
+  const openRecordDialog = async () => {
     setOpen         (true);
     setStudent      ("");
     setRecordDate   ("");
     setVacineDate   ("");
   };
 
-  const closeDialog = async () => {
+  const closeRecordDialog = async () => {
     setOpen(false);
   }
+  // For Create Record Dialog --End
 
   return (
     <div>
@@ -152,24 +200,34 @@ const Page2 = () => {
         <Typography variant="h1" component="div" gutterBottom>
           Immunizations Table
         </Typography>
-        <div>
-          <Button variant ="contained" onClick ={openDialog} sx={{ mr: 2 }}>
-            <Typography variant="button" component="div">
-              + Add Record
-            </Typography>
-          </Button>
-          <Button variant ="contained" onClick ={openEditDialog}>
-            <Typography variant="button" component="div">
-              Edit Table
-            </Typography>
-          </Button>
-        </div>
+        <Button variant ="contained" onClick ={openRecordDialog} sx={{ mr: 2 }}>
+          <Typography variant="button" component="div">
+            + Add Record
+          </Typography>
+        </Button>
       </Box>
-      {/* Add Immunization Record */}
+      <Card>
+        <DataGrid
+          sx={{ m: 5 }}
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 5,
+              },
+            },
+          }}
+          slots={{toolbar: CustomToolbar}} 
+          pageSizeOptions={[5]}
+          disableRowSelectionOnClick
+        />
+      </Card>
+      {/* Add Immunization Record Dialog --Start */}
       <Dialog
         fullWidth
         open              ={open}
-        onClose           ={closeDialog}
+        onClose           ={closeRecordDialog}
         aria-labelledby   ="alert-dialog-title"
         aria-describedby  ="alert-dialog-description"
       >
@@ -245,119 +303,10 @@ const Page2 = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCreate}>Create</Button>
+          <Button onClick={handleCreateRecord}>Create</Button>
         </DialogActions>
       </Dialog>
-      {/* Edit Immunization Table */}
-      <Dialog
-        fullWidth
-        open              ={openEdit}
-        onClose           ={closeEditDialog}
-        aria-labelledby   ="alert-dialog-title"
-        aria-describedby  ="alert-dialog-description"
-      >
-        <DialogTitle>
-          <h2>Immunizations Settings</h2>
-        </DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={12}>
-              <h4>Edit the table columns</h4>
-            </Grid>
-            <Grid item xs={6} md={6}>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['Hep B']} onChange={handleCheckboxChange} name="Hep B" />}
-                  label="Hep B"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['DTaP']} onChange={handleCheckboxChange} name="DTaP" />}
-                  label="DTaP"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['Hib']} onChange={handleCheckboxChange} name="Hib" />}
-                  label="Hib"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['PCV']} onChange={handleCheckboxChange} name="PCV" />}
-                  label="PCV"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['Polio']} onChange={handleCheckboxChange} name="Polio" />}
-                  label="Polio"
-                />
-              </FormGroup>
-            </Grid>
-            <Grid item xs={6} md={6}>
-              <FormGroup>
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['Rotavirus']} onChange={handleCheckboxChange} name="Rotavirus" />}
-                  label="Rotavirus"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['Flu']} onChange={handleCheckboxChange} name="Flu" />}
-                  label="Flu"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['Hep A']} onChange={handleCheckboxChange} name="Hep A" />}
-                  label="Hep A"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['MMR']} onChange={handleCheckboxChange} name="MMR" />}
-                  label="MMR"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={checkedItems['VAR']} onChange={handleCheckboxChange} name="VAR" />}
-                  label="VAR"
-                />
-              </FormGroup>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button>Apply</Button>
-        </DialogActions>
-      </Dialog>
-      <Card>
-        <Table>
-          <TableHead>
-            <TableRow className={classes.tableHeadRow}>
-              {tableHead.map((prop, index) => {
-                if (index < 2 || checkedItems[prop]) {
-                  return (
-                    <TableCell
-                      className={classes.tableCell + classes.tableHeadCell}
-                      key={prop}
-                      style={{
-                        textAlign: 'center'
-                      }}
-                    >
-                      {prop}
-                    </TableCell>
-                  );
-                }
-                return null;
-              })}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell style={{textAlign: "center"}}>1</TableCell>
-              <TableCell style={{textAlign: "center"}}>Student 1</TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="not taken" color="warning" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="not taken" color="warning" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="not taken" color="warning" /></TableCell>
-              <TableCell style={{textAlign: "center"}}><Chip label="taken" color="success" /></TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Card>
+      {/* Add Immunization Record Dialog --End */}
     </div>
   );
 };

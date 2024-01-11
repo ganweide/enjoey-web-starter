@@ -1,13 +1,17 @@
 // React Imports
 import React from "react";
 
+// Material UI Imports
 import {
   Card,
   Box,
   Typography,
 } from "@mui/material";
+
+// Material UI X Imports
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
+// Global Constants
 const columns = [
   { field: 'id', headerName: 'ID' },
   {

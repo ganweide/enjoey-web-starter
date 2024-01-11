@@ -1,8 +1,5 @@
 // React Imports
-import React, { useEffect, useState } from "react";
-
-// Axios Import
-import Axios from "axios";
+import React from "react";
 
 // Material UI Imports
 import {
@@ -11,10 +8,9 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { DataGrid, GridToolbar, GridToolbarExport } from '@mui/x-data-grid';
 
-// Local Imports
-import Styles from "./style";
+// Material UI X Imports
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 // Global Constants
 const calculateRatio = (student, staff) => {
@@ -82,15 +78,7 @@ const Page2 = () => {
   );
   return (
     <div>
-      <Box 
-        sx={{
-          p: 2,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "left",
-          justifyContent: "space-between"
-        }}
-      >
+      <Box sx={{ p: 2 }}>
         <Typography variant="h1" component="div" gutterBottom>
           Room Check Report
         </Typography>
