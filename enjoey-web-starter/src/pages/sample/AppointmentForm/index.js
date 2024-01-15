@@ -7,7 +7,6 @@ import Axios from "axios";
 // Material UI Imports
 import { makeStyles } from "@material-ui/core/styles";
 import EditIcon from '@mui/icons-material/Edit';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import {
   Button,
   Card,
@@ -31,15 +30,15 @@ import {
   Tabs,
   Tab,
   Menu,
-  IconButton,
 } from "@mui/material";
 
-// PropTypes import
+// PropTypes Imports
 import PropTypes from 'prop-types';
 
 // Local Imports
 import Styles from "./style";
 
+// React Big Calendar Imports
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -81,22 +80,20 @@ function a11yProps(index) {
   };
 }
 
-const localizer = momentLocalizer(moment);
-const DnDCalendar = withDragAndDrop(Calendar);
-const useStyles = makeStyles(Styles);
+const useStyles       = makeStyles(Styles);
+const localizer       = momentLocalizer(moment);
+const DnDCalendar     = withDragAndDrop(Calendar);
 const appointmentUrl  = "http://localhost:8000/api/appointment/";
 const timeSlotUrl     = "http://localhost:8000/api/appointment-time-slots/";
 const branchUrl       = "http://localhost:8000/api/branch/";
 
 const Page2 = () => {
   const classes   = useStyles();
-  const tableHeadAppointments = [" ", "Parent", "Age Interest", "Date", "Time", "Branch", "Phone", "Action"];
   const tableHeadTimeSlots    = [" ", "Branch", "Age Interest", "From", "Till", "Action"];
   const [tab, setTab]                                     = useState(0);
   const [actionMenu, setActionMenu]                       = useState(null);
   const [addAppointmentDialog, setAddAppointmentDialog]   = useState(false);
   const [createTimeSlotsDialog, setCreateTimeSlotsDialog] = useState(false);
-  const [customDateOpen, setCustomDateOpen]               = useState(false);
   const [appointments, setAppointments]                   = useState([]);
   const [appointmentTimeSlots, setAppointmentTimeSlots]   = useState([]);
   const [branchData, setBranchData]                       = useState([]);
@@ -114,117 +111,90 @@ const Page2 = () => {
   const [name, setName]                                   = useState([]);
   const [ageInterest, setAgeInterest]                     = useState("");
   const [ageInterestTimeSlots, setAgeInterestTimeSlots]   = useState("");
-  const [filterDate, setFilterDate]                       = useState("");
-  const [filterAgeInterest, setFilterAgeInterest]         = useState("");
-  const [filterTime, setFilterTime]                       = useState("");
-  const [filteredAppointments, setFilteredAppointments]   = useState([]);
   const [events, setEvents]                               = useState([]);
-
-  const handleFilterDateChange = (e) => {
-    const selectedValue = e.target.value;
-    setFilterDate(selectedValue);
-
-    if (selectedValue === 'custom') {
-      setCustomDateOpen(true);
-    } else {
-      setCustomDateOpen(false);
-    }
-  };
-
-  const handleCustomDateClose = () => {
-    setCustomDateOpen(false);
-  };
-
-  const handleFilterAgeInterestChange = (e) => {
-    setFilterAgeInterest(e.target.value);
-  };
-
-  const handleFilterTimeChange = (e) => {
-    setFilterTime(e.target.value);
-  };
-
-  const filterAppointments = () => {
-    let filteredData = appointments;
-
-    if (filterAgeInterest) {
-      filteredData = filteredData.filter(appointment => appointment.ageInterest === filterAgeInterest);
-    }
-
-    if (filterTime) {
-      filteredData = filteredData.filter(appointment => appointment.time === filterTime);
-    }
-
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
-    const startDate = new Date(currentYear, currentMonth, 1);
-    const endDate = new Date(currentYear, currentMonth + 1, 0);
-
-    switch (filterDate) {
-      case 'this month':
-        filteredData = filteredData.filter(appointment => {
-          const appointmentDate = new Date(appointment.date);
-          return appointmentDate >= startDate && appointmentDate <= endDate;
-        });
-        break;
-      case 'last month':
-        const lastMonthStartDate = new Date(currentYear, currentMonth - 1, 1);
-        const lastMonthEndDate = new Date(currentYear, currentMonth, 0);
-        filteredData = filteredData.filter(appointment => {
-          const appointmentDate = new Date(appointment.date);
-          return appointmentDate >= lastMonthStartDate && appointmentDate <= lastMonthEndDate;
-        });
-        break;
-      case 'next month':
-        const nextMonthStartDate = new Date(currentYear, currentMonth + 1, 1);
-        const nextMonthEndDate = new Date(currentYear, currentMonth + 2, 0);
-        filteredData = filteredData.filter(appointment => {
-          const appointmentDate = new Date(appointment.date);
-          return appointmentDate >= nextMonthStartDate && appointmentDate <= nextMonthEndDate;
-        });
-        break;
-      case 'this year':
-        filteredData = filteredData.filter(appointment => {
-          const appointmentDate = new Date(appointment.date);
-          return appointmentDate.getFullYear() === currentYear;
-        });
-        break;
-      case 'year to date':
-        filteredData = filteredData.filter(appointment => {
-          const appointmentDate = new Date(appointment.date);
-          return appointmentDate >= startDate && appointmentDate <= currentDate;
-        });
-        break;
-      case 'last year':
-        filteredData = filteredData.filter(appointment => {
-          const appointmentDate = new Date(appointment.date);
-          return appointmentDate.getFullYear() === currentYear - 1;
-        });
-        break;
-      case 'custom':
-        // Handle custom date range logic here if needed
-        break;
-      default:
-        // No filter selected
-    }
-    setFilteredAppointments(filteredData);
-  };
-
-  useEffect(() => {
-    filterAppointments(); // Trigger filtering logic when filter values change
-  }, [filterAgeInterest, filterTime, filterDate]);
-
-  const handleReset = () => {
-    setFilterDate('');
-    setFilterAgeInterest('');
-    setFilterTime('');
-  };
-
 
   const handleChange = (event, newValue) => {
     setTab(newValue);
   };
 
+  useEffect(() => {
+    try {
+      Axios.get(appointmentUrl).then((response) => {
+        setAppointments(response.data);
+      });
+      Axios.get(timeSlotUrl).then((response) => {
+        setAppointmentTimeSlots(response.data);
+      });
+      Axios.get(branchUrl).then((response) => {
+        setBranchData(response.data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, [refresh]);
+
+  // Dnd Big Calendar
+  useEffect(() => {
+    const bigCalendarEvents = appointments.map(appointment => {
+      const start = moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").toDate();
+      const end = moment(start).add(1, "hours").toDate();
+      const title = appointment.name;
+      const time = appointment.time;
+      const program = appointment.ageInterest;
+      const id = appointment.id;
+
+      return { start, end, title, program, time, id };
+    })
+    setEvents(bigCalendarEvents);
+  }, [appointments]);
+
+  const EventComponent = ({ event }) => (
+    <div>
+      <strong>{event.title}</strong>
+      <div>{event.time}</div>
+      <div>{event.program}</div>
+    </div>
+  );
+
+  EventComponent.propTypes = {
+    event: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      program: PropTypes.string.isRequired,
+      time: PropTypes.string.isRequired,
+    }).isRequired,
+  };
+
+  const onEventDrop = async (data) => {
+    const { start, end, event } = data;
+  
+    // Assuming you are only updating the first event
+    const formattedDate = moment(start).format("YYYY-MM-DD");
+    const updatedEvent = {
+      ...event,
+      date: formattedDate,
+      start,
+      end,
+    };
+  
+    try {
+      // Update the server with the new event information
+      await Axios({
+        method: "PUT", // Use the appropriate HTTP method for updating
+        url: `${appointmentUrl}${updatedEvent.id}/`, // Adjust the URL based on your server API
+        data: updatedEvent,
+      });
+      // Update the local state with the new event
+      setEvents((prevEvents) => 
+        prevEvents.map((prevEvent) => 
+          prevEvent.id === updatedEvent.id ? updatedEvent : prevEvent
+        )
+      );
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
+  };
+
+  // Time Slots Table
   const handleOpenMenu = (event) => {
     setActionMenu(event.currentTarget);
   };
@@ -238,28 +208,102 @@ const Page2 = () => {
     return branch ? branch.branchName : 'Unknown Branch';
   }
 
-  useEffect(() => {
-    try {
-      Axios.get("http://127.0.0.1:8000/api/appointment/").then((response) => {
-        setAppointments(response.data);
-        setFilteredAppointments(response.data);
-      });
-      Axios.get("http://127.0.0.1:8000/api/appointment-time-slots/").then((response) => {
-        setAppointmentTimeSlots(response.data);
-      });
-      Axios.get(branchUrl).then((response) => {
-        setBranchData(response.data);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }, [refresh]);
-
+  
+  // Dialog Constants
+  //// Add Appointment Dialog
   const openAddAppointmentDialog = async () => {
     setAddAppointmentDialog (true);
   };
 
+  const closeAddAppointmentDialog = async () => {
+    setDate                 ("");
+    setTime                 ("");
+    setBranch               ("");
+    setName                 ("");
+    setPhone                ("");
+    setAgeInterest          ("");
+    setAddAppointmentDialog(false);
+  }
 
+  const newAppointment = async () => {
+    const appointmentData = new FormData();
+    appointmentData.append("name", name);
+    appointmentData.append("ageInterest", ageInterest);
+    appointmentData.append("branchId", branch);
+    appointmentData.append("time", time);
+    appointmentData.append("date", date);
+    appointmentData.append("phone", phone);
+
+    try {
+      const response = await Axios({
+        method  : "POST",
+        url     : appointmentUrl,
+        data    : appointmentData,
+        headers : {"Content-Type": "multipart/form-data"},
+      });
+      setRefresh(response.data)
+    } catch (error) {
+      console.log("error", error);
+    }
+    closeAddAppointmentDialog();
+  };
+
+  //// Create Time Slot Dialog
+  const openCreateTimeSlotsDialog = () => {
+    setCreateTimeSlotsDialog (true);
+  }
+
+  const closeCreateTimeSlotsDialog = () => {
+    setBranch               ("");
+    setAgeInterestTimeSlots ("");
+    setStartTime            ("09:00");
+    setEndTime              ("17:00");
+    setCreateTimeSlotsDialog(false);
+  }
+
+  const handleStartTimeChange = (e) => {
+    setStartTime(e.target.value);
+    validateTimeRange(e.target.value, endTime);
+  };
+
+  const handleEndTimeChange = (e) => {
+    setEndTime(e.target.value);
+    validateTimeRange(startTime, e.target.value);
+  };
+
+  const validateTimeRange = (selectedStartTime, selectedEndTime) => {
+    const minTime = '09:00';
+    const maxTime = '17:00';
+
+    if (selectedStartTime < minTime || selectedEndTime > maxTime) {
+      setError('Selected time must be within 9:00 am to 5:00 pm.');
+    } else {
+      setError('');
+    }
+  };
+
+  const newTimeSlot = async () => {
+    const timeSlotData = new FormData();
+    timeSlotData.append("branchId", branch);
+    timeSlotData.append("ageInterest", ageInterestTimeSlots);
+    timeSlotData.append("startTime", startTime);
+    timeSlotData.append("endTime", endTime);
+
+    try {
+      const response = await Axios({
+        method  : "POST",
+        url     : timeSlotUrl,
+        data    : timeSlotData,
+        headers : {"Content-Type": "multipart/form-data"},
+      });
+      setRefresh(response.data)
+    } catch (error) {
+      console.log("error", error);
+    }
+    closeCreateTimeSlotsDialog();
+  };
+
+  // Filters For Dialog
   useEffect(() => {
     const filteredAppointments = appointments.filter(appointment => {
       const matchingTimeSlots = appointmentTimeSlots.filter(slot => slot.startTime === appointment.time);
@@ -308,167 +352,11 @@ const Page2 = () => {
     }
   }, [branch]);
 
-  const closeAddAppointmentDialog = async () => {
-    setDate                 ("");
-    setTime                 ("");
-    setBranch               ("");
-    setName                 ("");
-    setPhone                ("");
-    setAgeInterest          ("");
-    setAddAppointmentDialog(false);
-  }
-
-  const openCreateTimeSlotsDialog = () => {
-    setCreateTimeSlotsDialog (true);
-  }
-
-  const validateTimeRange = (selectedStartTime, selectedEndTime) => {
-    const minTime = '09:00';
-    const maxTime = '17:00';
-
-    if (selectedStartTime < minTime || selectedEndTime > maxTime) {
-      setError('Selected time must be within 9:00 am to 5:00 pm.');
-    } else {
-      setError('');
-    }
-  };
-
-  const handleStartTimeChange = (e) => {
-    setStartTime(e.target.value);
-    validateTimeRange(e.target.value, endTime);
-  };
-
-  const handleEndTimeChange = (e) => {
-    setEndTime(e.target.value);
-    validateTimeRange(startTime, e.target.value);
-  };
-
-  const closeCreateTimeSlotsDialog = () => {
-    setBranch               ("");
-    setAgeInterestTimeSlots ("");
-    setStartTime            ("09:00");
-    setEndTime              ("17:00");
-    setCreateTimeSlotsDialog(false);
-  }
-
-  const newAppointment = async () => {
-    const appointmentData = new FormData();
-    appointmentData.append("name", name);
-    appointmentData.append("ageInterest", ageInterest);
-    appointmentData.append("branchId", branch);
-    appointmentData.append("time", time);
-    appointmentData.append("date", date);
-    appointmentData.append("phone", phone);
-
-    try {
-      const response = await Axios({
-        method  : "POST",
-        url     : appointmentUrl,
-        data    : appointmentData,
-        headers : {"Content-Type": "multipart/form-data"},
-      });
-      setRefresh(response.data)
-    } catch (error) {
-      console.log("error", error);
-    }
-    closeAddAppointmentDialog();
-  };
-
-  const newTimeSlot = async () => {
-    const timeSlotData = new FormData();
-    timeSlotData.append("branchId", branch);
-    timeSlotData.append("ageInterest", ageInterestTimeSlots);
-    timeSlotData.append("startTime", startTime);
-    timeSlotData.append("endTime", endTime);
-
-    try {
-      const response = await Axios({
-        method  : "POST",
-        url     : timeSlotUrl,
-        data    : timeSlotData,
-        headers : {"Content-Type": "multipart/form-data"},
-      });
-      setRefresh(response.data)
-    } catch (error) {
-      console.log("error", error);
-    }
-    closeCreateTimeSlotsDialog();
-  };
-
-  useEffect(() => {
-    const bigCalendarEvents = appointments.map(appointment => {
-      const start = moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").toDate();
-      const end = moment(start).add(1, "hours").toDate();
-      const title = appointment.name;
-      const time = appointment.time;
-      const program = appointment.ageInterest;
-      const id = appointment.id;
-
-      return { start, end, title, program, time, id };
-    })
-    setEvents(bigCalendarEvents);
-  }, [appointments]);
-
-  const EventComponent = ({ event }) => (
-    <div>
-      <strong>{event.title}</strong>
-      <div>{event.time}</div>
-      <div>{event.program}</div>
-    </div>
-  );
-
-  EventComponent.propTypes = {
-    event: PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      program: PropTypes.string.isRequired,
-      time: PropTypes.string.isRequired,
-    }).isRequired,
-  };
-
-  const onEventResize = (data) => {
-    const { start, end } = data;
-
-    setEvents((prevEvents) => [
-      {
-        ...prevEvents[0],
-        start,
-        end,
-      },
-    ]);
-  };
-
-  const onEventDrop = async (data) => {
-    const { start, end } = data;
-  
-    // Assuming you are only updating the first event
-    const formattedDate = moment(start).format("YYYY-MM-DD");
-    const updatedEvent = {
-      ...events[0],
-      date: formattedDate,
-      start,
-      end,
-    };
-  
-    try {
-      // Update the server with the new event information
-      await Axios({
-        method: "PUT", // Use the appropriate HTTP method for updating
-        url: `${appointmentUrl}${updatedEvent.id}/`, // Adjust the URL based on your server API
-        data: updatedEvent,
-      });
-  
-      // Update the local state with the new event
-      setEvents([updatedEvent, ...events.slice(1)]); // Assuming you are only updating the first event
-    } catch (error) {
-      console.error("Error updating event:", error);
-    }
-  };
-
   return (
     <Card sx={{ p: 5 }}>
       <Box sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tab} onChange={handleChange} aria-label="basic tabs example">
+          <Tabs value={tab} onChange={handleChange} aria-label="appointment-form-tab-panel">
             <Tab label="Appointments" {...a11yProps(0)} />
             <Tab label="Time Slots" {...a11yProps(1)} />
           </Tabs>
@@ -503,9 +391,8 @@ const Page2 = () => {
               event: EventComponent,
             }}
             onEventDrop={onEventDrop}
-            onEventResize={onEventResize}
             resizable
-            style={{ height: "100vh" }}
+            style={{ height: "200vh" }}
           />
         </TabPanel>
         <TabPanel value={tab} index={1}>
@@ -805,29 +692,6 @@ const Page2 = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={newTimeSlot}>Save</Button>
-        </DialogActions>
-      </Dialog>
-      {/* Custom Date Dialog */}
-      <Dialog
-        fullWidth
-        maxWidth          ="sm"
-        open              ={customDateOpen}
-        onClose           ={handleCustomDateClose}
-        aria-labelledby   ="alert-dialog-title"
-        aria-describedby  ="alert-dialog-description"
-      >
-        <DialogTitle>
-          <h2>Custom Date Selection</h2>
-        </DialogTitle>
-        <DialogContent>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCustomDateClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleCustomDateClose} color="primary">
-            Apply
-          </Button>
         </DialogActions>
       </Dialog>
     </Card>
