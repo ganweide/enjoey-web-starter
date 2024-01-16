@@ -339,18 +339,18 @@ class PDFGenerationAndUploadView(APIView):
             today = datetime.date.today().strftime("%Y-%m-%d")
             data = {
                 'invoice_date': today,
-                'amount': 1000.00,
+                'amount': '1,000.00',
                 'student_name': 'Testing 43434',
                 'invoice_no': '1234567',
                 'payment_name': 'Payment 123',
                 'program': 'Infant Care Program',
                 'fee_description': 'First payment',
-                'subtotal': 1000.00,
-                'gst': 60.00,
-                'total': 1060.00,
+                'subtotal': '1,000.00',
+                'gst': '60.00',
+                'total': '1,060.00',
             }
 
-            template_instance = EmailTemplateHtmlTable.objects.get(pk=63)
+            template_instance = EmailTemplateHtmlTable.objects.get(pk=71)
             serializer = EmailTemplateHtmlTableSerializer(template_instance)
             html_code = serializer.data.get('htmlFormat', '')
 
@@ -370,6 +370,29 @@ class PDFGenerationAndUploadView(APIView):
 
             for u_row_div in soup.find_all('div', class_='u-row'):
                 u_row_div['style'] = str(u_row_div.get('style', '')) + 'max-width: 100%;'
+
+            for img_tag in soup.find_all('img', src='https://cdn.tools.unlayer.com/image/placeholder.png'):
+                table_tag = img_tag.find_parent('table')
+                if table_tag:
+                    # Find the parent of the parent table and remove it as well
+                    parent_table_tag = table_tag.find_parent('table')
+                    if parent_table_tag:
+                        parent_table_tag.extract()
+
+            # Find and replace <div> and <p> tags
+            div_style = "font-size: 14px; line-height: 140%; text-align: right; word-wrap: break-word;"
+            for div_tag in soup.find_all('div', style=div_style):
+                # Extract the text from each <p> and create a new <div> for each line
+                lines = [line.strip() for line in div_tag.stripped_strings]
+                new_div = soup.new_tag('div')
+                for line in lines:
+                    new_line_div = soup.new_tag('div', style="text-align: right")
+                    new_line_div.string = line
+                    new_div.append(new_line_div)
+                    new_div.append(soup.new_tag('br'))
+
+                # Replace the original div with the new div
+                div_tag.replace_with(new_div)
 
             # Get the cleaned HTML code
             cleaned_html = str(soup)
