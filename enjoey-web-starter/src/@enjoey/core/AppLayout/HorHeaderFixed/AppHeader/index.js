@@ -70,17 +70,17 @@ const AppHeader = ({toggleNavCollapsed}) => {
             </Hidden>
 
             <Box
-              sx={{
-                mr: 2,
-                '& .app-logo': {
-                  pl: 0,
-                },
-                '& .logo-text': {
-                  display: {xs: 'none', sm: 'block'},
-                },
-              }}
+              // sx={{
+              //   mr: 2,
+              //   '& .app-logo': {
+              //     pl: 0,
+              //   },
+              //   '& .logo-text': {
+              //     display: {xs: 'none', sm: 'block'},
+              //   },
+              // }}
             >
-              <AppLogo />
+              {/* <AppLogo /> */}
             </Box>
             <Box
               sx={{

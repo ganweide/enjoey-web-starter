@@ -114,7 +114,7 @@ const Page2 = () => {
         try {
           Axios.post("http://127.0.0.1:8000/api/email-editor-json/", { templateName: designName, jsonFormat: JSON.stringify(data) });
           setRefresh(data);
-          console.log('JSON successfully saved', data);
+          // console.log('JSON successfully saved', data);
         } catch (error) {
           console.error('Error saving design', error);
         }

@@ -1,26 +1,12 @@
 // React Imports
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import Axios from "axios";
 
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Card,
-  Grid,
   Typography,
-  Box,
-  Table,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableRow,
-  MenuItem,
-  Menu,
   Button,
-  Dialog,
-  DialogContent,
-  Tab,
-  IconButton,
 } from "@mui/material";
 
 const Page2 = () => {
@@ -56,7 +42,7 @@ const Page2 = () => {
         key: key,
         amount: amount,
         currency: 'MYR',
-        name: 'Visualogic Resources Sdn. Bhd.',
+        name: 'Pink Tower',
         description: 'Payment Description',
         order_id: orderId,
         handler: async function (response) {
@@ -78,9 +64,9 @@ const Page2 = () => {
           }
         },
         prefill: {
-          name: 'John Doe',
-          email: 'john@example.com',
-          contact: '9876543210',
+          name: 'Test Payer 1',
+          email: 'testpayer@email.com',
+          contact: '0187367283',
         },
       };
 

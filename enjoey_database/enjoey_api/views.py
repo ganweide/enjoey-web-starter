@@ -350,7 +350,7 @@ class PDFGenerationAndUploadView(APIView):
                 'total': '1,060.00',
             }
 
-            template_instance = EmailTemplateHtmlTable.objects.get(pk=71)
+            template_instance = EmailTemplateHtmlTable.objects.get(pk=75)
             serializer = EmailTemplateHtmlTableSerializer(template_instance)
             html_code = serializer.data.get('htmlFormat', '')
 
