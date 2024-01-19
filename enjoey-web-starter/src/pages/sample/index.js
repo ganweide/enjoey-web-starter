@@ -24,6 +24,7 @@ const Page20 = React.lazy(() => import('./Invoice'));
 const Page21 = React.lazy(() => import('./CheckoutForm'));
 const Page22 = React.lazy(() => import('./AppointmentForm'));
 const Page23 = React.lazy(() => import('./EmailEditor'));
+const Page24 = React.lazy(() => import('./ImportCSV'));
 
 export const samplePagesConfigs = [
   {
@@ -118,5 +119,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/EmailEditor',
     element: <Page23 />,
+  },
+  {
+    path: '/sample/ImportCSV',
+    element: <Page24 />,
   },
 ];

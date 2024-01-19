@@ -22,6 +22,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/CheckoutForm',
       },
+      {
+        id: 'import-csv',
+        title: 'Import CSV',
+        messageId: 'Import CSV',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/ImportCSV',
+      },
     ],
   },
   {
