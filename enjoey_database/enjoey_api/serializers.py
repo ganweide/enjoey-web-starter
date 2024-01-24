@@ -1,5 +1,30 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily
+
+class TempTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TempTable
+        fields = '__all__'
+
+class CoreServiceChildrenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoreServiceChildren
+        fields = '__all__'
+
+class CoreServiceChildrenAllergiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoreServiceChildrenAllergies
+        fields = '__all__'
+
+class CoreServiceChildrenMedicalContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoreServiceChildrenMedicalContact
+        fields = '__all__'
+
+class CoreServiceFamilySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoreServiceFamily
+        fields = '__all__'
 
 class EmailTemplateHtmlTableSerializer(serializers.ModelSerializer):
     createdAt   = serializers.DateTimeField(required=False)

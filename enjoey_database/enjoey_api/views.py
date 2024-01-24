@@ -1,10 +1,9 @@
 # from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.generics import CreateAPIView
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer
 from rest_framework.response import Response
-import datetime
 from django.views import View
 from django.conf import settings
 import os
@@ -31,7 +30,85 @@ from xhtml2pdf import pisa
 import pdfkit
 from django.template import Context, Template
 from bs4 import BeautifulSoup, Comment
+import csv
+from datetime import datetime
 
+class CSVImportView(APIView):
+    def post(self, request, *args, **kwargs):
+        file = request.FILES.get('file')
+
+        try:
+            csv_data = csv.DictReader(file.read().decode('utf-8-sig').splitlines())
+
+            def convert_bool(value):
+                if value.lower() == 'true':
+                    return True
+                elif value.lower() == 'false':
+                    return False
+                else:
+                    return value
+            
+            def format_date(date_str):
+                formats_to_try = ["%d-%m-%Y", "%Y-%m-%d", "%d/%m/%Y", "%Y-%m-%d"]
+                
+                for date_format in formats_to_try:
+                    try:
+                        date_obj = datetime.strptime(date_str, date_format)
+                        return date_obj.strftime("%d-%m-%Y")
+                    except ValueError:
+                        continue
+                
+                # Handle invalid date formats here
+                return None
+            
+            def format_phone_number(phone_number):
+                return f"{phone_number[:3]}-{phone_number[3:]}"
+
+            def format_birth_ic(birth_ic):
+                return f"{birth_ic[:6]}-{birth_ic[6:8]}-{birth_ic[8:]}"
+                
+            def insert_temp_table(row):
+                # Remove BOM if present in column names
+                row = {key.lstrip('\ufeff'): value for key, value in row.items()}
+                row['birthIC'] = format_birth_ic(row.get('birthIC', ''))
+                row['birthICFamily'] = format_birth_ic(row.get('birthICFamily', ''))
+                row['phoneMC'] = format_phone_number(row.get('phoneMC', ''))
+                row['phoneFamily'] = format_phone_number(row.get('phoneFamily', ''))
+                row['birthDate'] = format_date(row.get('birthDate', ''))
+                row['isAllowPickup'] = convert_bool(row.get('isAllowPickup', ''))
+                row['haveMedicine'] = convert_bool(row.get('haveMedicine', ''))
+                serializer = TempTableSerializer(data=row)
+                if serializer.is_valid():
+                    serializer.save()
+                    return serializer.data
+                else:
+                    raise Exception(serializer.errors)
+
+            def populate_other_tables(row):
+                children_serializer = CoreServiceChildrenSerializer(data=row)
+                medical_contact_serializer = CoreServiceChildrenMedicalContactSerializer(data=row)
+                family_serializer = CoreServiceFamilySerializer(data=row)
+                allergies_serializer = CoreServiceChildrenAllergiesSerializer(data=row)
+
+                if all([serializer.is_valid() for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]]):
+                    children_serializer.save()
+                    medical_contact_serializer.save()
+                    family_serializer.save()
+                    allergies_serializer.save()
+                else:
+                    raise Exception([serializer.errors for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]])
+
+            temp_table_instances = [insert_temp_table(row) for row in csv_data]
+
+            for temp_table_instance in temp_table_instances:
+                populate_other_tables(temp_table_instance)
+
+            TempTable.objects.all().delete()
+
+            return Response({'message': 'CSV data imported successfully'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class HtmlImageUploadView(APIView):
     def post(self, request, *args, **kwargs):

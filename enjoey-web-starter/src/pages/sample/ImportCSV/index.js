@@ -20,6 +20,11 @@ const Page2 = () => {
 
   const handleUpload = async () => {
     try {
+      if(!file) {
+        console.error('No File Selected');
+        return;
+      }
+      
       const formData = new FormData();
       formData.append('file', file);
   
@@ -28,14 +33,14 @@ const Page2 = () => {
       
       // Log the data to the console
       console.log('CSV File Contents:', fileContents);
-  
-      // Simulate the file upload - Replace 'YOUR_DJANGO_UPLOAD_API_URL' with your actual Django API endpoint
-      // This is commented out to avoid actual file upload in this example
-      // await Axios.post('YOUR_DJANGO_UPLOAD_API_URL', formData, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //   },
-      // });
+
+      // Replace 'YOUR_DJANGO_UPLOAD_API_URL' with your actual Django API endpoint for file upload
+      const response = await Axios.post('http://127.0.0.1:8000/api/csvupload/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log(response.data);
   
       // Optionally, you can perform additional actions after successful upload
       console.log('File uploaded successfully');
