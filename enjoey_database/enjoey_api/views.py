@@ -66,6 +66,14 @@ class CSVImportView(APIView):
 
             def format_birth_ic(birth_ic):
                 return f"{birth_ic[:6]}-{birth_ic[6:8]}-{birth_ic[8:]}"
+            
+            def format_currency(currency):
+                try:
+                    currency_value = float(currency)
+                    formatted_currency = "{:.2f}".format(currency_value)
+                    return formatted_currency
+                except ValueError:
+                    return None
                 
             def insert_temp_table(row):
                 # Remove BOM if present in column names
