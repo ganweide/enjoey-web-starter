@@ -31,7 +31,7 @@ import pdfkit
 from django.template import Context, Template
 from bs4 import BeautifulSoup, Comment
 import csv
-from datetime import datetime
+import datetime
 
 class CSVImportView(APIView):
     def post(self, request, *args, **kwargs):
@@ -423,19 +423,21 @@ class PDFGenerationAndUploadView(APIView):
         try:
             today = datetime.date.today().strftime("%Y-%m-%d")
             data = {
-                'invoice_date': today,
+                'receipt_date': today,
+                'birth_certificate': '003928-93-2674',
+                'class': 'Banana Class',
                 'amount': '1,000.00',
                 'student_name': 'Testing 43434',
-                'invoice_no': '1234567',
-                'payment_name': 'Payment 123',
-                'program': 'Infant Care Program',
+                'receipt_no': '1234567',
+                'student_name': 'John Doe',
                 'fee_description': 'First payment',
                 'subtotal': '1,000.00',
                 'gst': '60.00',
                 'total': '1,060.00',
+                'bank_no': '7364 3781 3746',
             }
 
-            template_instance = EmailTemplateHtmlTable.objects.get(pk=75)
+            template_instance = EmailTemplateHtmlTable.objects.get(pk=76)
             serializer = EmailTemplateHtmlTableSerializer(template_instance)
             html_code = serializer.data.get('htmlFormat', '')
 
