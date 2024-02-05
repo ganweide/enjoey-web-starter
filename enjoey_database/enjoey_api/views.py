@@ -32,6 +32,7 @@ from django.template import Context, Template
 from bs4 import BeautifulSoup, Comment
 import csv
 import datetime
+from datetime import datetime
 
 class CSVImportView(APIView):
     def post(self, request, *args, **kwargs):
@@ -39,6 +40,8 @@ class CSVImportView(APIView):
 
         try:
             csv_data = csv.DictReader(file.read().decode('utf-8-sig').splitlines())
+            total_uploaded = 0
+            total_ignored = 0
 
             def convert_bool(value):
                 if value.lower() == 'true':
@@ -91,29 +94,47 @@ class CSVImportView(APIView):
                     return serializer.data
                 else:
                     raise Exception(serializer.errors)
+                
+            def is_duplicate_data(self, row):
+                # Check for duplication based on specified criteria
+                existing_data = CoreServiceChildren.objects.filter(
+                    branchId=row.get('branchId'),
+                    fullName=row.get('fullName'),
+                    birthIC=row['birthIC']
+                )
+
+                return existing_data.exists()
 
             def populate_other_tables(row):
-                children_serializer = CoreServiceChildrenSerializer(data=row)
-                medical_contact_serializer = CoreServiceChildrenMedicalContactSerializer(data=row)
-                family_serializer = CoreServiceFamilySerializer(data=row)
-                allergies_serializer = CoreServiceChildrenAllergiesSerializer(data=row)
+                if not is_duplicate_data(self, row):
+                    children_serializer = CoreServiceChildrenSerializer(data=row)
+                    medical_contact_serializer = CoreServiceChildrenMedicalContactSerializer(data=row)
+                    family_serializer = CoreServiceFamilySerializer(data=row)
+                    allergies_serializer = CoreServiceChildrenAllergiesSerializer(data=row)
 
-                if all([serializer.is_valid() for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]]):
-                    children_serializer.save()
-                    medical_contact_serializer.save()
-                    family_serializer.save()
-                    allergies_serializer.save()
+                    if all([serializer.is_valid() for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]]):
+                        children_serializer.save()
+                        medical_contact_serializer.save()
+                        family_serializer.save()
+                        allergies_serializer.save()
+                    else:
+                        raise Exception([serializer.errors for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]])
+                    
                 else:
-                    raise Exception([serializer.errors for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]])
+                    nonlocal total_ignored
+                    total_ignored += 1
+                    return False
 
             temp_table_instances = [insert_temp_table(row) for row in csv_data]
 
             for temp_table_instance in temp_table_instances:
-                populate_other_tables(temp_table_instance)
+                if temp_table_instance:
+                    if populate_other_tables(temp_table_instance):
+                        total_uploaded += 1
 
             TempTable.objects.all().delete()
 
-            return Response({'message': 'CSV data imported successfully'}, status=status.HTTP_200_OK)
+            return Response({'message': 'CSV data imported successfully', 'uploaded' : total_uploaded, 'ignored' : total_ignored}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -12,6 +12,9 @@ import {
 
 const Page2 = () => {
   const [file, setFile] = useState(null);
+  const [status, setStatus] = useState('Waiting');
+  const [success, setSuccess] = useState([]);
+  const [ignored, setIgnored] = useState([]);
   
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -35,16 +38,20 @@ const Page2 = () => {
       console.log('CSV File Contents:', fileContents);
 
       // Replace 'YOUR_DJANGO_UPLOAD_API_URL' with your actual Django API endpoint for file upload
+      setStatus('Populating');
       const response = await Axios.post('http://127.0.0.1:8000/api/csvupload/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       console.log(response.data);
-  
       // Optionally, you can perform additional actions after successful upload
+      setSuccess(`Uploaded: ${response.data.uploaded}`);
+      setIgnored(`Ignored: ${response.data.ignored}`);
+      setStatus('Completed');
       console.log('File uploaded successfully');
     } catch (error) {
+      setStatus('Failed');
       console.error('Error uploading file', error);
     }
   };
@@ -77,6 +84,9 @@ const Page2 = () => {
           <Button onClick={handleUpload} disabled={!file}>
             <Typography>Upload CSV</Typography>
           </Button>
+          <div>Status: {status}</div>
+          <div>{success}</div>
+          <div>{ignored}</div>
         </Box>
       </Card>
     </div>
