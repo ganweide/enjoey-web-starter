@@ -12,9 +12,9 @@ import {
 
 const Page2 = () => {
   const [file, setFile] = useState(null);
-  const [status, setStatus] = useState('Waiting');
+  const [status, setStatus] = useState('');
   const [success, setSuccess] = useState([]);
-  const [ignored, setIgnored] = useState([]);
+  const [skipped, setSkipped] = useState([]);
   
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -30,7 +30,7 @@ const Page2 = () => {
       
       const formData = new FormData();
       formData.append('file', file);
-  
+
       // Read the contents of the file before uploading
       const fileContents = await readFileContents(file);
       
@@ -38,7 +38,7 @@ const Page2 = () => {
       console.log('CSV File Contents:', fileContents);
 
       // Replace 'YOUR_DJANGO_UPLOAD_API_URL' with your actual Django API endpoint for file upload
-      setStatus('Populating');
+      setStatus('Status: Populating');
       const response = await Axios.post('http://127.0.0.1:8000/api/csvupload/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -47,11 +47,14 @@ const Page2 = () => {
       console.log(response.data);
       // Optionally, you can perform additional actions after successful upload
       setSuccess(`Uploaded: ${response.data.uploaded}`);
-      setIgnored(`Ignored: ${response.data.ignored}`);
-      setStatus('Completed');
+      setSkipped(`Ignored: ${response.data.ignored}`);
+      setStatus('Status: Completed');
+      setTimeout(() => {
+        setStatus('');
+      }, 3000);
       console.log('File uploaded successfully');
     } catch (error) {
-      setStatus('Failed');
+      setStatus('Status: Failed');
       console.error('Error uploading file', error);
     }
   };
@@ -84,9 +87,9 @@ const Page2 = () => {
           <Button onClick={handleUpload} disabled={!file}>
             <Typography>Upload CSV</Typography>
           </Button>
-          <div>Status: {status}</div>
+          <div>{status}</div>
           <div>{success}</div>
-          <div>{ignored}</div>
+          <div>{skipped}</div>
         </Box>
       </Card>
     </div>
