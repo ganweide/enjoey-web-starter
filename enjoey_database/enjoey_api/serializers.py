@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable
+
+class DocumentsTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DocumentsTable
+        fields = '__all__'
 
 class TempTableSerializer(serializers.ModelSerializer):
     class Meta:

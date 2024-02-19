@@ -30,6 +30,22 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/ImportCSV',
       },
+      {
+        id: 'document-upload',
+        title: 'Document Upload',
+        messageId: 'Document Upload',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/DocumentUpload',
+      },
+      {
+        id: 'document-view',
+        title: 'Document View',
+        messageId: 'Document View',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/DocumentView',
+      },
     ],
   },
   {

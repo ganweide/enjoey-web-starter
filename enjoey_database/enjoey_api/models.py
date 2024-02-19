@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
-from .storagebackend import PDFStorage, ImageStorage
+from .storagebackend import PDFStorage, ImageStorage, DocumentsStorage
 import os
 import datetime
 from django.utils.timezone import utc
@@ -8,6 +8,14 @@ from django.conf import settings
 import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
+
+class DocumentsTable(models.Model):
+    documentName = models.CharField(max_length=250)
+    isRequired = models.BooleanField()
+    documentURL = models.FileField(storage=DocumentsStorage(), null=True, blank=True)
+    createdAt = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt = models.DateTimeField("deleted_at", null=True, blank=True)
 
 class TempTable(models.Model): 
     branchId = models.CharField(max_length=250)
@@ -177,7 +185,7 @@ class ActivityTagsTable(models.Model):
             self.createdAt = timezone.now()
         self.updatedAt = timezone.now()
         return super(ActivityTagsTable, self).save(*args, **kwargs)
-                                              
+
 class ActivityAreaTagsTable(models.Model):
     tenantId = models.CharField(max_length=250)
     branchId = models.BigIntegerField()
