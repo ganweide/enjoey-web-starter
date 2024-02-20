@@ -27,8 +27,12 @@ const documentsURL  = "http://127.0.0.1:8000/api/documents/";
 
 const DocumentsViewTable = () => {
   const classes   = useStyles();
-  const tableHead = ["Id", "Name", "Requirements", "Action"];
+  const tableHead = ["Id", "Name", "Requirements", "Document URL", "Action"];
   const [documentsTableData, setDocumentsTableData] = useState([]);
+
+  const handleView = (documentURL) => {
+    window.open(documentURL, '_blank');
+  };
 
   useEffect(() => {
     try {
@@ -79,8 +83,9 @@ const DocumentsViewTable = () => {
                   <TableCell style={{textAlign: "center"}}>{data.id}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{data.documentName}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{data.isRequired ? "Mandatory" : "Optional"}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{data.documentURL}</TableCell>
                   <TableCell style={{textAlign: "center"}}>
-                    <Button>View</Button>
+                    <Button onClick={() => handleView(data.documentURL)}>View</Button>
                   </TableCell>
                 </TableRow>
               ))
