@@ -17,6 +17,7 @@ import {
   Box,
   Typography,
   Alert,
+  AlertTitle,
   IconButton,
   Collapse,
 } from "@mui/material";
@@ -123,7 +124,13 @@ const DocumentsUploadTable = () => {
           Documents Upload
         </Typography>
       </Box>
-      <Card>
+      <Card
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow className={classes.tableHeadRow}>
@@ -157,12 +164,12 @@ const DocumentsUploadTable = () => {
             }
           </TableBody>
         </Table>
-        <Button onClick={handleGlobalSubmit} disabled={!enableSubmit}>
+        <Button sx={{ m: 3, alignSelf: "flex-end" }} onClick={handleGlobalSubmit} disabled={!enableSubmit}>
           Submit All
         </Button>
         <Collapse in={open}>
           {alert.severity && alert.message && (
-            <Alert
+            <Alert 
               action={
                 <IconButton
                   aria-label='close'
@@ -176,7 +183,11 @@ const DocumentsUploadTable = () => {
                 </IconButton>
               }
               sx={{ mb: 2 }}
-              severity={alert.severity}>{alert.message}</Alert>
+              severity='success'
+            >
+              <AlertTitle>Success</AlertTitle>
+                <strong>{alert.message}</strong>
+            </Alert>
           )}
         </Collapse>
       </Card>
