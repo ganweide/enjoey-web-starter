@@ -34,6 +34,10 @@ PDF_LOCATION = 'pdf'
 IMG_LOCATION = 'images'
 DOC_LOCATION = 'documents'
 
+PAYMENT_GATEWAY_MODE = (
+    ("Test", "Test"),
+    ("Live", "Live"),
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/

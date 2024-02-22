@@ -27,7 +27,7 @@ const documentsURL  = "http://127.0.0.1:8000/api/documents/";
 
 const DocumentsViewTable = () => {
   const classes   = useStyles();
-  const tableHead = ["Id", "Name", "Requirements", "Document URL", "Action"];
+  const tableHead = ["Id", "Name", "Requirements", "Action"];
   const [documentsTableData, setDocumentsTableData] = useState([]);
 
   const handleView = (documentURL) => {
@@ -83,7 +83,6 @@ const DocumentsViewTable = () => {
                   <TableCell style={{textAlign: "center"}}>{data.id}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{data.documentName}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{data.isRequired ? "Mandatory" : "Optional"}</TableCell>
-                  <TableCell style={{textAlign: "center"}}>{data.documentURL}</TableCell>
                   <TableCell style={{textAlign: "center"}}>
                     <Button onClick={() => handleView(data.documentURL)}>View</Button>
                   </TableCell>

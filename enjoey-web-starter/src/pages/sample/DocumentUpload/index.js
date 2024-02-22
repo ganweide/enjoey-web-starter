@@ -32,7 +32,7 @@ const documentsURL  = "http://127.0.0.1:8000/api/documents/";
 
 const DocumentsUploadTable = () => {
   const classes   = useStyles();
-  const tableHead = ["Id", "Name", "Requirements", "Action"];
+  const tableHead = ["Id", "Name", "Requirements", "URL", "Action"];
   const [documentsTableData, setDocumentsTableData] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState({});
   const [enableSubmit, setEnableSubmit] = useState(false);
@@ -154,6 +154,7 @@ const DocumentsUploadTable = () => {
                   <TableCell style={{textAlign: "center"}}>{data.id}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{data.documentName}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{data.isRequired ? "Mandatory" : "Optional"}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{data.documentURL}</TableCell>
                   <TableCell style={{textAlign: "center"}}>
                     <Button onClick={() => handleUpload(data.id)} disabled={loading}>
                       {loading ? 'Uploading...' : 'Upload'}

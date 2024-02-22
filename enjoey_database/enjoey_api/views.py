@@ -1,8 +1,8 @@
 # from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.generics import CreateAPIView
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer
 from rest_framework.response import Response
 from django.views import View
 from django.conf import settings
@@ -33,6 +33,44 @@ from bs4 import BeautifulSoup, Comment
 import csv
 import datetime
 from datetime import datetime
+
+class TenantPaymentKeySettingsView(viewsets.ModelViewSet):
+    queryset = TenantPaymentKeySettings.objects.all().order_by('-createdAt')
+    serializer_class = TenantPaymentKeySettingsSerializer
+    #all
+    def list(self, request):
+        queryset = TenantPaymentKeySettings.objects.all().order_by('id')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = TenantPaymentKeySettingsSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = TenantPaymentKeySettingsSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = TenantPaymentKeySettingsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def update(self, request, pk=None):
+        try:
+            document_instance = TenantPaymentKeySettings.objects.get(id=pk)
+        except TenantPaymentKeySettings.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = TenantPaymentKeySettingsSerializer(document_instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            # Check if 'documentURL' exists in request.FILES
+            if 'documentURL' in request.FILES:
+                document_instance.documentURL = request.FILES['documentURL']
+
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DocumentsView(viewsets.ModelViewSet):
     queryset = DocumentsTable.objects.all().order_by('-createdAt')

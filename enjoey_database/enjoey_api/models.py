@@ -9,13 +9,27 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
+class TenantPaymentKeySettings(models.Model):
+    tenantId = models.CharField(max_length=250)
+    branchId = models.BigIntegerField(null=True)
+    currency = models.CharField(max_length=3, default='MYR')
+    provider = models.CharField(max_length=250)
+    merchantId = models.CharField(max_length=250)
+    mode = models.CharField(max_length=15, choices=settings.PAYMENT_GATEWAY_MODE, default='Test')
+    authKey1 = models.CharField(max_length=255)
+    authKey2 = models.CharField(max_length=255)
+    isActive = models.BooleanField(default=False)
+    creator = models.CharField(max_length=250)
+    createdAt = models.DateTimeField(auto_now_add=True, editable=False)
+    updatedAt = models.DateTimeField(auto_now=True)
+
 class DocumentsTable(models.Model):
     documentName = models.CharField(max_length=250)
     isRequired = models.BooleanField()
     documentURL = models.FileField(storage=DocumentsStorage(), null=True, blank=True)
-    createdAt = models.DateTimeField("created_at", auto_now_add=True)
-    updatedAt = models.DateTimeField("updated_at", auto_now=True)
-    deletedAt = models.DateTimeField("deleted_at", null=True, blank=True)
+    createdAt = models.DateTimeField("createdAt", auto_now_add=True)
+    updatedAt = models.DateTimeField("updatedAt", auto_now=True)
+    deletedAt = models.DateTimeField("deletedAt", null=True, blank=True)
 
 class TempTable(models.Model): 
     branchId = models.CharField(max_length=250)

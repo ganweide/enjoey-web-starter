@@ -3,8 +3,8 @@ const routesConfig = [
   {
     id: 'app',
     title: 'Sample',
-    messageId: 'landing.solutions',
-    type: 'group',
+    messageId: 'Payments',
+    type: 'collapse',
     children: [
       {
         id: 'payment',
@@ -23,13 +23,21 @@ const routesConfig = [
         url: '/sample/CheckoutForm',
       },
       {
-        id: 'import-csv',
-        title: 'Import CSV',
-        messageId: 'Import CSV',
+        id: 'checkout',
+        title: 'Payment Setup',
+        messageId: 'Payment Setup',
         type: 'item',
         icon: <BiAlignLeft />,
-        url: '/sample/ImportCSV',
+        url: '/sample/PaymentSetup',
       },
+    ],
+  },
+  {
+    id: 'app',
+    title: 'Sample',
+    messageId: 'Documents',
+    type: 'collapse',
+    children: [
       {
         id: 'document-upload',
         title: 'Document Upload',
@@ -46,7 +54,7 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/DocumentView',
       },
-    ],
+    ]
   },
   {
     id: 'app',
@@ -269,6 +277,14 @@ const routesConfig = [
         type: 'item',
         icon: <BiAlignLeft />,
         url: '/sample/EmailEditor',
+      },
+      {
+        id: 'import-csv',
+        title: 'Import CSV',
+        messageId: 'Import CSV',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/ImportCSV',
       },
     ]
   },
