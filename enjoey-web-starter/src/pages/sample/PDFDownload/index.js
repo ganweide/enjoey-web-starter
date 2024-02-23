@@ -1,5 +1,5 @@
 // React Imports
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Axios from "axios";
 
@@ -9,8 +9,11 @@ import {
   Divider,
   Grid,
   Typography,
+  Box,
 } from "@mui/material";
 
+import Editor from "./editor";
+import "./style.css";
 
 import { Document, Page, pdfjs } from 'react-pdf';
 
@@ -116,7 +119,7 @@ const Page2 = () => {
 
   return (
     <div>
-      <Card sx={{ p: 5}}>
+      <Card sx={{ p: 5 }}>
         <Grid container spacing={5}>
           <Grid item xs={12} md={12}>
             <Button variant ="contained" onClick={handleDownloadClick}>
@@ -190,6 +193,10 @@ const Page2 = () => {
           </Grid>
         </Grid>
       </Card>
+      <Box>
+        <Typography variant="h2">Announcement Editor</Typography>
+        <Editor />
+      </Box>
     </div>
   );
 };
