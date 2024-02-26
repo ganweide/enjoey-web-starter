@@ -1,5 +1,5 @@
 // React Imports
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import Axios from "axios";
 
@@ -117,6 +117,23 @@ const Page2 = () => {
     }
   };
 
+  const editorRef = useRef();
+  const handleConsole = () => {
+    const editor = editorRef.current;
+    if (!editor) {
+      console.error("Editor is not yet defined");
+      return;
+    }
+    const editorState = editor.getEditorState();
+    const jsonString = JSON.stringify(editorState);
+    console.log('jsonString', jsonString);
+    editor.update(() => {
+      const htmlString = $generateHtmlFromNodes(editor, null);
+      console.log(htmlString);
+    });
+  };
+  
+
   return (
     <div>
       <Card sx={{ p: 5 }}>
@@ -195,7 +212,12 @@ const Page2 = () => {
       </Card>
       <Box>
         <Typography variant="h2">Announcement Editor</Typography>
-        <Editor />
+        <Editor editorRef={editorRef} />
+        <Button variant ="contained" onClick={handleConsole}>
+          <Typography variant="button" component="div">
+            Show
+          </Typography>
+        </Button>
       </Box>
     </div>
   );

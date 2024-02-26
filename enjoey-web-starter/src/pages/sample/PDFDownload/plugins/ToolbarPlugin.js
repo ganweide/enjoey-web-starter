@@ -39,6 +39,7 @@ import {
   getDefaultCodeLanguage,
   getCodeLanguages
 } from "@lexical/code";
+import { INSERT_TABLE_COMMAND } from "@lexical/table"
 
 const LowPriority = 1;
 
@@ -536,6 +537,28 @@ export default function ToolbarPlugin() {
     }
   }, [editor, isLink]);
 
+  const createTable = payload => {
+    editor.dispatchCommand(INSERT_TABLE_COMMAND, payload)
+  }
+
+  const Fill = () => {
+    const rows = prompt("Enter the number of rows:", "")
+    const columns = prompt("Enter the number of columns:", "")
+
+    if (
+      isNaN(Number(columns)) ||
+      columns == null ||
+      rows == null ||
+      columns === "" ||
+      rows === "" ||
+      isNaN(Number(rows))
+    ) {
+      return
+    }
+
+    createTable({ columns: columns, rows: rows })
+  }
+
   return (
     <div className="toolbar" ref={toolbarRef}>
       <button
@@ -685,11 +708,17 @@ export default function ToolbarPlugin() {
             onClick={() => {
               editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify");
             }}
-            className="toolbar-item"
+            className="toolbar-item spaced"
             aria-label="Justify Align"
           >
             <i className="format justify-align" />
-          </button>{" "}
+          </button>
+          <button
+            onClick={() => Fill()}
+            className={"toolbar-item spaced "}
+          >
+            <i className="icon table" />
+          </button>
         </>
       )}
     </div>

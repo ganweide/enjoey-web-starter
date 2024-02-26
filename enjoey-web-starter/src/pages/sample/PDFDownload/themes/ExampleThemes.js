@@ -1,8 +1,10 @@
+import "../style.css";
+
 const exampleTheme = {
     ltr: "ltr",
     rtl: "rtl",
     placeholder: "editor-placeholder",
-    paragraph: "editor-paragraph",
+    paragraph: "PlaygroundEditorTheme__paragraph",
     quote: "editor-quote",
     heading: {
       h1: "editor-heading-h1",
@@ -21,6 +23,20 @@ const exampleTheme = {
     },
     image: "editor-image",
     link: "editor-link",
+    table: "PlaygroundEditorTheme__table",
+    tableAddColumns: "PlaygroundEditorTheme__tableAddColumns",
+    tableAddRows: "PlaygroundEditorTheme__tableAddRows",
+    tableCell: "PlaygroundEditorTheme__tableCell",
+    tableCellActionButton: "PlaygroundEditorTheme__tableCellActionButton",
+    tableCellActionButtonContainer: "PlaygroundEditorTheme__tableCellActionButtonContainer",
+    tableCellEditing: "PlaygroundEditorTheme__tableCellEditing",
+    tableCellHeader: "PlaygroundEditorTheme__tableCellHeader",
+    tableCellPrimarySelected: "PlaygroundEditorTheme__tableCellPrimarySelected",
+    tableCellResizer: "PlaygroundEditorTheme__tableCellResizer",
+    tableCellSelected: "PlaygroundEditorTheme__tableCellSelected",
+    tableCellSortedIndicator: "PlaygroundEditorTheme__tableCellSortedIndicator",
+    tableResizeRuler: "PlaygroundEditorTheme__tableCellResizeRuler",
+    tableSelected: "PlaygroundEditorTheme__tableSelected",
     text: {
       bold: "editor-text-bold",
       italic: "editor-text-italic",
