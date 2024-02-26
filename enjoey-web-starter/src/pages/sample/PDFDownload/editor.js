@@ -21,6 +21,7 @@ import { TRANSFORMERS } from "@lexical/markdown";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
+import TableCellResizer from "./plugins/TableCellResizer";
 
 
 function Placeholder() {
@@ -57,6 +58,7 @@ export default function Editor(props) {
         <div className="editor-container">
           <ToolbarPlugin />
           <TablePlugin />
+          <TableCellResizer />
           <div className="editor-inner">
             <RichTextPlugin
               contentEditable={<ContentEditable className="editor-input" />}
