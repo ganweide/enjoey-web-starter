@@ -12,8 +12,8 @@ import {
   Box,
 } from "@mui/material";
 
-import Editor from "./editor";
-import "./style.css";
+import CKEditor from "./CKEditor";
+import DevExtremeEditor from "./DevExtremeEditor";
 
 import { Document, Page, pdfjs } from 'react-pdf';
 
@@ -117,108 +117,98 @@ const Page2 = () => {
     }
   };
 
-  const editorRef = useRef();
-  const handleConsole = () => {
-    const editor = editorRef.current;
-    if (!editor) {
-      console.error("Editor is not yet defined");
-      return;
-    }
-    const editorState = editor.getEditorState();
-    const jsonString = JSON.stringify(editorState);
-    console.log('jsonString', jsonString);
-    editor.update(() => {
-      const htmlString = $generateHtmlFromNodes(editor, null);
-      console.log(htmlString);
-    });
-  };
-  
-
   return (
     <div>
-      <Card sx={{ p: 5 }}>
-        <Grid container spacing={5}>
-          <Grid item xs={12} md={12}>
-            <Button variant ="contained" onClick={handleDownloadClick}>
-              <Typography variant="button" component="div">
-                Download PDF
-              </Typography>
-            </Button>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Typography variant="h3" component="div">
-              Click button above to download the PDF
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Divider />
-          </Grid>
-          {/* <Grid item xs={12} md={12}>
-            <input type="file" accept=".pdf" onChange={handleFileChange} />
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Button variant ="contained" onClick={handleUploadClick}>
-              <Typography variant="button" component="div">
-                Upload PDF
-              </Typography>
-            </Button>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Typography variant="h3" component="div">
-              Click button above to upload the PDF to AWS S3 Bucket
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Divider />
-          </Grid> */}
-          <Grid item xs={12} md={12}>
-            <input type="file" accept=".pdf" onChange={handleFileChange} />
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Button variant ="contained" onClick={uploadFile}>
-              <Typography variant="button" component="div">
-                Upload PDF
-              </Typography>
-            </Button>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Typography variant="h3" component="div">
-              Click button above to upload the PDF to AWS S3 Bucket using django-storages
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Divider />
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Button variant ="contained" onClick={handleShowPDF}>
-              <Typography variant="button" component="div">
-                Show PDF
-              </Typography>
-            </Button>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            <Typography variant="h3" component="div">
-              Click button above show the uploaded pdf file
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={12}>
-            {pdfUrl && (
-              <Document file={{ url: pdfUrl }} >
-                <Page pageNumber={1} width={600} height={800} />
-              </Document>
-            )}
-          </Grid>
+      <Grid container spacing={5}>
+        <Grid item xs={12} md={12}>
+          <Card sx={{ p: 5 }}>
+            <Grid container spacing={5}>
+              <Grid item xs={12} md={12}>
+                <Button variant ="contained" onClick={handleDownloadClick}>
+                  <Typography variant="button" component="div">
+                    Download PDF
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Typography variant="h3" component="div">
+                  Click button above to download the PDF
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Divider />
+              </Grid>
+              {/* <Grid item xs={12} md={12}>
+                <input type="file" accept=".pdf" onChange={handleFileChange} />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button variant ="contained" onClick={handleUploadClick}>
+                  <Typography variant="button" component="div">
+                    Upload PDF
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Typography variant="h3" component="div">
+                  Click button above to upload the PDF to AWS S3 Bucket
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Divider />
+              </Grid> */}
+              <Grid item xs={12} md={12}>
+                <input type="file" accept=".pdf" onChange={handleFileChange} />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button variant ="contained" onClick={uploadFile}>
+                  <Typography variant="button" component="div">
+                    Upload PDF
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Typography variant="h3" component="div">
+                  Click button above to upload the PDF to AWS S3 Bucket using django-storages
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Divider />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button variant ="contained" onClick={handleShowPDF}>
+                  <Typography variant="button" component="div">
+                    Show PDF
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Typography variant="h3" component="div">
+                  Click button above show the uploaded pdf file
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                {pdfUrl && (
+                  <Document file={{ url: pdfUrl }} >
+                    <Page pageNumber={1} width={600} height={800} />
+                  </Document>
+                )}
+              </Grid>
+            </Grid>
+          </Card>
         </Grid>
-      </Card>
-      <Box>
-        <Typography variant="h2">Announcement Editor</Typography>
-        <Editor editorRef={editorRef} />
-        <Button variant ="contained" onClick={handleConsole}>
-          <Typography variant="button" component="div">
-            Show
-          </Typography>
-        </Button>
-      </Box>
+        <Grid item xs={12} md={12}>
+          <Card sx={{ p: 5 }}>
+            <Typography variant="h2">Announcement Editor (CKEditor)</Typography>
+            <CKEditor />
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Card sx={{ p: 5 }}>
+            <Typography variant="h2">Announcement Editor (DevExtreme React)</Typography>
+            <DevExtremeEditor />
+          </Card>
+        </Grid>
+      </Grid>
     </div>
   );
 };
