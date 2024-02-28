@@ -33,9 +33,26 @@ from bs4 import BeautifulSoup, Comment
 import csv
 import datetime
 from datetime import datetime
-import uuid
-from django.views.decorators.csrf import csrf_exempt
-import botocore
+
+class HandleImageUploadView(APIView):
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            try:
+                uploaded_image = request.FILES['image']
+                if not uploaded_image:
+                    return JsonResponse({'error': 'Image file not found in the request.'}, status=400)
+                storage = S3Boto3Storage()
+                image_name = uploaded_image.name.replace(' ', '_')
+                image_path = f"{settings.IMG_LOCATION}/{image_name}"
+                storage.save(image_path, uploaded_image)
+
+                s3_url = storage.url(image_path)
+
+                return JsonResponse({'success': True, 'url': s3_url})
+            except Exception as e:
+                print('Error:', e)
+                return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 class TenantPaymentKeySettingsView(viewsets.ModelViewSet):
     queryset = TenantPaymentKeySettings.objects.all().order_by('-createdAt')

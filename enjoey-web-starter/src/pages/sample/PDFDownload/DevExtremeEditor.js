@@ -5,10 +5,52 @@ import HtmlEditor, {
   ImageUpload,
   Item,
 } from "devextreme-react/html-editor";
-import { Button } from "@mui/material";
+import { 
+  Button,
+  TextField,
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Tabs,
+  Tab,
+  Box,
+} from "@mui/material";
 import prettier from 'prettier/standalone';
 import parserHtml from 'prettier/parser-html';
 import "devextreme/dist/css/dx.light.css";
+import _debounce from 'lodash/debounce';
+
+// Global Constants
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      // eslint-disable-next-line
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
 const sizeValues = ['8pt', '10pt', '12pt', '14pt', '18pt', '24pt', '36pt'];
 const fontValues = [
@@ -38,14 +80,87 @@ const headerOptions = {
   },
 };
 export default function App() {
-  const [valueContent, setValueContent] = useState("");
+  const [valueContent, setValueContent]   = useState("");
+  const [popupVisible, setPopupVisible]   = useState(false);
+  const [tab, setTab]                     = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [url, setUrl]                     = useState("");
+  const [width, setWidth]                 = useState("");
+  const [height, setHeight]               = useState("");
+  const [alt, setAlt]                     = useState("");
+  
+  const handleAddImage = async () => {
+    if (selectedImage && tab === 0) {
+      // Image from local device
+      const imageDataUrl = await uploadImageToS3(selectedImage);
+      const updatedContent = valueContent + `<img src="${imageDataUrl}" alt="custom">`;
+      setValueContent(updatedContent);
+    } else if (tab === 1) {  
+      if (url) {
+        const imgTag = `<img src="${url}" alt="${alt}" width="${width}" height="${height}">`;
+        const updatedContent = valueContent + imgTag;
+        setValueContent(updatedContent);
+      }
+    }
+  
+    setPopupVisible(false);
+    setSelectedImage(null);
+  };
+  
+  const uploadImageToS3 = async (imageFile) => {
+    try {
+      // Implement your logic to upload the image to S3 here
+      // Use AWS SDK or your preferred method to upload the image
+  
+      // Replace the following line with your actual S3 upload code
+      const s3ImageUrl = await uploadToS3Bucket(imageFile);
+  
+      return s3ImageUrl;
+    } catch (error) {
+      console.error('Error uploading image to S3:', error);
+      // Handle error, e.g., show an error message to the user
+      return '';
+    }
+  };
+  
+  // Replace this function with your actual S3 upload implementation
+  const uploadToS3Bucket = async (imageFile) => {
+    // Implement your S3 upload logic here and return the uploaded image URL
+    // Example:
+    // const response = await fetch('Your S3 Upload URL', { method: 'PUT', body: imageFile });
+    // const s3ImageUrl = 'URL of the uploaded image';
+    // return s3ImageUrl;
+  
+    // For illustration purposes, returning a placeholder URL
+    return 'https://your-s3-bucket.s3.amazonaws.com/placeholder.jpg';
+  };
+
   const valueChanged = useCallback(
     (e) => {
       setValueContent(e.value);
-      console.log("valueContent", e.value);
     },
-    [setValueContent],
+    [],
   );
+
+  const handleChangeTab = (event, newValue) => {
+    setTab(newValue);
+  };
+
+  const customButtonClick = useCallback(() => {
+    setPopupVisible(true);
+  }, [setPopupVisible]);
+
+  const getToolbarButtonOptions = useCallback(() => ({
+    icon: "image",
+    stylingMode: "text",
+    onClick: customButtonClick,
+  }), [customButtonClick]);
+
+  const popupHiding = useCallback(() => {
+    setPopupVisible(false);
+  }, [setPopupVisible]);
+
+  const tabs = { value: ['file', 'url'] };
 
   const prettierFormat = useCallback(
     (text) => (
@@ -54,7 +169,6 @@ export default function App() {
         plugins: [parserHtml],
       })
     ),
-    [],
   );
   const handleSaveHtml = () => {
     const formattedContent = prettierFormat(valueContent);
@@ -100,17 +214,19 @@ export default function App() {
       console.error('Error uploading file', error);
     }
   };
+
   return (
     <div className="widget-container">
       <HtmlEditor
         height="725px"
-        valueType="html"
         value={valueContent}
+        valueType="html"
         onValueChanged={valueChanged}
       >
         <MediaResizing enabled={true} />
         <ImageUpload
           fileUploadMode="base64"
+          tabs={tabs.value}
         />
         <Toolbar multiline>
           <Item name="undo" />
@@ -150,7 +266,7 @@ export default function App() {
           <Item name="background" />
           <Item name="separator" />
           <Item name="link" />
-          <Item name="image" />
+          <Item widget="dxButton" options={getToolbarButtonOptions()} />
           <Item name="separator" />
           <Item name="clear" />
           <Item name="codeBlock" />
@@ -177,6 +293,93 @@ export default function App() {
       <Button onClick={handleImportHtml}>
         Import HTML
       </Button>
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={popupVisible}
+        onClose           ={popupHiding}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2">Add Image</Typography>
+        </DialogTitle>
+        <DialogContent dividers sx={{ height: '325px' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={tab} onChange={handleChangeTab} aria-label="appointment-form-tab-panel">
+              <Tab label="From This Device" {...a11yProps(0)} />
+              <Tab label="From the Web" {...a11yProps(1)} />
+            </Tabs>
+          </Box>
+          <TabPanel value={tab} index={0}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+              <TextField
+                margin="dense"
+                id="image-input"
+                type="file"
+                fullWidth
+                variant="outlined"
+                inputProps={{ accept: 'image/*' }}
+                onChange={(e) => setSelectedImage(e.target.files[0])}
+              />
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={tab} index={1}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  value    ={url}
+                  margin   ="dense"
+                  label    ="URL"
+                  type     ="text"
+                  fullWidth
+                  variant  ="outlined"
+                  onChange ={(e) => setUrl(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <TextField
+                  value    ={width}
+                  onChange ={(e) => setWidth(e.target.value)}
+                  margin          ="dense"
+                  label           ="Width"
+                  type            ="text"
+                  fullWidth
+                  variant         ="outlined"
+                />
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <TextField
+                  value    ={height}
+                  onChange ={(e) => setHeight(e.target.value)}
+                  margin   ="dense"
+                  label    ="Height"
+                  type     ="text"
+                  fullWidth
+                  variant  ="outlined"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  value    ={alt}
+                  onChange ={(e) => setAlt(e.target.value)}
+                  margin   ="dense"
+                  label    ="Alt"
+                  type     ="text"
+                  fullWidth
+                  variant  ="outlined"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleAddImage}>Add</Button>
+          <Button variant="outlined" onClick={popupHiding}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

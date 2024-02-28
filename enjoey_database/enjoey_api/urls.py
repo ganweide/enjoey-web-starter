@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView
 from . import views
 from rest_framework import routers
 
@@ -86,5 +86,6 @@ urlpatterns = [
     path('csvupload/', CSVImportView.as_view(), name='file-upload'),
     path('documents/', include(route16.urls)),
     path('tenant-payment-key-settings/', include(route17.urls)),
+    path('handle-image-upload/', HandleImageUploadView.as_view(), name='handle_image_upload'),
 ]
 
