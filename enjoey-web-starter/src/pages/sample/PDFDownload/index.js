@@ -14,6 +14,7 @@ import {
 
 import CKEditor from "./CKEditor";
 import DevExtremeEditor from "./DevExtremeEditor";
+import TipTapEditor from "./TipTapEditor";
 
 import { Document, Page, pdfjs } from 'react-pdf';
 
@@ -206,6 +207,12 @@ const Page2 = () => {
           <Card sx={{ p: 5 }}>
             <Typography variant="h2">Announcement Editor (DevExtreme React)</Typography>
             <DevExtremeEditor />
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Card sx={{ p: 5 }}>
+            <Typography variant="h2">Announcement Editor (Tip Tap)</Typography>
+            <TipTapEditor />
           </Card>
         </Grid>
       </Grid>
