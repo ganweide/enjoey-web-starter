@@ -10,9 +10,10 @@ import TableRow from '@tiptap/extension-table-row'
 import Document from '@tiptap/extension-document'
 import Dropcursor from '@tiptap/extension-dropcursor'
 import Image from '@tiptap/extension-image'
-import { EditorProvider, useCurrentEditor, EditorContent, useEditor } from '@tiptap/react'
+import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useState } from 'react'
+import { CustomTable, CustomTableCell, CustomTableRow } from './Section';
 
 import { 
   RiBold,
@@ -66,86 +67,78 @@ const TipTapEditor = () => {
     },
   })
 
-  const editor = useEditor({
-    extensions: [
-      Color.configure({ types: [TextStyle.name, ListItem.name] }),
-      TextStyle.configure({ types: [ListItem.name] }),
-      StarterKit.configure({
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
-      }),
-      Table.configure({
-        resizable: true,
-      }),
-      TableRow,
-      TableHeader,
-      CustomTableCell,
-      Image,
-      Dropcursor,
-      Document,
-    ],
-    content:`
-      <h2>
-        Hi there,
-      </h2>
-      <p>
-        this is a <em>basic</em> example of <strong>tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
-      </p>
-      <ul>
-        <li>
-        That’s a bullet list with one …
-        </li>
-        <li>
-        … or two list items.
-        </li>
-      </ul>
-      <p>
-        Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
-      </p>
-      <pre><code class="language-css">body {
-        display: none;
-      }</code></pre>
-      <p>
-        I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
-      </p>
-      <blockquote>
-        Wow, that’s amazing. Good work, boy! 👏
-        <br />
-        — Mom
-      </blockquote>
-      <table style="width:100%">
-        <tr>
-          <th>Firstname</th>
-          <th>Lastname</th>
-          <th>Age</th>
-        </tr>
-        <tr>
-          <td>Jill</td>
-          <td>Smith</td>
-          <td>50</td>
-        </tr>
-        <tr>
-          <td>Eve</td>
-          <td>Jackson</td>
-          <td>94</td>
-        </tr>
-        <tr>
-          <td>John</td>
-          <td>Doe</td>
-          <td>80</td>
-        </tr>
-      </table>
-      <img src="https://source.unsplash.com/8xznAGy4HcY/800x400" />
-    `
-  })
+  const content = `
+    <h2>
+      Hi there,
+    </h2>
+    <p>
+      this is a <em>basic</em> example of <strong>tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
+    </p>
+    <ul>
+      <li>
+      That’s a bullet list with one …
+      </li>
+      <li>
+      … or two list items.
+      </li>
+    </ul>
+    <p>
+      Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
+    </p>
+    <blockquote>
+      Wow, that’s amazing. Good work, boy! 👏
+      <br />
+      — Mom
+    </blockquote>
+    <table style="width:100%">
+      <tr>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Age</th>
+      </tr>
+      <tr>
+        <td>Jill</td>
+        <td>Smith</td>
+        <td>50</td>
+      </tr>
+      <tr>
+        <td>Eve</td>
+        <td>Jackson</td>
+        <td>94</td>
+      </tr>
+      <tr>
+        <td>John</td>
+        <td>Doe</td>
+        <td>80</td>
+      </tr>
+    </table>
+    <img src="https://source.unsplash.com/8xznAGy4HcY/800x400" />
+  `
+
+  const extensions = [
+    Color.configure({ types: [TextStyle.name, ListItem.name] }),
+    TextStyle.configure({ types: [ListItem.name] }),
+    StarterKit.configure({
+      bulletList: {
+        keepMarks: true,
+        keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      },
+      orderedList: {
+        keepMarks: true,
+        keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      },
+    }),
+    Table.configure({
+      resizable: true,
+    }),
+    TableRow,
+    TableHeader,
+    CustomTableCell,
+    Image,
+  ]
 
   const MenuBar = () => {
+    const { editor } = useCurrentEditor()
     if (!editor) {
       return null
     }
@@ -170,19 +163,21 @@ const TipTapEditor = () => {
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={`menu-item${editor.isActive('bold') ? ' is-active' : ''}`}
-          
+          title="Bold"
         >
           <RiBold />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={`menu-item${editor.isActive('italic') ? ' is-active' : ''}`}
+          title="Italic"
         >
           <RiItalic />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleStrike().run()}
           className={`menu-item${editor.isActive('strike') ? ' is-active' : ''}`}
+          title="Strike Through"
         >
           <RiStrikethrough />
         </button>
@@ -190,42 +185,49 @@ const TipTapEditor = () => {
         <button
           onClick={() => editor.chain().focus().setParagraph().run()}
           className={`menu-item${editor.isActive('paragraph') ? ' is-active' : ''}`}
+          title="Paragraph"
         >
           <RiParagraph />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={`menu-item${editor.isActive('heading', { level: 1}) ? ' is-active' : ''}`}
+          title="Heading 1"
         >
           <RiH1 />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={`menu-item${editor.isActive('heading', { level: 2}) ? ' is-active' : ''}`}
+          title="Heading 2"
         >
           <RiH2 />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           className={`menu-item${editor.isActive('heading', { level: 3}) ? ' is-active' : ''}`}
+          title="Heading 3"
         >
           <RiH3 />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`menu-item${editor.isActive('bulletList') ? ' is-active' : ''}`}
+          title="Bullet List"
         >
           <RiListUnordered />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`menu-item${editor.isActive('orderedList') ? ' is-active' : ''}`}
+          title="Ordered List"
         >
           <RiListOrdered />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={`menu-item${editor.isActive('blockquote') ? ' is-active' : ''}`}
+          title="Quote"
         >
           <RiDoubleQuotesL />
         </button>
@@ -233,12 +235,14 @@ const TipTapEditor = () => {
         <button
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
           className="menu-item"
+          title="Divider"
         >
           <RiSeparator />
         </button>
         <button
           onClick={() => editor.chain().focus().setHardBreak().run()}
           className="menu-item"
+          title="Break"
         >
           <RiTextWrap />
         </button>
@@ -253,6 +257,7 @@ const TipTapEditor = () => {
               .undo()
               .run()
           }
+          title="Undo"
         >
           <RiArrowGoBackLine />
         </button>
@@ -266,6 +271,7 @@ const TipTapEditor = () => {
               .redo()
               .run()
           }
+          title="Redo"
         >
           <RiArrowGoForwardLine />
         </button>
@@ -273,30 +279,35 @@ const TipTapEditor = () => {
         <button
           onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
           className="menu-item"
+          title="Table"
         >
           <RiTableLine />
         </button>
         <button
           onClick={() => editor.chain().focus().addColumnBefore().run()} disabled={!editor.can().addColumnBefore()}
           className="menu-item"
+          title="Insert Left Column"
         >
           <RiInsertColumnLeft />
         </button>
         <button
           onClick={() => editor.chain().focus().addColumnAfter().run()} disabled={!editor.can().addColumnAfter()}
           className="menu-item"
+          title="Insert Right Column"
         >
           <RiInsertColumnRight />
         </button>
         <button
           onClick={() => editor.chain().focus().addRowBefore().run()} disabled={!editor.can().addRowBefore()}
           className="menu-item"
+          title="Insert Top Row"
         >
           <RiInsertRowTop />
         </button>
         <button
           onClick={() => editor.chain().focus().addRowAfter().run()} disabled={!editor.can().addRowAfter()}
           className="menu-item"
+          title="Insert Bottom Row"
         >
           <RiInsertRowBottom />
         </button>
@@ -304,12 +315,14 @@ const TipTapEditor = () => {
         <button
           onClick={() => editor.chain().focus().mergeCells().run()} disabled={!editor.can().mergeCells()}
           className="menu-item"
+          title="Merge Cells"
         >
           <RiMergeCellsHorizontal />
         </button>
         <button
           onClick={() => editor.chain().focus().splitCell().run()} disabled={!editor.can().splitCell()}
           className="menu-item"
+          title="Split Cells"
         >
           <RiSplitCellsHorizontal />
         </button>
@@ -317,33 +330,65 @@ const TipTapEditor = () => {
         <button
           onClick={() => editor.chain().focus().deleteColumn().run()} disabled={!editor.can().deleteColumn()}
           className="menu-item"
+          title="Delete Column"
         >
           <RiDeleteColumn />
         </button>
         <button
           onClick={() => editor.chain().focus().deleteRow().run()} disabled={!editor.can().deleteRow()}
           className="menu-item"
+          title="Delete Row"
         >
           <RiDeleteRow />
         </button>
         <button
           onClick={() => editor.chain().focus().deleteTable().run()} disabled={!editor.can().deleteTable()}
           className="menu-item"
+          title="Delete Table"
         >
           <RiDeleteBin5Line />
         </button>
         <div className="divider" />
-        <button onClick={addImage} className="menu-item"><RiFileImageLine /></button>
+        <button
+          onClick={() => editor.chain().focus().insertTable({ rows: 1, cols: 2, withHeaderRow: false, borderStyle: 'dotted' }).run()}
+          className="menu-item"
+          title="Create Section"
+        >
+          <RiTableLine />
+        </button>
+        <button
+          className="menu-item"
+          title="Insert Left Section"
+        >
+          <RiInsertColumnLeft />
+        </button>
+        <button
+          className="menu-item"
+          title="Insert Right Section"
+        >
+          <RiInsertColumnRight />
+        </button>
+        <button
+          className="menu-item"
+          title="Delete Section"
+        >
+          <RiDeleteColumn />
+        </button>
         <div className="divider" />
-        <button onClick={handleGetHtml} className="menu-item"><RiDownload2Fill /></button>
+        <button onClick={addImage} className="menu-item" title="Add Image"><RiFileImageLine /></button>
+        <div className="divider" />
+        <button onClick={handleGetHtml} className="menu-item" title="Show HTML"><RiDownload2Fill /></button>
       </div>
     )
   }
   
   return (
     <div className="editor">
-      <MenuBar editor={editor} />
-      <EditorContent className="editor-content" editor={editor} />
+      <EditorProvider
+        slotBefore={<MenuBar />}
+        extensions={extensions}
+        content={content}
+      />
       <div>{html}</div>
     </div>
   );

@@ -197,12 +197,12 @@ const Page2 = () => {
             </Grid>
           </Card>
         </Grid>
-        <Grid item xs={12} md={12}>
+        {/* <Grid item xs={12} md={12}>
           <Card sx={{ p: 5 }}>
             <Typography variant="h2">Announcement Editor (CKEditor)</Typography>
             <CKEditor />
           </Card>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} md={12}>
           <Card sx={{ p: 5 }}>
             <Typography variant="h2">Announcement Editor (DevExtreme React)</Typography>
