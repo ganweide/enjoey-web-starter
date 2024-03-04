@@ -78,6 +78,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/Learning',
       },
+      {
+        id: 'school-events',
+        title: 'School Events',
+        messageId: 'School Events',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/EventCalendar',
+      },
     ]
   },
   {
