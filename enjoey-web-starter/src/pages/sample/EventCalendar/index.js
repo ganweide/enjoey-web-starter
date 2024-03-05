@@ -1,5 +1,5 @@
 // React Imports
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 // Axios Import
 import Axios from "axios";
@@ -37,6 +37,9 @@ import PropTypes from 'prop-types';
 // Local Imports
 import TipTapEditor from "./TipTapEditor";
 
+// Dropzone Imports
+import Dropzone from 'react-dropzone';
+
 // React Big Calendar Imports
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
@@ -46,69 +49,47 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const localizer       = momentLocalizer(moment);
 const DnDCalendar     = withDragAndDrop(Calendar);
-const appointmentUrl  = "http://localhost:8000/api/appointment/";
-const timeSlotUrl     = "http://localhost:8000/api/appointment-time-slots/";
-const branchUrl       = "http://localhost:8000/api/branch/";
+// const appointmentUrl  = "http://localhost:8000/api/appointment/";
 
 const Page2 = () => {
-  const [openNewEventDialog, setOpenNewEventDialog]       = useState(false);
-  const [show, setShow] = useState(false);
-  const [openAddOptionsDialog, setOpenAddOptionsDialog]       = useState(false);
-  const [showTextfield, setShowTextfield] = useState(false);
-  const [showRadio, setShowRadio] = useState(false);
-  const [showSelect, setShowSelect] = useState(false);
-  const [appointments, setAppointments]                   = useState([]);
-  const [appointmentTimeSlots, setAppointmentTimeSlots]   = useState([]);
-  const [branchData, setBranchData]                       = useState([]);
-  const [filteredTimeSlots, setFilteredTimeSlots]         = useState([]);
-  const [filteredAgeInterest, setFilteredAgeInterest]     = useState([]);
-  const [filteredBranch, setFilteredBranch]               = useState([]);
-  const [refresh, setRefresh]                             = useState([]);
-  const [date, setDate]                                   = useState("");
-  const [time, setTime]                                   = useState("");
-  const [branch, setBranch]                               = useState("");
-  const [phone, setPhone]                                 = useState([]);
-  const [title, setTitle]               = useState("");
-  const [category, setCategory]         = useState("");
-  const [startDate, setStartDate]       = useState("");
-  const [endDate, setEndDate]           = useState("");
-  const [receipt, setReceipt]           = useState("");
-  const [display, setDisplay]           = useState("");
-  const [question, setQuestion]         = useState("");
-  const [radioItems, setRadioItems]     = useState([{ id: 1, value: '' }]);
-  const [selectItems, setSelectItems]   = useState([{ id: 1, value: '' }]);
-  const [idCounter, setIdCounter]       = useState(1);
-  const [savedOptions, setSavedOptions] = useState([]);
-  const [ageInterest, setAgeInterest]                     = useState("");
-  const [events, setEvents]                               = useState([]);
-
-  useEffect(() => {
-    try {
-      Axios.get(appointmentUrl).then((response) => {
-        setAppointments(response.data);
-      });
-      Axios.get(timeSlotUrl).then((response) => {
-        setAppointmentTimeSlots(response.data);
-      });
-      Axios.get(branchUrl).then((response) => {
-        setBranchData(response.data);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }, [refresh]);
+  const [appointments, setAppointments]                 = useState([]);
+  const [openNewEventDialog, setOpenNewEventDialog]     = useState(false);
+  const [show, setShow]                                 = useState(false);
+  const [openAddOptionsDialog, setOpenAddOptionsDialog] = useState(false);
+  const [showTextfield, setShowTextfield]               = useState(false);
+  const [showRadio, setShowRadio]                       = useState(false);
+  const [showSelect, setShowSelect]                     = useState(false);
+  const [coverImg, setCoverImg]                         = useState("");
+  const [title, setTitle]                               = useState("");
+  const [category, setCategory]                         = useState("");
+  const [startDate, setStartDate]                       = useState("");
+  const [endDate, setEndDate]                           = useState("");
+  const [startTime, setStartTime]                       = useState("");
+  const [endTime, setEndTime]                           = useState("");
+  const [receipt, setReceipt]                           = useState("");
+  const [display, setDisplay]                           = useState("");
+  const [question, setQuestion]                         = useState("");
+  const [radioTitle, setRadioTitle]                     = useState("");
+  const [radioItems, setRadioItems]                     = useState([{ id: 1, value: '' }]);
+  const [selectTitle, setSelectTitle]                   = useState("");
+  const [selectItems, setSelectItems]                   = useState([{ id: 1, value: '' }]);
+  const [idCounter, setIdCounter]                       = useState(1);
+  const [savedOptions, setSavedOptions]                 = useState([]);
+  const [events, setEvents]                             = useState([]);
+  const [refresh, setRefresh]                           = useState([]);
 
   // Dnd Big Calendar
   useEffect(() => {
     const bigCalendarEvents = appointments.map(appointment => {
-      const start = moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").toDate();
-      const end = moment(start).add(1, "hours").toDate();
-      const title = appointment.name;
-      const time = appointment.time;
-      const program = appointment.ageInterest;
-      const id = appointment.id;
+      const start = moment(appointment.startDate + appointment.startTime, "YYYY-MM-DD HH:mm").toDate();
+      const end = moment(appointment.endDate + appointment.endTime, "YYYY-MM-DD HH:mm").toDate();
+      const title = appointment.title;
+      const category = appointment.category;
+      const coverImg = appointment.coverImg;
+      const savedOptions = appointment.savedOptions;
+      const receipt = appointment.receipt;
 
-      return { start, end, title, program, time, id };
+      return { start, end, title, category, coverImg, savedOptions };
     })
     setEvents(bigCalendarEvents);
   }, [appointments]);
@@ -116,8 +97,7 @@ const Page2 = () => {
   const EventComponent = ({ event }) => (
     <div>
       <strong>{event.title}</strong>
-      <div>{event.time}</div>
-      <div>{event.program}</div>
+      <div>{event.category}</div>
     </div>
   );
 
@@ -128,36 +108,6 @@ const Page2 = () => {
       time: PropTypes.string.isRequired,
     }).isRequired,
   };
-
-  const onEventDrop = async (data) => {
-    const { start, end, event } = data;
-  
-    // Assuming you are only updating the first event
-    const formattedDate = moment(start).format("YYYY-MM-DD");
-    const updatedEvent = {
-      ...event,
-      date: formattedDate,
-      start,
-      end,
-    };
-  
-    try {
-      // Update the server with the new event information
-      await Axios({
-        method: "PUT", // Use the appropriate HTTP method for updating
-        url: `${appointmentUrl}${updatedEvent.id}/`, // Adjust the URL based on your server API
-        data: updatedEvent,
-      });
-      // Update the local state with the new event
-      setEvents((prevEvents) => 
-        prevEvents.map((prevEvent) => 
-          prevEvent.id === updatedEvent.id ? updatedEvent : prevEvent
-        )
-      );
-    } catch (error) {
-      console.error("Error updating event:", error);
-    }
-  };
   
   // Dialog Constants
   //// New Event Dialog
@@ -166,13 +116,51 @@ const Page2 = () => {
   };
 
   const handleCloseNewEventDialog = async () => {
-    setDate                 ("");
-    setTime                 ("");
-    setBranch               ("");
-    setPhone                ("");
-    setAgeInterest          ("");
+    setCoverImg("");
+    setTitle("");
+    setCategory("");
+    setStartDate("");
+    setEndDate("");
+    setStartTime("");
+    setEndTime("");
+    setSavedOptions([]);
     setOpenNewEventDialog(false);
   }
+
+  const handleSaveNewEventDialog = () => {
+    // Save the inputted data
+    const newAppointment = {
+      coverImg,
+      title,
+      category,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      receipt,
+      savedOptions, // Assuming savedOptions is an array of objects with necessary data
+    };
+
+    // Update the appointments state
+    setRefresh((prevAppointments) => [...prevAppointments, newAppointment]);
+    setAppointments((prevAppointments) => [...prevAppointments, newAppointment]);
+
+    // Close the dialog
+    setCoverImg("");
+    setTitle("");
+    setCategory("");
+    setStartDate("");
+    setEndDate("");
+    setStartTime("");
+    setEndTime("");
+    setSavedOptions([]);
+    setOpenNewEventDialog(false);
+  };
+
+  const onDrop = useCallback((acceptedFiles) => {
+    const imageFiles = acceptedFiles.filter(file => file.type.startsWith('image/'));
+    setCoverImg(imageFiles[0]);
+  }, []);
 
   const handleDeleteOption = (index) => {
     const updatedOptions = [...savedOptions];
@@ -187,7 +175,9 @@ const Page2 = () => {
   const handleCloseAddOptionsDialog = async () => {
     setDisplay("");
     setQuestion("");
+    setRadioTitle("")
     setRadioItems([{ id: 1, value: '' }]);
+    setSelectTitle("");
     setSelectItems([{ id: 1, value: '' }]);
     setShowTextfield(false);
     setShowRadio(false);
@@ -196,21 +186,22 @@ const Page2 = () => {
   }
 
   const handleSaveAddOptionsDialog = () => {
-    // Save the data based on display, question, radioItems, selectItems
     const newOption = {
       display,
       question,
       radioItems: display === 'radio' ? radioItems : [],
       selectItems: display === 'select' ? selectItems : [],
+      radioTitle: display === 'radio' ? radioTitle : '',
+      selectTitle: display === 'select' ? selectTitle : '',
     };
   
-    // Update the savedOptions state with the new option
     setSavedOptions((prevOptions) => [...prevOptions, newOption]);
   
-    // Close the dialog
     setDisplay("");
     setQuestion("");
+    setRadioTitle("");
     setRadioItems([{ id: 1, value: '' }]);
+    setSelectTitle("");
     setSelectItems([{ id: 1, value: '' }]);
     setShowTextfield(false);
     setShowRadio(false);
@@ -274,66 +265,9 @@ const Page2 = () => {
     );
   };
 
-  // Filters For Dialog
-  useEffect(() => {
-    const filteredAppointments = appointments.filter(appointment => {
-      const matchingTimeSlots = appointmentTimeSlots.filter(slot => slot.startTime === appointment.time);
-      return (
-        appointment.branchId === branch &&
-        appointment.ageInterest === ageInterest &&
-        appointment.date === date &&
-        matchingTimeSlots.length > 0
-      )
-    });
-  
-    if (filteredAppointments.length > 0) {
-      const appointmentTimes = filteredAppointments.map(appointment => appointment.time);
-      const newFilteredTimeSlots = appointmentTimeSlots.map(slot => ({
-        ...slot,
-        isBooked: appointmentTimes.includes(slot.startTime)
-      }));
-      setFilteredTimeSlots(newFilteredTimeSlots);
-    } else {
-      const newFilteredTimeSlots = appointmentTimeSlots.map(slot => ({
-        ...slot,
-        isBooked: false
-      }));
-      setFilteredTimeSlots(newFilteredTimeSlots);
-    }  
-  }, [ageInterest, branch, date]);
-  
-  useEffect(() => {
-    if (ageInterest) {
-      const newFilteredBranch = branchData.filter((slot) => {
-        const programsArray = slot.branchPrograms.split(',').map((program) => program.trim());
-        return programsArray.includes(ageInterest);
-      });
-      setFilteredBranch(newFilteredBranch);
-    } else {
-      setFilteredBranch([]);
-    }
-  }, [ageInterest]);
-
-  useEffect(() => {
-    if (branch) {
-      const newFilteredAgeInterest = branchData.filter(slot => slot.branchId === branch);
-      setFilteredAgeInterest(newFilteredAgeInterest);
-    } else {
-      setFilteredAgeInterest([]);
-    }
-  }, [branch]);
-
   const handleShowAdvancedSettings = () => {
     setShow(!show);
   }
-  
-  const getCurrentDate = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   return (
     <div>
@@ -369,7 +303,6 @@ const Page2 = () => {
                 components={{
                   event: EventComponent,
                 }}
-                onEventDrop={onEventDrop}
                 resizable
                 style={{ height: "200vh" }}
               />
@@ -411,6 +344,20 @@ const Page2 = () => {
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid item xs={12} md={12}>
+              <Dropzone onDrop={onDrop} accept="image/*">
+                {({ getRootProps, getInputProps }) => (
+                  <div {...getRootProps()} className="dropzone">
+                    <input {...getInputProps()} />
+                    {coverImg ? (
+                      <img src={URL.createObjectURL(coverImg)} alt="CoverImg" className="coverImage" />
+                    ) : (
+                      <p>Drag &apos;n&apos; drop an image here, or click to select a file</p>
+                    )}
+                  </div>
+                )}
+              </Dropzone>
+            </Grid>
+            <Grid item xs={12} md={12}>
               <TextField
                 onChange={(e) => setTitle(e.target.value)}
                 margin="dense"
@@ -445,7 +392,7 @@ const Page2 = () => {
                 type="date"
                 fullWidth
                 variant="outlined"
-                value={startDate || getCurrentDate()}
+                value={startDate}
               />
             </Grid>
             <Grid item xs={6} md={6}>
@@ -457,7 +404,31 @@ const Page2 = () => {
                 type="date"
                 fullWidth
                 variant="outlined"
-                value={endDate || getCurrentDate()}
+                value={endDate}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                InputLabelProps ={{ shrink: true }}
+                onChange={(e) => setStartTime(e.target.value)}
+                margin="dense"
+                label="Start Time"
+                type="time"
+                fullWidth
+                variant="outlined"
+                value={startTime}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                InputLabelProps ={{ shrink: true }}
+                onChange={(e) => setEndTime(e.target.value)}
+                margin="dense"
+                label="End Time"
+                type="time"
+                fullWidth
+                variant="outlined"
+                value={endTime}
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -481,7 +452,7 @@ const Page2 = () => {
                       )}
                       {option.display === 'radio' && (
                         <FormControl component="fieldset">
-                          <FormLabel component="legend">Radio Items</FormLabel>
+                          <FormLabel component="legend">{option.radioTitle}</FormLabel>
                           <RadioGroup>
                             {option.radioItems.map((item) => (
                               <FormControlLabel
@@ -497,7 +468,7 @@ const Page2 = () => {
                       )}
                       {option.display === 'select' && (
                         <FormControl fullWidth>
-                          <InputLabel id="select-label">Select Items</InputLabel>
+                          <InputLabel id="select-label">{option.selectTitle}</InputLabel>
                           <Select labelId="select-label" id="select-label" label="Select Items" disabled>
                             {option.selectItems.map((item) => (
                               <MenuItem key={item.id} value={item.value}>
@@ -565,7 +536,8 @@ const Page2 = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseNewEventDialog}>Save</Button>
+          <Button color="error" onClick={handleCloseNewEventDialog}>Cancel</Button>
+          <Button onClick={handleSaveNewEventDialog}>Save</Button>
         </DialogActions>
       </Dialog>
       {/* New Options Dialog */}
@@ -601,7 +573,7 @@ const Page2 = () => {
             <Grid item xs={12} md={12}>
               <Collapse in={showTextfield} timeout="auto" unmountOnExit>
                 <Grid container spacing={2}>
-                  <Grid item xs={10} md={10}>
+                  <Grid item xs={12} md={12}>
                     <TextField
                       onChange={(e) => setQuestion(e.target.value)}
                       margin="dense"
@@ -617,6 +589,17 @@ const Page2 = () => {
             </Grid>
             <Grid item xs={12} md={12}>
               <Collapse in={showRadio} timeout="auto" unmountOnExit>
+                <Grid item xs={12} md={12}>
+                  <TextField
+                    onChange={(e) => setRadioTitle(e.target.value)}
+                    margin="dense"
+                    label="Radio Title"
+                    type="text"
+                    fullWidth
+                    variant="outlined"
+                    value={radioTitle}
+                  />
+                </Grid>
                 {radioItems.map((item) => (
                   <Grid container item xs={12} md={12} key={item.id}>
                     <Grid item xs={11} md={11}>
@@ -644,6 +627,17 @@ const Page2 = () => {
             </Grid>
             <Grid item xs={12} md={12}>
               <Collapse in={showSelect} timeout="auto" unmountOnExit>
+                <Grid item xs={12} md={12}>
+                  <TextField
+                    onChange={(e) => setSelectTitle(e.target.value)}
+                    margin="dense"
+                    label="Select Title"
+                    type="text"
+                    fullWidth
+                    variant="outlined"
+                    value={selectTitle}
+                  />
+                </Grid>
                 {selectItems.map((item) => (
                   <Grid container item xs={12} md={12} key={item.id}>
                     <Grid item xs={11} md={11}>

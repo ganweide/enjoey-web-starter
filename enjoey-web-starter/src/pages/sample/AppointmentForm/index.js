@@ -148,6 +148,8 @@ const Page2 = () => {
     setEvents(bigCalendarEvents);
   }, [appointments]);
 
+  console.log(events);
+
   const EventComponent = ({ event }) => (
     <div>
       <strong>{event.title}</strong>

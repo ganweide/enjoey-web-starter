@@ -187,3 +187,16 @@
   width: 1px;
 }
 
+.dropzone {
+  border: 2px dashed #cccccc;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.coverImage {
+  max-width: 100%;
+  max-height: 150px;
+}
+
