@@ -30,6 +30,9 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
+import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 
 // PropTypes Imports
 import PropTypes from 'prop-types';
@@ -49,34 +52,64 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const localizer       = momentLocalizer(moment);
 const DnDCalendar     = withDragAndDrop(Calendar);
-// const appointmentUrl  = "http://localhost:8000/api/appointment/";
 
 const Page2 = () => {
-  const [appointments, setAppointments]                 = useState([]);
-  const [openNewEventDialog, setOpenNewEventDialog]     = useState(false);
-  const [show, setShow]                                 = useState(false);
-  const [openAddOptionsDialog, setOpenAddOptionsDialog] = useState(false);
-  const [showTextfield, setShowTextfield]               = useState(false);
-  const [showRadio, setShowRadio]                       = useState(false);
-  const [showSelect, setShowSelect]                     = useState(false);
-  const [coverImg, setCoverImg]                         = useState("");
-  const [title, setTitle]                               = useState("");
-  const [category, setCategory]                         = useState("");
-  const [startDate, setStartDate]                       = useState("");
-  const [endDate, setEndDate]                           = useState("");
-  const [startTime, setStartTime]                       = useState("");
-  const [endTime, setEndTime]                           = useState("");
-  const [receipt, setReceipt]                           = useState("");
-  const [display, setDisplay]                           = useState("");
-  const [question, setQuestion]                         = useState("");
-  const [radioTitle, setRadioTitle]                     = useState("");
-  const [radioItems, setRadioItems]                     = useState([{ id: 1, value: '' }]);
-  const [selectTitle, setSelectTitle]                   = useState("");
-  const [selectItems, setSelectItems]                   = useState([{ id: 1, value: '' }]);
-  const [idCounter, setIdCounter]                       = useState(1);
-  const [savedOptions, setSavedOptions]                 = useState([]);
-  const [events, setEvents]                             = useState([]);
-  const [refresh, setRefresh]                           = useState([]);
+  const [appointments, setAppointments]                   = useState([]);
+  const [openEventDetailDialog, setOpenEventDetailDialog] = useState(false);
+  const [openAcceptEventDialog, setOpenAcceptEventDialog] = useState(false);
+  const [openNewEventDialog, setOpenNewEventDialog]       = useState(false);
+  const [show, setShow]                                   = useState(false);
+  const [openAddOptionsDialog, setOpenAddOptionsDialog]   = useState(false);
+  const [showTextfield, setShowTextfield]                 = useState(false);
+  const [showRadio, setShowRadio]                         = useState(false);
+  const [showSelect, setShowSelect]                       = useState(false);
+  const [coverImg, setCoverImg]                           = useState("");
+  const [title, setTitle]                                 = useState("");
+  const [category, setCategory]                           = useState("");
+  const [startDate, setStartDate]                         = useState("");
+  const [endDate, setEndDate]                             = useState("");
+  const [startTime, setStartTime]                         = useState("");
+  const [endTime, setEndTime]                             = useState("");
+  const [receipt, setReceipt]                             = useState("");
+  const [display, setDisplay]                             = useState("");
+  const [question, setQuestion]                           = useState("");
+  const [radioTitle, setRadioTitle]                       = useState("");
+  const [radioItems, setRadioItems]                       = useState([{ id: 1, value: '' }]);
+  const [selectTitle, setSelectTitle]                     = useState("");
+  const [selectItems, setSelectItems]                     = useState([{ id: 1, value: '' }]);
+  const [idCounter, setIdCounter]                         = useState(1);
+  const [savedOptions, setSavedOptions]                   = useState([]);
+  const [events, setEvents]                               = useState([]);
+  const [eventList, setEventList]                         = useState([]);
+  const [selectedEvent, setSelectedEvent]                 = useState([]);
+
+  const handleDateClick = date => {
+    console.log("clicked");
+
+    // Filter events based on the selected date and update the list
+    const filteredEvents = events.filter(event =>
+      moment(event.startDate).isSame(date, 'day')
+    );
+    setEventList(filteredEvents);
+  };
+
+  const handleOpenEventDetailDialog = async (event) => {
+    setSelectedEvent(event);
+    setOpenEventDetailDialog(true);
+  };
+
+  const handleCloseEventDetailDialog = async () => {
+    setOpenEventDetailDialog(false);
+  }
+
+  const handleOpenAcceptEventDialog = async() => {
+    setOpenAcceptEventDialog(true);
+  }
+
+  const handleCloseAcceptEventDialog = async() => {
+    setOpenAcceptEventDialog(false);
+    setOpenEventDetailDialog(false);
+  }
 
   // Dnd Big Calendar
   useEffect(() => {
@@ -89,7 +122,7 @@ const Page2 = () => {
       const savedOptions = appointment.savedOptions;
       const receipt = appointment.receipt;
 
-      return { start, end, title, category, coverImg, savedOptions };
+      return { start, end, title, category, coverImg, savedOptions, receipt };
     })
     setEvents(bigCalendarEvents);
   }, [appointments]);
@@ -123,12 +156,13 @@ const Page2 = () => {
     setEndDate("");
     setStartTime("");
     setEndTime("");
+    setReceipt("");
     setSavedOptions([]);
+    setShow(false);
     setOpenNewEventDialog(false);
   }
 
   const handleSaveNewEventDialog = () => {
-    // Save the inputted data
     const newAppointment = {
       coverImg,
       title,
@@ -138,14 +172,11 @@ const Page2 = () => {
       startTime,
       endTime,
       receipt,
-      savedOptions, // Assuming savedOptions is an array of objects with necessary data
+      savedOptions,
     };
 
-    // Update the appointments state
-    setRefresh((prevAppointments) => [...prevAppointments, newAppointment]);
     setAppointments((prevAppointments) => [...prevAppointments, newAppointment]);
 
-    // Close the dialog
     setCoverImg("");
     setTitle("");
     setCategory("");
@@ -153,7 +184,9 @@ const Page2 = () => {
     setEndDate("");
     setStartTime("");
     setEndTime("");
+    setReceipt("");
     setSavedOptions([]);
+    setShow(false);
     setOpenNewEventDialog(false);
   };
 
@@ -303,6 +336,9 @@ const Page2 = () => {
                 components={{
                   event: EventComponent,
                 }}
+                onSelectEvent={(event) => {
+                  handleDateClick(event);
+                }}
                 resizable
                 style={{ height: "200vh" }}
               />
@@ -311,24 +347,128 @@ const Page2 = () => {
         </Grid>
         <Grid item xs={3.6} md={3.6}>
           <Card sx={{ p: 5 }}>
-            <Box sx={{ width: '100%' }}>
-              <Box 
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between"
-                }}
-              >
-                <Typography variant="h1" component="div" gutterBottom>
-                  Events List
-                </Typography>
-              </Box>
-            </Box>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <Box 
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between"
+                  }}
+                >
+                  <Typography variant="h1" component="div" gutterBottom>
+                    Events List
+                  </Typography>
+                </Box>
+              </Grid>
+              {eventList.map(event => (
+                <Grid item xs={12} md={12} key={event.title} onClick={() => handleOpenEventDetailDialog(event)}>
+                  {/* Render your event details here */}
+                  <div>{event.coverImg && <img src={URL.createObjectURL(event.coverImg)} alt="Cover Image" className="coverImage" />}</div>
+                  <div>{event.title}</div>
+                  <div>{moment(event.startDate).format('YYYY-MM-DD')} - {moment(event.endDate).format('YYYY-MM-DD')}</div>
+                  <div>{moment(event.startTime).format('HH:mm')} - {moment(event.endDate).format('HH:mm')}</div>
+                </Grid>
+              ))}
+            </Grid>
           </Card>
         </Grid>
       </Grid>
+      {/* Event Detail Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="md"
+        open              ={openEventDetailDialog}
+        onClose           ={handleCloseEventDetailDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>{selectedEvent.title}</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={12}>
+              <Box>
+                {selectedEvent.coverImg && <img src={URL.createObjectURL(selectedEvent.coverImg)} alt="Cover Image" className="coverImage" />}
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <div>{selectedEvent.title}</div>
+              <div>{moment(selectedEvent.startDate).format('YYYY-MM-DD')} - {moment(selectedEvent.endDate).format('YYYY-MM-DD')}</div>
+              <div>{moment(selectedEvent.startTime).format('HH:mm')} - {moment(selectedEvent.endTime).format('HH:mm')}</div>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button color="success" onClick={handleOpenAcceptEventDialog}><EventAvailableIcon />Accept</Button>
+          <Button onClick={handleOpenAcceptEventDialog}><HelpCenterIcon />Tentative</Button>
+          <Button color="error" onClick={handleCloseEventDetailDialog}><EventBusyIcon />Decline</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Accept Event Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={openAcceptEventDialog}
+        onClose           ={handleCloseAcceptEventDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <h2>{selectedEvent.title}</h2>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            {selectedEvent.savedOptions?.map((event, index) => (
+              <Grid item xs={12} md={12} key={index}>
+                {event.display === "textfield" && (
+                  <TextField
+                    margin="dense"
+                    label={event.question}
+                    type="text"
+                    fullWidth
+                    variant="outlined"
+                    value=""
+                  />
+                )}
+                {event.display === 'radio' && (
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend">{event.radioTitle}</FormLabel>
+                    <RadioGroup>
+                      {event.radioItems.map((item) => (
+                        <FormControlLabel
+                          key={item.id}
+                          value={item.value}
+                          control={<Radio />}
+                          label={item.value}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                )}
+                {event.display === 'select' && (
+                  <FormControl fullWidth>
+                    <InputLabel id="select-label">{event.selectTitle}</InputLabel>
+                    <Select labelId="select-label" id="select-label" label="Select Items">
+                      {event.selectItems.map((item) => (
+                        <MenuItem key={item.id} value={item.value}>
+                          {item.value}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button color="success" onClick={handleCloseAcceptEventDialog}>Done</Button>
+        </DialogActions>
+      </Dialog>
       {/* New Event Dialog */}
       <Dialog
         fullWidth
@@ -346,7 +486,9 @@ const Page2 = () => {
             <Grid item xs={12} md={12}>
               <Dropzone onDrop={onDrop} accept="image/*">
                 {({ getRootProps, getInputProps }) => (
+                  // eslint-disable-next-line
                   <div {...getRootProps()} className="dropzone">
+                    {/* eslint-disable-next-line */}
                     <input {...getInputProps()} />
                     {coverImg ? (
                       <img src={URL.createObjectURL(coverImg)} alt="CoverImg" className="coverImage" />
@@ -432,7 +574,7 @@ const Page2 = () => {
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Button fullWidth onClick={handleShowAdvancedSettings}>Advanced Settings {show ? <ExpandLess /> : <ExpandMore />}</Button>
+              <Button fullWidth onClick={handleShowAdvancedSettings} disabled={category !== 'physical'}>Advanced Settings {show ? <ExpandLess /> : <ExpandMore />}</Button>
             </Grid>
             <Grid item xs={12} md={12}>
               <Collapse in={show} timeout="auto" unmountOnExit>
