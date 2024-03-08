@@ -294,6 +294,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/ImportCSV',
       },
+      {
+        id: 'button-test',
+        title: 'Button Test',
+        messageId: 'Button Test',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/ButtonTest',
+      },
     ]
   },
 ];
