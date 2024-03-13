@@ -26,6 +26,7 @@ import {
   Typography,
   Collapse,
   Avatar,
+  FormHelperText,
 } from "@mui/material";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -83,6 +84,13 @@ const Page2 = () => {
   const [events, setEvents]                               = useState([]);
   const [eventList, setEventList]                         = useState([]);
   const [selectedEvent, setSelectedEvent]                 = useState([]);
+
+  const [titleError, setTitleError]         = useState(false);
+  const [categoryError, setCategoryError]   = useState(false);
+  const [startDateError, setStartDateError] = useState(false);
+  const [endDateError, setEndDateError]     = useState(false);
+  const [startTimeError, setStartTimeError] = useState(false);
+  const [endTimeError, setEndTimeError]     = useState(false);
 
   const handleDateClick = date => {
     const filteredEvents = events.filter(event =>
@@ -161,6 +169,48 @@ const Page2 = () => {
   }
 
   const handleSaveNewEventDialog = () => {
+    if (!title) {
+      setTitleError(true);
+      return;
+    } else {
+      setTitleError(false);
+    }
+
+    if (!category) {
+      setCategoryError(true);
+      return;
+    } else {
+      setCategoryError(false);
+    }
+
+    if (!startDate) {
+      setStartDateError(true);
+      return;
+    } else {
+      setStartDateError(false);
+    }
+
+    if (!endDate) {
+      setEndDateError(true);
+      return;
+    } else {
+      setEndDateError(false);
+    }
+
+    if (!startTime) {
+      setStartTimeError(true);
+      return;
+    } else {
+      setStartTimeError(false);
+    }
+
+    if (!endTime) {
+      setEndTimeError(true);
+      return;
+    } else {
+      setEndTimeError(false);
+    }
+
     const newAppointment = {
       coverImg,
       title,
@@ -300,6 +350,8 @@ const Page2 = () => {
     setShow(!show);
   }
 
+  const getRandomColor = () => '#' + Math.floor(Math.random() * 16777215).toString(16);
+
   return (
     <div>
       <Grid container spacing={2}>
@@ -365,7 +417,7 @@ const Page2 = () => {
                 <Grid item xs={12} md={12} key={event.title} onClick={() => handleOpenEventDetailDialog(event)} sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
                   <Box sx={{ mr: 5 }}>
                     <div>
-                      {event.coverImg ? <Avatar alt='Cover Image' src={URL.createObjectURL(event.coverImg)} /> : <Avatar sx={{ bgcolor: "#00FFFF" }}>{event.title.charAt([0])}</Avatar>}
+                      {event.coverImg ? <Avatar alt='Cover Image' src={URL.createObjectURL(event.coverImg)} /> : <Avatar sx={{ backgroundColor: getRandomColor() }}>{event.title.charAt([0])}</Avatar>}
                     </div>
                   </Box>
                   <Box>
@@ -511,6 +563,9 @@ const Page2 = () => {
                 fullWidth
                 variant="outlined"
                 value={title}
+                required
+                error={titleError}
+                helperText={titleError ? 'Title is required' : ''}
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -522,10 +577,13 @@ const Page2 = () => {
                   value   ={category}
                   label   ="Category"
                   onChange={(e) => {setCategory(e.target.value)}}
+                  required
+                  error={categoryError}
                 >
                   <MenuItem value="physical">Physical</MenuItem>
                   <MenuItem value="virtual">Virtual</MenuItem>
                 </Select>
+                {categoryError && <FormHelperText>Category is required</FormHelperText>}
               </FormControl>
             </Grid>
             <Grid item xs={6} md={6}>
@@ -538,6 +596,9 @@ const Page2 = () => {
                 fullWidth
                 variant="outlined"
                 value={startDate}
+                required
+                error={startDateError}
+                helperText={startDateError ? 'Start date is required' : ''}
               />
             </Grid>
             <Grid item xs={6} md={6}>
@@ -550,6 +611,9 @@ const Page2 = () => {
                 fullWidth
                 variant="outlined"
                 value={endDate}
+                required
+                error={endDateError}
+                helperText={endDateError ? 'End date is required' : ''}
               />
             </Grid>
             <Grid item xs={6} md={6}>
@@ -562,6 +626,9 @@ const Page2 = () => {
                 fullWidth
                 variant="outlined"
                 value={startTime}
+                required
+                error={startTimeError}
+                helperText={startTimeError ? 'Start time is required' : ''}
               />
             </Grid>
             <Grid item xs={6} md={6}>
@@ -574,6 +641,9 @@ const Page2 = () => {
                 fullWidth
                 variant="outlined"
                 value={endTime}
+                required
+                error={endTimeError}
+                helperText={endTimeError ? 'End time is required' : ''}
               />
             </Grid>
             <Grid item xs={12} md={12}>
