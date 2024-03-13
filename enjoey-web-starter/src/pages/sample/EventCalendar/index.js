@@ -25,6 +25,7 @@ import {
   Box,
   Typography,
   Collapse,
+  Avatar,
 } from "@mui/material";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -361,14 +362,17 @@ const Page2 = () => {
                 </Box>
               </Grid>
               {eventList.map(event => (
-                <Grid item xs={12} md={12} key={event.title} onClick={() => handleOpenEventDetailDialog(event)}>
-                  {/* Render your event details here */}
-                  <div>
-                    {event.coverImg ? <img src={URL.createObjectURL(event.coverImg)} alt="Cover Image" className="coverImage" /> : <div className="coverBackground">{moment(event.startDate).format('YYYY-MM-DD')}</div>}
-                  </div>
-                  <div>{event.title}</div>
-                  <div>{moment(event.start).format('YYYY-MM-DD')} - {moment(event.end).format('YYYY-MM-DD')}</div>
-                  <div>{moment(event.start).format('HH:mm')} - {moment(event.end).format('HH:mm')}</div>
+                <Grid item xs={12} md={12} key={event.title} onClick={() => handleOpenEventDetailDialog(event)} sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                  <Box sx={{ mr: 5 }}>
+                    <div>
+                      {event.coverImg ? <Avatar alt='Cover Image' src={URL.createObjectURL(event.coverImg)} /> : <Avatar sx={{ bgcolor: "#00FFFF" }}>{event.title.charAt([0])}</Avatar>}
+                    </div>
+                  </Box>
+                  <Box>
+                    <div>{event.title}</div>
+                    <div>{moment(event.start).format('YYYY-MM-DD')} - {moment(event.end).format('YYYY-MM-DD')}</div>
+                    <div>{moment(event.start).format('HH:mm')} - {moment(event.end).format('HH:mm')}</div>
+                  </Box>
                 </Grid>
               ))}
             </Grid>
