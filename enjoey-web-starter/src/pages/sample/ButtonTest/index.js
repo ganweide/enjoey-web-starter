@@ -11,18 +11,13 @@ import {
   DialogActions,
   Grid,
   Typography,
-  FormLabel,
-  FormControl,
-  FormControlLabel,
   Checkbox,
-  FormGroup,
   CardContent,
 } from "@mui/material";
 
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PhonelinkRingIcon from '@mui/icons-material/PhonelinkRing';
-import PaypalIcon from './paypal.svg';
 import VisaIcon from './cc-visa.svg';
 import MastercardIcon from './cc-mastercard.svg';
 import AlipayIcon from './alipay.svg';
@@ -134,11 +129,22 @@ const Page2 = () => {
 
   return (
     <div>
-      <Button variant="outlined">Share</Button>
       <Card sx={{ p: 5 }}>
-        <Typography variant="h1">Payment Method</Typography>
-        <Button variant="outlined" onClick={handleOpenPaymentMethodSettingsDialog}>Payment Method Settings</Button>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={12}>
+            <Typography variant="h1">Payment Method</Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Button variant="outlined" onClick={handleOpenPaymentMethodSettingsDialog}>
+              Payment Method Settings
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Button variant="outlined">Share</Button>
+          </Grid>
+        </Grid>
       </Card>
+      {/* Payment Methods Settings Dialog */}
       <Dialog
         fullWidth
         maxWidth          ="sm"
@@ -185,7 +191,6 @@ const Page2 = () => {
                 items={[
                   { label: "Visa", icon: VisaIcon },
                   { label: "MasterCard", icon: MastercardIcon },
-                  // Add more card items as needed
                 ]}
                 color="#00FFFF"
               />
@@ -195,7 +200,6 @@ const Page2 = () => {
                 title="Supported Cash"
                 items={[
                   { label: "FPX Transfer", icon: FPXIcon },
-                  // Add more cash items as needed
                 ]}
                 color="#40E0D0"
               />
@@ -207,7 +211,6 @@ const Page2 = () => {
                   { label: "Touch n' Go", icon: TouchnGoIcon },
                   { label: "Apple Pay", icon: ApplePayIcon },
                   { label: "Alipay", icon: AlipayIcon },
-                  // Add more e-wallet items as needed
                 ]}
                 color="#B4CFEC"
               />

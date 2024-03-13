@@ -84,11 +84,8 @@ const Page2 = () => {
   const [selectedEvent, setSelectedEvent]                 = useState([]);
 
   const handleDateClick = date => {
-    console.log("clicked");
-
-    // Filter events based on the selected date and update the list
     const filteredEvents = events.filter(event =>
-      moment(event.startDate).isSame(date, 'day')
+      moment(event.start).isSame(moment(date.start), 'day')
     );
     setEventList(filteredEvents);
   };
@@ -366,10 +363,12 @@ const Page2 = () => {
               {eventList.map(event => (
                 <Grid item xs={12} md={12} key={event.title} onClick={() => handleOpenEventDetailDialog(event)}>
                   {/* Render your event details here */}
-                  <div>{event.coverImg && <img src={URL.createObjectURL(event.coverImg)} alt="Cover Image" className="coverImage" />}</div>
+                  <div>
+                    {event.coverImg ? <img src={URL.createObjectURL(event.coverImg)} alt="Cover Image" className="coverImage" /> : <div className="coverBackground">{moment(event.startDate).format('YYYY-MM-DD')}</div>}
+                  </div>
                   <div>{event.title}</div>
-                  <div>{moment(event.startDate).format('YYYY-MM-DD')} - {moment(event.endDate).format('YYYY-MM-DD')}</div>
-                  <div>{moment(event.startTime).format('HH:mm')} - {moment(event.endDate).format('HH:mm')}</div>
+                  <div>{moment(event.start).format('YYYY-MM-DD')} - {moment(event.end).format('YYYY-MM-DD')}</div>
+                  <div>{moment(event.start).format('HH:mm')} - {moment(event.end).format('HH:mm')}</div>
                 </Grid>
               ))}
             </Grid>
