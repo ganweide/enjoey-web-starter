@@ -370,8 +370,8 @@ const Page2 = () => {
                   </Box>
                   <Box>
                     <div>{event.title}</div>
-                    <div>{moment(event.start).format('YYYY-MM-DD')} - {moment(event.end).format('YYYY-MM-DD')}</div>
-                    <div>{moment(event.start).format('HH:mm')} - {moment(event.end).format('HH:mm')}</div>
+                    <div>{moment(event.start).format('DD-MM-YYYY')} ~ {moment(event.end).format('DD-MM-YYYY')}</div>
+                    <div>{moment(event.start).format('h:mm A')} ~ {moment(event.end).format('h:mm A')}</div>
                   </Box>
                 </Grid>
               ))}
