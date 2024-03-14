@@ -390,7 +390,7 @@ const Page2 = () => {
                   handleDateClick(event);
                 }}
                 resizable
-                style={{ height: "200vh" }}
+                style={{ height: "150vh" }}
               />
             </Box>
           </Card>
