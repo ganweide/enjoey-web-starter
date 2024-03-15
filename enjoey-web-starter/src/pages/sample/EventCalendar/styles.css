@@ -227,15 +227,3 @@
   text-align: center; /* Center the text within each span */
   font-size: 15px; /* Adjust the font size for the year */
 }
-
-.eventTitle {
-  font-size: 25px;
-}
-
-.eventDate {
-  font-size: 15px;
-}
-
-.eventTime {
-  font-size: 15px;
-}

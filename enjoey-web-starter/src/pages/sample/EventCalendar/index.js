@@ -25,7 +25,6 @@ import {
   Box,
   Typography,
   Collapse,
-  Avatar,
   FormHelperText,
 } from "@mui/material";
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -417,10 +416,10 @@ const Page2 = () => {
                   </Card>
                 }
               </Grid>
-              <Grid item xs={9} md={9} sx={{ pl: 5 }}>
-                <div className="eventTitle">{event.title}</div>
-                <div className="eventDate">Date: {moment(event.start).format('DD-MM-YYYY')} ({moment(event.start).format('dddd')})</div>
-                <div className="eventTime">Time: {moment(event.start).format('h:mm A')} ~ {moment(event.end).format('h:mm A')}</div>
+              <Grid item xs={9} md={9} sx={{ pl: 5, display: "flex", flexDirection: "column" }}>
+                <Typography variant="h3">{event.title}</Typography>
+                <Typography variant="body1">Date: {moment(event.start).format('DD-MM-YYYY')} ({moment(event.start).format('dddd')})</Typography>
+                <Typography variant="body1">Time: {moment(event.start).format('h:mm A')} ~ {moment(event.end).format('h:mm A')}</Typography>
               </Grid>
             </Card>
           ))}
