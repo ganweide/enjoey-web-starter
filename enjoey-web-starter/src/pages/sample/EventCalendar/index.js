@@ -397,38 +397,33 @@ const Page2 = () => {
         </Grid>
         <Grid item xs={3.6} md={3.6}>
           <Card sx={{ p: 5 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={12}>
-                <Box 
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between"
-                  }}
-                >
-                  <Typography variant="h1" component="div" gutterBottom>
-                    Events List
-                  </Typography>
-                </Box>
-              </Grid>
-              {eventList.map(event => (
-                <Grid item xs={12} md={12} key={event.title} onClick={() => handleOpenEventDetailDialog(event)} sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-                  <Box sx={{ mr: 5 }}>
-                    <div>
-                      {event.coverImg ? <Avatar alt='Cover Image' src={URL.createObjectURL(event.coverImg)} /> : <Avatar sx={{ backgroundColor: getRandomColor() }}>{event.title.charAt([0])}</Avatar>}
-                    </div>
-                  </Box>
-                  <Box>
-                    <div>{event.title}</div>
-                    <div>{moment(event.start).format('DD-MM-YYYY')} ~ {moment(event.end).format('DD-MM-YYYY')}</div>
-                    <div>{moment(event.start).format('h:mm A')} ~ {moment(event.end).format('h:mm A')}</div>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
+            <Typography variant="h1" component="div" gutterBottom>
+              Events List
+            </Typography>
           </Card>
+          {eventList.map(event => (
+            <Card key={event.title} sx={{ mt: 2, p: 5, display: "flex", flexDirection: "row", alignItems: "center", cursor: "pointer" }} onClick={() => handleOpenEventDetailDialog(event)} className="eventlistCard">
+              <Grid item xs={3} md={3}>
+                {event.coverImg
+                ? 
+                  <Card>
+                    <img className="coverImage" src={URL.createObjectURL(event.coverImg)} />
+                  </Card>
+                :
+                  <Card className="dateCard">
+                    <span className="month">{moment(event.start).format('MMM')}</span>
+                    <span className="day">{moment(event.start).format('DD')}</span>
+                    <span className="year">{moment(event.start).format('YYYY')}</span>
+                  </Card>
+                }
+              </Grid>
+              <Grid item xs={9} md={9} sx={{ pl: 5 }}>
+                <div className="eventTitle">{event.title}</div>
+                <div className="eventDate">Date: {moment(event.start).format('DD-MM-YYYY')} ({moment(event.start).format('dddd')})</div>
+                <div className="eventTime">Time: {moment(event.start).format('h:mm A')} ~ {moment(event.end).format('h:mm A')}</div>
+              </Grid>
+            </Card>
+          ))}
         </Grid>
       </Grid>
       {/* Event Detail Dialog */}
