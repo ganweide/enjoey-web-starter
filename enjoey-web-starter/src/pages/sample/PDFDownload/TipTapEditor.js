@@ -10,6 +10,7 @@ import TableRow from '@tiptap/extension-table-row'
 import Document from '@tiptap/extension-document'
 import Dropcursor from '@tiptap/extension-dropcursor'
 import Image from '@tiptap/extension-image'
+import ResizableImageExtension from './ResizableImageExtension'
 import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useState } from 'react'
@@ -135,6 +136,7 @@ const TipTapEditor = () => {
     TableHeader,
     CustomTableCell,
     Image,
+    ResizableImageExtension,
   ]
 
   const MenuBar = () => {
