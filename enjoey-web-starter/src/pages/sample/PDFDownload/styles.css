@@ -1,4 +1,59 @@
+/* Root Colors */
+:root {
+  --background: #ffffff;
+  --text: #0d0d0d;
+  --border-color: #0d0d0d;
+  --table-th-color: #f1f3f5;
+  --active-background: #d4d4d4;
+  --active-color: #353535;
+  --blockquote-border-color: rgba(13, 13, 13, 0.705);
+  --hr-border-color: rgba(13, 13, 13, 0.705);
+}
+
+.editor.dark-mode {
+  --background: #2c2c2c;
+  --text: #ffffff;
+  --border-color: #ced4da;
+  --table-th-color: #48494a;
+  --active-background: #7d7d7d;
+  --active-color: #ffffff;
+  --blockquote-border-color: rgba(198, 197, 197, 0.705);
+  --hr-border-color: rgba(198, 197, 197, 0.705);
+}
+
 /* Basic editor styles */
+.editor {
+  background-color: var(--background);
+  border: 3px solid var(--border-color);
+  border-radius: 0.75rem;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+}
+
+.editor-header {
+  align-items: center;
+  background: var(--background);
+  color: var(--text);
+  border-bottom: 3px solid var(--border-color);
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  padding: 0.25rem;
+}
+
+.editor .ProseMirror {
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
 .tiptap {
   margin: 1rem 0;
 }
@@ -25,26 +80,6 @@
   line-height: 1.1;
 }
 
-.tiptap code {
-  background-color: rgba(97, 97, 97, 0.1);
-  color: #616161;
-}
-
-.tiptap pre {
-  background: #0D0D0D;
-  color: #FFF;
-  font-family: 'JetBrainsMono', monospace;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-}
-
-.tiptap pre code {
-  color: inherit;
-  padding: 0;
-  background: none;
-  font-size: 0.8rem;
-}
-
 .tiptap img {
   max-width: 100%;
   height: auto;
@@ -52,12 +87,12 @@
 
 .tiptap blockquote {
   padding-left: 1rem;
-  border-left: 2px solid rgba(13, 13, 13, 0.1);
+  border-left: 2px solid var(--blockquote-border-color);
 }
 
 .tiptap hr {
   border: none;
-  border-top: 2px solid rgba(13, 13, 13, 0.1);
+  border-top: 2px solid var(--hr-border-color);
   margin: 2rem 0;
 }
 
@@ -83,7 +118,7 @@
 .tiptap table th {
   font-weight: bold;
   text-align: left;
-  background-color: #f1f3f5;
+  background-color: var(--table-th-color);
 }
 
 .tiptap table .selectedCell:after {
@@ -117,14 +152,16 @@
   cursor: col-resize;
 }
 
+/* Menu-specific styling */
 .menu-item {
   background-color: transparent;
   border: none;
   border-radius: 0.4rem;
-  color: #fff;
+  color: var(--text);
   cursor: pointer;
   height: 1.75rem;
   margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
   padding: 0.25rem;
   width: 1.75rem;
 }
@@ -137,50 +174,12 @@
 
 .menu-item:hover,
 .menu-item.is-active {
-  background-color: #303030;
+  background-color: var(--active-background);
+  color: var(--active-color);
 }
 
 .divider {
-  background-color: rgba(255, 255, 255, 0.25);
-  height: 1.25rem;
-  margin-left: 0.5rem;
-  margin-right: 0.75rem;
-  width: 1px;
-}
-
-.editor {
-  background-color: #fff;
-  border: 3px solid #0d0d0d;
-  border-radius: 0.75rem;
-  color: #0d0d0d;
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
-}
-
-.editor-header {
-  align-items: center;
-  background: #0d0d0d;
-  border-bottom: 3px solid #0d0d0d;
-  border-top-left-radius: 0.25rem;
-  border-top-right-radius: 0.25rem;
-  display: flex;
-  flex: 0 0 auto;
-  flex-wrap: wrap;
-  padding: 0.25rem;
-}
-
-.editor .ProseMirror {
-  flex: 1 1 auto;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  -webkit-overflow-scrolling: touch;
-}
-
-.divider {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: var(--text);
   height: 1.25rem;
   margin-left: 0.5rem;
   margin-right: 0.75rem;

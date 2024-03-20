@@ -1,21 +1,23 @@
+// Local Imports
 import './styles.css'
+import ResizableImageExtension from './ResizableImageExtension'
 
-import { Color } from '@tiptap/extension-color'
+// TipTap Editor Imports
 import ListItem from '@tiptap/extension-list-item'
 import TextStyle from '@tiptap/extension-text-style'
 import Table from '@tiptap/extension-table'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
-import Document from '@tiptap/extension-document'
-import Dropcursor from '@tiptap/extension-dropcursor'
 import Image from '@tiptap/extension-image'
-import ResizableImageExtension from './ResizableImageExtension'
-import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React, { useState } from 'react'
-import { CustomTable, CustomTableCell, CustomTableRow } from './Section';
+import { Color } from '@tiptap/extension-color'
+import { EditorProvider, useCurrentEditor } from '@tiptap/react'
 
+// React Imports
+import React, { useState } from 'react'
+
+// Remix Icons Imports
 import { 
   RiBold,
   RiItalic,
@@ -42,11 +44,126 @@ import {
   RiDeleteRow,
   RiDeleteBin5Line,
   RiFileImageLine,
-  RiDownload2Fill,
 } from 'react-icons/ri';
 
+// Material Design Icons Imports
+import {
+  MdOutlinePreview,
+  MdDarkMode,
+  MdLightMode,
+} from "react-icons/md";
+
+// Boostrap Icons Imports
+import {
+  BsFiletypeJson,
+  BsFiletypeHtml,
+} from "react-icons/bs";
+
+// Github Octicons Icons Imports
+import {
+  GoColumns,
+  GoSidebarCollapse,
+  GoSidebarExpand,
+} from "react-icons/go";
+
+// Material UI Imports
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+  Box,
+  Tabs,
+  Tab,
+  Grid,
+  TextField,
+} from "@mui/material";
+
+// Tab Panels
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      // eslint-disable-next-line
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography variant="button">{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
 const TipTapEditor = () => {
-  const [html, setHtml] = useState('');
+  const [html, setHtml]                                   = useState("");
+  const [json, setJson]                                   = useState("");
+  const [openPreviewDialog, setOpenPreviewDialog]         = useState(false);
+  const [openImageUploadDialog, setOpenImageUploadDialog] = useState(false);
+  const [tab, setTab]                                     = useState(0);
+  const [selectedImage, setSelectedImage]                 = useState(null);
+  const [url, setUrl]                                     = useState("");
+  const [width, setWidth]                                 = useState("");
+  const [height, setHeight]                               = useState("");
+  const [alt, setAlt]                                     = useState("");
+  const [isDarkMode, setIsDarkMode]                       = useState(false);
+  const [editor, setEditor]                               = useState(null);
+  const [contentJson, setContentJson]                     = useState("");
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  const toggleLightMode = () => {
+    setIsDarkMode(false);
+  };
+
+  const handleOpenImageUploadDialog = (editor) => {
+    setOpenImageUploadDialog(true);
+    setEditor(editor);
+  }
+
+  const handleCloseImageUploadDialog = () => {
+    setOpenImageUploadDialog(false);
+  }
+
+  const handleChangeTab = (event, newValue) => {
+    setTab(newValue);
+  };
+
+  const handleAddImage = () => {
+    if (url) {
+      editor.chain().focus().setImage({ src: url, alt: alt, width: width, height: height }).run()
+    }
+  }
+
+  const handleOpenPreviewDialog = (editor) => {
+    if (editor) {
+      const editorContent = editor.getJSON(); // Get the JSON content of the editor
+      setContentJson(editorContent); // Set the JSON content in state
+      setOpenPreviewDialog(true); // Open the preview dialog
+    }
+  }
+
+  const handleClosePreviewDialog = () => {
+    setOpenPreviewDialog(false);
+  }
+
   const CustomTableCell = TableCell.extend({
     addAttributes() {
       return {
@@ -67,54 +184,6 @@ const TipTapEditor = () => {
       }
     },
   })
-
-  const content = `
-    <h2>
-      Hi there,
-    </h2>
-    <p>
-      this is a <em>basic</em> example of <strong>tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
-    </p>
-    <ul>
-      <li>
-      That’s a bullet list with one …
-      </li>
-      <li>
-      … or two list items.
-      </li>
-    </ul>
-    <p>
-      Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
-    </p>
-    <blockquote>
-      Wow, that’s amazing. Good work, boy! 👏
-      <br />
-      — Mom
-    </blockquote>
-    <table style="width:100%">
-      <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>Age</th>
-      </tr>
-      <tr>
-        <td>Jill</td>
-        <td>Smith</td>
-        <td>50</td>
-      </tr>
-      <tr>
-        <td>Eve</td>
-        <td>Jackson</td>
-        <td>94</td>
-      </tr>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>80</td>
-      </tr>
-    </table>
-    <img src="https://source.unsplash.com/8xznAGy4HcY/800x400" />
-  `
 
   const extensions = [
     Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -140,7 +209,7 @@ const TipTapEditor = () => {
   ]
 
   const MenuBar = () => {
-    const { editor } = useCurrentEditor()
+    const { editor } = useCurrentEditor();
     if (!editor) {
       return null
     }
@@ -152,14 +221,13 @@ const TipTapEditor = () => {
       }
     };
 
-    const addImage = () => {
-      const url = window.prompt('URL')
-  
-      if (url) {
-        editor.chain().focus().setImage({ src: url }).run()
+    const handleGetJson = () => {
+      if (editor) {
+        const jsonContent = editor.getJSON();
+        setJson(jsonContent);
       }
-    }
-  
+    };
+
     return (
       <div className="editor-header">
         <button
@@ -252,13 +320,7 @@ const TipTapEditor = () => {
         <button
           onClick={() => editor.chain().focus().undo().run()}
           className="menu-item"
-          disabled={
-            !editor.can()
-              .chain()
-              .focus()
-              .undo()
-              .run()
-          }
+          disabled={!editor.can().chain().focus().undo().run()}
           title="Undo"
         >
           <RiArrowGoBackLine />
@@ -266,13 +328,7 @@ const TipTapEditor = () => {
         <button
           onClick={() => editor.chain().focus().redo().run()}
           className="menu-item"
-          disabled={
-            !editor.can()
-              .chain()
-              .focus()
-              .redo()
-              .run()
-          }
+          disabled={!editor.can().chain().focus().redo().run()}
           title="Redo"
         >
           <RiArrowGoForwardLine />
@@ -313,7 +369,6 @@ const TipTapEditor = () => {
         >
           <RiInsertRowBottom />
         </button>
-        <div className="divider" />
         <button
           onClick={() => editor.chain().focus().mergeCells().run()} disabled={!editor.can().mergeCells()}
           className="menu-item"
@@ -328,7 +383,6 @@ const TipTapEditor = () => {
         >
           <RiSplitCellsHorizontal />
         </button>
-        <div className="divider" />
         <button
           onClick={() => editor.chain().focus().deleteColumn().run()} disabled={!editor.can().deleteColumn()}
           className="menu-item"
@@ -356,42 +410,193 @@ const TipTapEditor = () => {
           className="menu-item"
           title="Create Section"
         >
-          <RiTableLine />
+          <GoColumns />
         </button>
         <button
+          onClick={() => editor.chain().focus().addColumnBefore().run()} disabled={!editor.can().addColumnBefore()}
           className="menu-item"
           title="Insert Left Section"
         >
-          <RiInsertColumnLeft />
+          <GoSidebarExpand />
         </button>
         <button
+          onClick={() => editor.chain().focus().addColumnAfter().run()} disabled={!editor.can().addColumnAfter()}
           className="menu-item"
           title="Insert Right Section"
         >
-          <RiInsertColumnRight />
+          <GoSidebarCollapse />
         </button>
         <button
+          onClick={() => editor.chain().focus().deleteColumn().run()} disabled={!editor.can().deleteColumn()}
           className="menu-item"
           title="Delete Section"
         >
           <RiDeleteColumn />
         </button>
+        <button
+          onClick={() => editor.chain().focus().deleteTable().run()} disabled={!editor.can().deleteTable()}
+          className="menu-item"
+          title="Delete Container"
+        >
+          <RiDeleteBin5Line />
+        </button>
         <div className="divider" />
-        <button onClick={addImage} className="menu-item" title="Add Image"><RiFileImageLine /></button>
+        <button onClick={() => handleOpenImageUploadDialog(editor)} className="menu-item" title="Add Image">
+          <RiFileImageLine />
+        </button>
         <div className="divider" />
-        <button onClick={handleGetHtml} className="menu-item" title="Show HTML"><RiDownload2Fill /></button>
+        <button onClick={handleGetHtml} className="menu-item" title="Show HTML">
+          <BsFiletypeHtml />
+        </button>
+        <button onClick={handleGetJson} className="menu-item" title="Show HTML">
+          <BsFiletypeJson />
+        </button>
+        <button onClick={() => handleOpenPreviewDialog(editor)} className="menu-item" title="Preview">
+          <MdOutlinePreview />
+        </button>
+        <div className="divider" />
+        <button onClick={toggleLightMode} className={`menu-item ${!isDarkMode ? 'is-active' : ''}`} title="Light Mode">
+          <MdLightMode />
+        </button>
+        <button onClick={toggleDarkMode} className={`menu-item ${isDarkMode ? 'is-active' : ''}`} title="Dark Mode">
+          <MdDarkMode />
+        </button>
       </div>
     )
   }
   
   return (
-    <div className="editor">
+    <div className={`editor${isDarkMode ? ' dark-mode' : ''}`}>
       <EditorProvider
         slotBefore={<MenuBar />}
         extensions={extensions}
-        content={content}
+        content={contentJson}
       />
       <div>{html}</div>
+      <div>{json && JSON.stringify(json)}</div>
+      {/* Insert Image Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={openImageUploadDialog}
+        onClose           ={handleCloseImageUploadDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2">Add Image</Typography>
+        </DialogTitle>
+        <DialogContent dividers sx={{ height: '325px' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={tab} onChange={handleChangeTab} aria-label="appointment-form-tab-panel">
+              <Tab label="Local Device" {...a11yProps(0)} />
+              <Tab label="From Web" {...a11yProps(1)} />
+            </Tabs>
+          </Box>
+          <TabPanel value={tab} index={0}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                margin      ="dense"
+                id          ="image-input"
+                type        ="file"
+                variant     ="outlined"
+                inputProps  ={{ accept: 'image/*' }}
+                onChange    ={(e) => setSelectedImage(e.target.files[0])}
+              />
+              </Grid>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={tab} index={1}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  fullWidth
+                  value     ={url}
+                  onChange  ={(e) => setUrl(e.target.value)}
+                  margin    ="dense"
+                  label     ="URL"
+                  type      ="text"
+                  variant   ="outlined"
+                />
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <TextField
+                  fullWidth
+                  value     ={width}
+                  onChange  ={(e) => setWidth(e.target.value)}
+                  margin    ="dense"
+                  label     ="Width"
+                  type      ="text"
+                  variant   ="outlined"
+                />
+              </Grid>
+              <Grid item xs={6} md={6}>
+                <TextField
+                  fullWidth
+                  value     ={height}
+                  onChange  ={(e) => setHeight(e.target.value)}
+                  margin    ="dense"
+                  label     ="Height"
+                  type      ="text"
+                  variant   ="outlined"
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  fullWidth
+                  value     ={alt}
+                  onChange  ={(e) => setAlt(e.target.value)}
+                  margin    ="dense"
+                  label     ="Alt"
+                  type      ="text"
+                  variant   ="outlined"
+                />
+              </Grid>
+            </Grid>
+          </TabPanel>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleAddImage}>
+            <Typography variant="button">
+              Add
+            </Typography>
+          </Button>
+          <Button variant="outlined" onClick={handleCloseImageUploadDialog}>
+            <Typography variant="button">
+              Cancel
+            </Typography>
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Preview Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="md"
+        open              ={openPreviewDialog}
+        onClose           ={handleClosePreviewDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2">Preview</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <EditorProvider
+            extensions={extensions}
+            content={contentJson}
+            editable={false}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePreviewDialog} variant="outlined">
+            <Typography variant="button">
+              Done
+            </Typography>
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
