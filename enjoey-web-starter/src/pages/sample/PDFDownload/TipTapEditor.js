@@ -205,7 +205,7 @@ const TipTapEditor = () => {
     TableHeader,
     CustomTableCell,
     Image,
-    ResizableImageExtension,
+    ResizableImageExtension(openPreviewDialog),
   ]
 
   const MenuBar = () => {

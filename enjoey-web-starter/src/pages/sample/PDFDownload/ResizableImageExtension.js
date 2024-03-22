@@ -124,15 +124,24 @@ const ResizableImageTemplate = ({ node, updateAttributes }) => {
   );
 };
 
-export default TipTapImage.extend({
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      width: { renderHTML: ({ width }) => ({ width }) },
-      height: { renderHTML: ({ height }) => ({ height }) },
-    };
-  },
-  addNodeView() {
-    return ReactNodeViewRenderer(ResizableImageTemplate);
-  },
-}).configure({ inline: true });
+const ConditionalResizableImageExtension = (openPreviewDialog) => {
+  return TipTapImage.extend({
+    addAttributes() {
+      return {
+        ...this.parent?.(),
+        width: { renderHTML: ({ width }) => ({ width }) },
+        height: { renderHTML: ({ height }) => ({ height }) },
+      };
+    },
+    ...(!openPreviewDialog
+      ? {
+          addNodeView() {
+            return ReactNodeViewRenderer(ResizableImageTemplate);
+          }
+        }
+      : {}
+    )
+  }).configure({ inline: true });
+};
+
+export default ConditionalResizableImageExtension;

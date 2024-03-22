@@ -244,7 +244,7 @@ const Page2 = () => {
             </Grid>
             <Grid item xs={12} md={12}>
               <FormControl fullWidth>
-                <InputLabel id="student-select">Provider</InputLabel>
+                <InputLabel id="provider-select">Provider</InputLabel>
                 <Select
                   labelId="provider-select"
                   id="provider-select"
