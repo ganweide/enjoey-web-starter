@@ -145,11 +145,47 @@ const TipTapEditor = () => {
   const handleChangeTab = (event, newValue) => {
     setTab(newValue);
   };
+  
+  const AWS = require('aws-sdk');
 
-  const handleAddImage = () => {
-    if (url) {
-      editor.chain().focus().setImage({ src: url, alt: alt, width: width, height: height }).run()
+  // Configure AWS with your access key and secret access key
+  AWS.config.update({
+    accessKeyId: 'AKIAXA62Z6WIVIWQDQY7',
+    secretAccessKey: 'CclZt+Yx5zCDKeVfBlz37ErKr+EisEB4FF+oVhSG',
+    region: 'eu-central-1' // e.g., 'us-east-1'
+  });
+
+  // Create a new instance of the S3 class
+  const s3 = new AWS.S3();
+
+  const uploadImageToS3 = async (imageFile) => {
+    try {
+      const uploadParams = {
+        Bucket: 'weide1234',
+        Key: `images/${imageFile.name}`, // Specify the key (file name) under which the object will be stored in the bucket
+        Body: imageFile, // The actual file data
+        ContentType: imageFile.type // The content type of the file
+      };
+      const result = await s3.upload(uploadParams).promise();
+  
+      return result.Location;
+    } catch (error) {
+      console.error('Error uploading image to S3:', error);
+      // Handle error, e.g., show an error message to the user
+      return '';
     }
+  };
+
+  const handleAddImage = async () => {
+    if (selectedImage && tab === 0) {
+      const imageDataUrl = await uploadImageToS3(selectedImage);  
+      editor.chain().focus().setImage({ src: imageDataUrl }).run();
+      setSelectedImage([]);
+    } else if (url && tab === 1) {
+      editor.chain().focus().setImage({ src: url, alt: alt, width: width, height: height }).run();
+      setUrl("");
+    }
+    setOpenImageUploadDialog(false);
   }
 
   const handleOpenPreviewDialog = (editor) => {
