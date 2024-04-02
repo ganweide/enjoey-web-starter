@@ -1,5 +1,5 @@
 // React Imports
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 
 import Axios from "axios";
 
@@ -9,12 +9,7 @@ import {
   Divider,
   Grid,
   Typography,
-  Box,
 } from "@mui/material";
-
-import CKEditor from "./CKEditor";
-import DevExtremeEditor from "./DevExtremeEditor";
-import TipTapEditor from "./TipTapEditor";
 
 import { Document, Page, pdfjs } from 'react-pdf';
 
@@ -195,24 +190,6 @@ const Page2 = () => {
                 )}
               </Grid>
             </Grid>
-          </Card>
-        </Grid>
-        {/* <Grid item xs={12} md={12}>
-          <Card sx={{ p: 5 }}>
-            <Typography variant="h2">Announcement Editor (CKEditor)</Typography>
-            <CKEditor />
-          </Card>
-        </Grid> */}
-        <Grid item xs={12} md={12}>
-          <Card sx={{ p: 5 }}>
-            <Typography variant="h2">Announcement Editor (DevExtreme React)</Typography>
-            <DevExtremeEditor />
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Card sx={{ p: 5 }}>
-            <Typography variant="h2">Announcement Editor (Tip Tap)</Typography>
-            <TipTapEditor />
           </Card>
         </Grid>
       </Grid>

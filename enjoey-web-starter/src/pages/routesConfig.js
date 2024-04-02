@@ -287,6 +287,14 @@ const routesConfig = [
         url: '/sample/EmailEditor',
       },
       {
+        id: 'annoucement-editor',
+        title: 'Annoucement Editor',
+        messageId: 'Annoucement Editor',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/HtmlEditors',
+      },
+      {
         id: 'import-csv',
         title: 'Import CSV',
         messageId: 'Import CSV',

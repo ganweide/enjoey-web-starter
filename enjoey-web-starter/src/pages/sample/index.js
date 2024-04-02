@@ -30,6 +30,7 @@ const Page26 = React.lazy(() => import('./DocumentView'));
 const Page27 = React.lazy(() => import('./PaymentSetup'));
 const Page28 = React.lazy(() => import('./EventCalendar'));
 const Page29 = React.lazy(() => import('./ButtonTest'));
+const Page30 = React.lazy(() => import('./HtmlEditors'));
 
 export const samplePagesConfigs = [
   {
@@ -146,7 +147,11 @@ export const samplePagesConfigs = [
     element: <Page28 />,
   },
   {
-    path: '/sample/BUttonTest',
+    path: '/sample/ButtonTest',
     element: <Page29 />,
+  },
+  {
+    path: '/sample/HtmlEditors',
+    element: <Page30 />,
   },
 ];
