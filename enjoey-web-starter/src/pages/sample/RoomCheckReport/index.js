@@ -1,5 +1,5 @@
 // React Imports
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 // Material UI Imports
 import {
@@ -21,7 +21,7 @@ import {
   GridToolbarDensitySelector,
 } from '@mui/x-data-grid';
 
-import { jsPDF } from "jspdf";
+import { downloadPdf } from "./downloadpdf";
 
 // Global Constants
 const calculateRatio = (student, staff) => {
@@ -71,26 +71,50 @@ const rows = [
 const Page2 = () => {
   const currentDateTime = getCurrentDateTime();
 
-  const exportAsHtml = () => {
+  const exportAsHtml = (dateTime) => {
     // Create HTML content
     let htmlContent = `
-      <style>
-        table {
-          border-collapse: collapse;
-          width: 100%;
-        }
-        th, td {
-          border: 1px solid black;
-          padding: 8px;
-          text-align: left;
-        }
-        th {
-          background-color: #f2f2f2;
-        }
-      </style>
-      <table>
-        <thead>
-          <tr>
+      <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Room Check Report</title>
+          <style>
+            .table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            .table th,
+            .table td {
+              border: 1px solid black;
+              padding: 8px;
+              text-align: left;
+            }
+            .table th {
+              background-color: #f2f2f2;
+            }
+            .button-container {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+            }
+            .footer-container {
+              position: fixed;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              background-color: #f2f2f2;
+              padding: 10px;
+              text-align: right;
+              display: block;
+            }
+          </style>
+          <div id="table-container">
+            <h2>Room Check Report</h2>
+            <table class="table">
+              <thead>
+                <tr>
     `;
 
     // Add column headers
@@ -116,26 +140,23 @@ const Page2 = () => {
       htmlContent += "</tr>";
     });
 
-    htmlContent += "</tbody></table>";
+    htmlContent += "</tbody></table></div>";
 
     const newWindow = window.open();
     newWindow.document.write(htmlContent);
 
     newWindow.document.write(`
-      <div style="position: absolute; top: 10px; right: 10px;">
+      <div class="button-container">
         <button onclick="convertToPdf()">Convert to PDF</button>
+      </div>
+      <div class="footer-container">
+        Generated on: ${dateTime.replace(/\/|:|\s/g, '')}
       </div>
     `);
 
-    // Define function to convert HTML to PDF
     newWindow.convertToPdf = () => {
-      const pdf = new jsPDF();
-      pdf.html(htmlContent, {
-        callback: function (pdf) {
-          pdf.save('room_check_report.pdf');
-        }
-      });
-    };
+      downloadPdf(newWindow, false, false, "table-container", `room_check_report_${dateTime.replace(/\/|:|\s/g, '')}.pdf`);
+    }
   };
 
   const CustomToolbar = () => (
@@ -149,13 +170,13 @@ const Page2 = () => {
             fileName: `room_check_report_${currentDateTime.replace(/\/|:|\s/g, '')}.csv`,
           }}
         />
-        <MenuItem onClick={exportAsHtml}>Export as HTML</MenuItem>
+        <MenuItem onClick={()=>exportAsHtml(currentDateTime)}>Export as HTML</MenuItem>
       </GridToolbarExportContainer>
     </GridToolbarContainer>
   );
 
   return (
-    <div>
+    <div id="container">
       <Box sx={{ p: 2 }}>
         <Typography variant="h1" component="div" gutterBottom>
           Room Check Report
