@@ -21,6 +21,8 @@ import {
   GridToolbarDensitySelector,
 } from '@mui/x-data-grid';
 
+import "./style.css";
+
 import { downloadPdf } from "./downloadpdf";
 
 // Global Constants
@@ -58,14 +60,14 @@ const columns = [
 ];
 
 const rows = [
-  { id: 1, room: 'All Rooms', studentsIn: 13, staffsIn: 6 },
-  { id: 2, room: 'Hibiscus Room', studentsIn: 6, staffsIn: 3 },
-  { id: 3, room: 'Banana Room', studentsIn: 4, staffsIn: 2 },
-  { id: 4, room: 'Kitty Room', studentsIn: 5, staffsIn: 3 },
-  { id: 5, room: 'Dog Room', studentsIn: 9, staffsIn: 3 },
-  { id: 7, room: 'Elephant Room', studentsIn: 12, staffsIn: 4 },
-  { id: 8, room: 'Rose Room', studentsIn: 8, staffsIn: 1 },
-  { id: 9, room: 'Lily Room', studentsIn: 7, staffsIn: 2 },
+  { id: 1, room: 'All Rooms', studentsIn: 13, staffsIn: 6, baseStaffs: '1', baseStudents: '4' },
+  { id: 2, room: 'Hibiscus Room', studentsIn: 6, staffsIn: 3, baseStaffs: '1', baseStudents: '4' },
+  { id: 3, room: 'Banana Room', studentsIn: 4, staffsIn: 2, baseStaffs: '1', baseStudents: '4' },
+  { id: 4, room: 'Kitty Room', studentsIn: 5, staffsIn: 3, baseStaffs: '1', baseStudents: '4' },
+  { id: 5, room: 'Dog Room', studentsIn: 9, staffsIn: 3, baseStaffs: '1', baseStudents: '4' },
+  { id: 7, room: 'Elephant Room', studentsIn: 12, staffsIn: 4, baseStaffs: '1', baseStudents: '4' },
+  { id: 8, room: 'Rose Room', studentsIn: 8, staffsIn: 1, baseStaffs: '1', baseStudents: '4' },
+  { id: 9, room: 'Lily Room', studentsIn: 7, staffsIn: 2, baseStaffs: '1', baseStudents: '4' },
 ];
 
 const Page2 = () => {
@@ -140,7 +142,7 @@ const Page2 = () => {
       htmlContent += "</tr>";
     });
 
-    htmlContent += "</tbody></table></div>";
+    htmlContent += `</tbody></table><div class="footer-container">Generated on: ${dateTime.replace(/\/|:|\s/g, '')}</div></div>`;
 
     const newWindow = window.open();
     newWindow.document.write(htmlContent);
@@ -148,9 +150,6 @@ const Page2 = () => {
     newWindow.document.write(`
       <div class="button-container">
         <button onclick="convertToPdf()">Convert to PDF</button>
-      </div>
-      <div class="footer-container">
-        Generated on: ${dateTime.replace(/\/|:|\s/g, '')}
       </div>
     `);
 
@@ -203,6 +202,14 @@ const Page2 = () => {
           }}
           slots={{toolbar: CustomToolbar}}
           pageSizeOptions={[5]}
+          rowSelection={false}
+          getRowClassName={(params) => {
+            const gcd = calculateRatio(params.row.studentsIn, params.row.staffsIn);
+            const studentsInGcd = params.row.studentsIn/gcd;
+            const staffsInGcd = params.row.staffsIn/gcd;
+      
+            return studentsInGcd > params.row.baseStudents || staffsInGcd > params.row.baseStaffs ? 'highlighted-row' : '';
+          }}
         />
       </Card>
     </div>
