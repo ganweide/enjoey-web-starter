@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView, AttendanceView
 from . import views
 from rest_framework import routers
 
@@ -54,6 +54,9 @@ route16.register("", DocumentsView, basename='documentsview')
 route17 = routers.DefaultRouter()
 route17.register("", TenantPaymentKeySettingsView, basename='tenantpaymentkeysettingsview')
 
+route18 = routers.DefaultRouter()
+route18.register("", AttendanceView, basename='attendanceview')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -87,5 +90,6 @@ urlpatterns = [
     path('documents/', include(route16.urls)),
     path('tenant-payment-key-settings/', include(route17.urls)),
     path('handle-image-upload/', HandleImageUploadView.as_view(), name='handle_image_upload'),
+    path('attendance/', include(route18.urls)),
 ]
 

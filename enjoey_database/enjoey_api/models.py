@@ -9,6 +9,13 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
+class AttendanceTable(models.Model):
+    name = models.CharField(max_length=250)
+    date = models.CharField(max_length=250)
+    status = models.CharField(max_length=250)
+    createdAt = models.DateTimeField(auto_now_add=True, editable=False)
+    updatedAt = models.DateTimeField(auto_now=True)
+
 class TenantPaymentKeySettings(models.Model):
     tenantId = models.CharField(max_length=250)
     branchId = models.BigIntegerField(null=True)

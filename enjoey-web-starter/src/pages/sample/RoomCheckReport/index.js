@@ -83,6 +83,19 @@ const Page2 = () => {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Room Check Report</title>
           <style>
+            body {
+              margin: 0;
+              padding: 0;
+            }
+            .container {
+              padding: 1cm;
+            }
+            #table-container {
+              width: 21cm;
+              margin: auto;
+              box-sizing: border-box;
+              border: 1px solid #ccc;
+            }
             .table {
               width: 100%;
               border-collapse: collapse;
@@ -102,7 +115,7 @@ const Page2 = () => {
               right: 10px;
             }
             .footer-container {
-              position: fixed;
+              position: relative;
               bottom: 0;
               left: 0;
               right: 0;
@@ -113,10 +126,11 @@ const Page2 = () => {
             }
           </style>
           <div id="table-container">
-            <h2>Room Check Report</h2>
-            <table class="table">
-              <thead>
-                <tr>
+            <div class="container">
+              <h2>Room Check Report</h2>
+              <table class="table">
+                <thead>
+                  <tr>
     `;
 
     // Add column headers
@@ -142,7 +156,7 @@ const Page2 = () => {
       htmlContent += "</tr>";
     });
 
-    htmlContent += `</tbody></table><div class="footer-container">Generated on: ${dateTime.replace(/\/|:|\s/g, '')}</div></div>`;
+    htmlContent += `</tbody></table></div><div class="footer-container">Generated on: ${dateTime.replace(/\/|:|\s/g, '')}</div></div>`;
 
     const newWindow = window.open();
     newWindow.document.write(htmlContent);
@@ -202,7 +216,7 @@ const Page2 = () => {
           }}
           slots={{toolbar: CustomToolbar}}
           pageSizeOptions={[5]}
-          rowSelection={false}
+          disableRowSelectionOnClick
           getRowClassName={(params) => {
             const gcd = calculateRatio(params.row.studentsIn, params.row.staffsIn);
             const studentsInGcd = params.row.studentsIn/gcd;
