@@ -1,5 +1,15 @@
 from rest_framework import serializers
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable, TenantPlan, TenantPlanFeatures
+
+class TenantPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenantPlan
+        fields = '__all__'
+
+class TenantPlanFeaturesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TenantPlanFeatures
+        fields = '__all__'
 
 class AttendanceTableSerializer(serializers.ModelSerializer):
     class Meta:

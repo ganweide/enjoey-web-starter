@@ -11,10 +11,14 @@ import {
   DialogActions,
   Grid,
   Typography,
+  Divider,
+  TextField,
   Checkbox,
   CardContent,
 } from "@mui/material";
 
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PhonelinkRingIcon from '@mui/icons-material/PhonelinkRing';
@@ -100,11 +104,19 @@ const SelectedItemCard = ({ title, items, color }) => {
 
 const Page2 = () => {
   const [openPaymentMethodSettingsDialog, setOpenPaymentMethodSettingsDialog] = useState(false);
+  const [openAddNewPlanDialog, setOpenAddNewPlanDialog]                       = useState(false);
   const [selectedItems, setSelectedItems] = useState({
     card: false,
     cash: false,
     ewallet: false,
   });
+  const [duration, setDuration] = useState("");
+  const [name, setName]         = useState("");
+  const [price, setPrice]       = useState("");
+  const [tag, setTag]           = useState("");
+  const [tagColor, setTagColor] = useState("");
+  const [type, setType]         = useState("");
+  const [features, setFeatures] = useState([]);
 
   const handleCardSelect = () => {
     setSelectedItems((prev) => ({ ...prev, card: !prev.card }));
@@ -126,6 +138,25 @@ const Page2 = () => {
     setOpenPaymentMethodSettingsDialog(false);
   }
 
+  const handleOpenAddNewPlanDialog = () => {
+    setOpenAddNewPlanDialog(true);
+  }
+
+  const handleCloseAddNewPlanDialog = () => {
+    setOpenAddNewPlanDialog(false);
+  }
+
+  const handleAddFeature = () => {
+    setFeatures([...features, '']);
+  };
+
+  const handleDeleteFeature = (index) => {
+    if (features.length === 1) {
+      return;
+    }
+    const updatedFeatures = features.filter((_, i) => i !== index);
+    setFeatures(updatedFeatures);
+  };
 
   return (
     <div>
@@ -141,6 +172,18 @@ const Page2 = () => {
           </Grid>
           <Grid item xs={12} md={12}>
             <Button variant="outlined">Share</Button>
+          </Grid>
+        </Grid>
+      </Card>
+      <Card sx={{ mt: 2, p: 5 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={12}>
+            <Typography variant="h1">Create Plans</Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Button variant="outlined" onClick={handleOpenAddNewPlanDialog}>
+              Add New Plan
+            </Button>
           </Grid>
         </Grid>
       </Card>
@@ -219,6 +262,140 @@ const Page2 = () => {
         </DialogContent>
         <DialogActions>
           <Button variant="outlined" onClick={handleClosePaymentMethodSettingsDialog}>Save</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Add New Plan Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="sm"
+        open              ={openAddNewPlanDialog}
+        onClose           ={handleCloseAddNewPlanDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2">Subscription Plan</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                onChange        ={(e) => setName(e.target.value)}
+                margin          ="dense"
+                label           ="Plan's Name"
+                type            ="text"
+                variant         ="outlined"
+                value           ={name}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                onChange        ={(e) => setDuration(e.target.value)}
+                margin          ="dense"
+                label           ="Subscription's Duration (Months)"
+                type            ="number"
+                variant         ="outlined"
+                value           ={duration}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                onChange        ={(e) => setPrice(e.target.value)}
+                margin          ="dense"
+                label           ="Price"
+                type            ="number"
+                variant         ="outlined"
+                value           ={price}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                fullWidth
+                onChange        ={(e) => setTag(e.target.value)}
+                margin          ="dense"
+                label           ="Tag"
+                type            ="text"
+                variant         ="outlined"
+                value           ={tag}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                fullWidth
+                onChange        ={(e) => setTagColor(e.target.value)}
+                margin          ="dense"
+                label           ="Tag Color"
+                type            ="text"
+                variant         ="outlined"
+                value           ={tagColor}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Typography variant="h3" gutterBottom>Plan&apos;s Details</Typography>
+              <Divider />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <TextField
+                fullWidth
+                onChange        ={(e) => setType(e.target.value)}
+                margin          ="dense"
+                label           ="Plan Type"
+                type            ="text"
+                variant         ="outlined"
+                value           ={type}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <Typography variant="h4" gutterBottom>Features</Typography>
+            </Grid>
+            {features.map((feature, index) => (
+              <Grid container item xs={12} md={12} key={index}>
+                <Grid item xs={features.length === 1 ? 12 : 10} md={features.length === 1 ? 12 : 10}>
+                  <TextField
+                    fullWidth
+                    onChange={(e) => {
+                      const updatedFeatures = [...features];
+                      updatedFeatures[index] = e.target.value;
+                      setFeatures(updatedFeatures);
+                    }}
+                    margin="dense"
+                    label={`Feature ${index + 1}`}
+                    type="text"
+                    variant="outlined"
+                    value={feature}
+                  />
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  {features.length > 1 && ( // Display delete button if there's more than one feature
+                    <Button
+                      aria-label='delete'
+                      onClick={() => handleDeleteFeature(index)}
+                      style={{ width: "100%", height: "100%" }}
+                      color="error"
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  )}
+                </Grid>
+              </Grid>
+            ))}
+            <Grid item xs={12} md={12}>
+              <Button
+                aria-label='add'
+                onClick={handleAddFeature}
+                style={{ width: "100%", height: "100%" }}
+              >
+                <AddCircleIcon />
+              </Button>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleCloseAddNewPlanDialog}>Save</Button>
+          <Button variant="outlined" color="error" onClick={handleCloseAddNewPlanDialog}>Cancel</Button>
         </DialogActions>
       </Dialog>
     </div>

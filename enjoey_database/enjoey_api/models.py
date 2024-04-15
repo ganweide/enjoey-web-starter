@@ -9,6 +9,23 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
+class TenantPlan(models.Model):
+    termsInMonth = models.IntegerField()
+    title = models.CharField(max_length=100)
+    tag = models.CharField(max_length=40)
+    tagColor = models.CharField(max_length=100)
+    price = models.CharField(max_length=100)
+    createdAt = models.DateTimeField(auto_now_add=True, editable=False)
+    updatedAt = models.DateTimeField(auto_now=True)
+
+
+class TenantPlanFeatures(models.Model):
+    type = models.CharField(max_length=20)
+    title = models.CharField(max_length=200)
+    plan = models.ForeignKey(TenantPlan, on_delete=models.SET_NULL, related_name='features', null=True)
+    createdAt = models.DateTimeField(auto_now_add=True, editable=False)
+    updatedAt = models.DateTimeField(auto_now=True)
+
 class AttendanceTable(models.Model):
     name = models.CharField(max_length=250)
     date = models.CharField(max_length=250)
