@@ -86,6 +86,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/EventCalendar',
       },
+      {
+        id: 'tenant-plan',
+        title: 'Tenant Plan',
+        messageId: 'Tenant Plan',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/TenantPlan',
+      },
     ]
   },
   {

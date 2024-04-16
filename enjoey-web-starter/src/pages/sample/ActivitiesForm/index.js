@@ -114,7 +114,7 @@ const Page2 = () => {
     activityData.append("mealType", mealType);
     activityData.append("mealItem", mealItems);
     activityData.append("note", note);
-  
+
     try {
       const response = await Axios({
         method  : "POST",

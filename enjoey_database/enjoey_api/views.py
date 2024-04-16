@@ -2,7 +2,7 @@
 from rest_framework import viewsets, status
 from rest_framework.generics import CreateAPIView
 from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable, TenantPlan, TenantPlanFeatures
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer, AttendanceTableSerializer
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer, AttendanceTableSerializer, TenantPlanSerializer, TenantPlanFeaturesSerializer
 from rest_framework.response import Response
 from django.views import View
 from django.conf import settings
@@ -34,22 +34,43 @@ import csv
 import datetime
 from datetime import datetime
 
-class AttendanceView(viewsets.ModelViewSet):
-    queryset = AttendanceTable.objects.all().order_by('-createdAt')
-    serializer_class = AttendanceTableSerializer
+class TenantPlanView(viewsets.ModelViewSet):
+    queryset = TenantPlan.objects.all().order_by('-createdAt')
+    serializer_class = TenantPlanSerializer
     #all
     def list(self, request):
-        queryset = AttendanceTable.objects.all().order_by('id')
+        queryset = TenantPlan.objects.all().order_by('id')
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = AttendanceTableSerializer(page, many=True)
+            serializer = TenantPlanSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = AttendanceTableSerializer(queryset, many=True)
+        serializer = TenantPlanSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def create(self, request):
-        serializer = AttendanceTableSerializer(data=request.data)
+        serializer = TenantPlanSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class TenantPlanFeaturesView(viewsets.ModelViewSet):
+    queryset = TenantPlanFeatures.objects.all().order_by('-createdAt')
+    serializer_class = TenantPlanFeaturesSerializer
+    #all
+    def list(self, request):
+        queryset = TenantPlanFeatures.objects.all().order_by('id')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = TenantPlanFeaturesSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = TenantPlanFeaturesSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = TenantPlanFeaturesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

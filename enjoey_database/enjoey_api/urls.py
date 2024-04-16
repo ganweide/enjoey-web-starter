@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView, AttendanceView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView, AttendanceView, TenantPlanView, TenantPlanFeaturesView
 from . import views
 from rest_framework import routers
 
@@ -57,6 +57,12 @@ route17.register("", TenantPaymentKeySettingsView, basename='tenantpaymentkeyset
 route18 = routers.DefaultRouter()
 route18.register("", AttendanceView, basename='attendanceview')
 
+route19 = routers.DefaultRouter()
+route19.register("", TenantPlanView, basename='tenantplanview')
+
+route20 = routers.DefaultRouter()
+route20.register("", TenantPlanFeaturesView, basename='tenantplanfeaturesview')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -91,5 +97,7 @@ urlpatterns = [
     path('tenant-payment-key-settings/', include(route17.urls)),
     path('handle-image-upload/', HandleImageUploadView.as_view(), name='handle_image_upload'),
     path('attendance/', include(route18.urls)),
+    path('tenant-plan/', include(route19.urls)),
+    path('plan-features/', include(route20.urls)),
 ]
 
