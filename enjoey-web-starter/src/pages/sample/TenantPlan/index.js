@@ -1,6 +1,8 @@
 // React Imports
 import React, { useState, useEffect } from "react";
 
+import { SketchPicker } from 'react-color';
+
 import Axios from "axios";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -16,6 +18,15 @@ import {
   Typography,
   Divider,
   TextField,
+  Table,
+  TableCell,
+  TableBody,
+  TableRow,
+  TableHead,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -29,17 +40,47 @@ const planFeaturesUrl = "http://localhost:8000/api/plan-features/";
 
 const Page2 = () => {
   const classes   = useStyles();
-  const [openAddNewPlanDialog, setOpenAddNewPlanDialog]                       = useState(false);
+  const tableHead = [" ", "Plan", "Price", "Features"];
+  const [openAddNewPlanDialog, setOpenAddNewPlanDialog] = useState(false);
+  const [tenantPlans, setTenantPlans]   = useState([]);
+  const [planFeatures, setPlanFeatures] = useState([]);
   const [duration, setDuration] = useState("");
   const [name, setName]         = useState("");
   const [price, setPrice]       = useState("");
   const [tag, setTag]           = useState("");
   const [tagColor, setTagColor] = useState("");
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const [type, setType]         = useState("");
   const [features, setFeatures] = useState([]);
 
+  useEffect(() => {
+    Axios.get(tenantPlanUrl)
+      .then(response => {
+        setTenantPlans(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching tenant plans:', error);
+      });
+
+    // Fetch plan features
+    Axios.get(planFeaturesUrl)
+      .then(response => {
+        setPlanFeatures(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching plan features:', error);
+      });
+  }, []);
+
   const handleOpenAddNewPlanDialog = () => {
     setOpenAddNewPlanDialog(true);
+    setDuration("");
+    setName("");
+    setPrice("");
+    setTag("");
+    setTagColor("");
+    setType("");
+    setFeatures([]);
   }
 
   const handleCloseAddNewPlanDialog = () => {
@@ -108,12 +149,52 @@ const Page2 = () => {
       <Card sx={{ mt: 2, p: 5 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={12}>
-            <Typography variant="h1">Create Plans</Typography>
+            <Box 
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
+              <Typography variant="h1">Create Plans</Typography>
+              <Button variant="outlined" onClick={handleOpenAddNewPlanDialog}>Add New Plan</Button>
+            </Box>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Button variant="outlined" onClick={handleOpenAddNewPlanDialog}>
-              Add New Plan
-            </Button>
+            <Table>
+              <TableHead>
+                <TableRow className={classes.tableHeadRow}>
+                  {tableHead.map((prop) => (
+                    <TableCell
+                      className ={classes.tableCell + classes.tableHeadCell}
+                      key       ={prop}
+                      style     ={{
+                        textAlign: "center",
+                      }}
+                    >
+                      {prop}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {tenantPlans.map((plan, index) => (
+                  <TableRow key={plan.id}>
+                    <TableCell style={{textAlign: "center", width: "5%"}}>{index + 1}</TableCell>
+                    <TableCell style={{textAlign: "center"}}>{plan.title}</TableCell>
+                    <TableCell style={{textAlign: "center"}}>{plan.price}</TableCell>
+                    <TableCell style={{textAlign: "center"}}>
+                      {planFeatures
+                        .filter(feature => feature.plan === plan.id)
+                        .map(filteredFeature => (
+                          <div key={filteredFeature.id}>{filteredFeature.title}</div>
+                      ))}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Grid>
         </Grid>
       </Card>
@@ -165,41 +246,64 @@ const Page2 = () => {
               />
             </Grid>
             <Grid item xs={6} md={6}>
-              <TextField
-                fullWidth
-                onChange        ={(e) => setTag(e.target.value)}
-                margin          ="dense"
-                label           ="Tag"
-                type            ="text"
-                variant         ="outlined"
-                value           ={tag}
-              />
+              <FormControl fullWidth margin ="dense">
+                <InputLabel id="tag-select-label">Tag</InputLabel>
+                <Select
+                  labelId ="tag-select-label"
+                  id      ="tag-select"
+                  value   ={tag}
+                  label   ="Tag"
+                  onChange={(event) => setTag(event.target.value)}
+                >
+                  <MenuItem value="Basic">Basic</MenuItem>
+                  <MenuItem value="Plus">Plus</MenuItem>
+                  <MenuItem value="Premium">Premium</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={6} md={6}>
               <TextField
                 fullWidth
-                onChange        ={(e) => setTagColor(e.target.value)}
-                margin          ="dense"
-                label           ="Tag Color"
-                type            ="text"
-                variant         ="outlined"
-                value           ={tagColor}
+                margin="dense"
+                label="Tag Color"
+                variant="outlined"
+                value={tagColor}
+                onClick={() => setShowColorPicker(true)} // Show color picker when clicked
+                InputProps={{
+                  readOnly: true, // Make the input read-only
+                }}
               />
+              {showColorPicker && (
+                <div style={{ position: 'absolute', zIndex: 999 }}>
+                  <SketchPicker
+                    color={tagColor}
+                    onChangeComplete={(color) => {
+                      setTagColor(color.hex);
+                      setShowColorPicker(false); // Hide color picker after selection
+                    }}
+                  />
+                </div>
+              )}
             </Grid>
             <Grid item xs={12} md={12}>
               <Typography variant="h3" gutterBottom>Plan&apos;s Details</Typography>
               <Divider />
             </Grid>
             <Grid item xs={12} md={12}>
-              <TextField
-                fullWidth
-                onChange        ={(e) => setType(e.target.value)}
-                margin          ="dense"
-                label           ="Plan Type"
-                type            ="text"
-                variant         ="outlined"
-                value           ={type}
-              />
+              <FormControl fullWidth margin ="dense">
+                <InputLabel id="type-select-label">Type</InputLabel>
+                <Select
+                  labelId ="type-select-label"
+                  id      ="type-select"
+                  value   ={type}
+                  label   ="Type"
+                  onChange={(event) => setType(event.target.value)}
+                >
+                  <MenuItem value="Plan A">Plan A</MenuItem>
+                  <MenuItem value="Plan B">Plan B</MenuItem>
+                  <MenuItem value="Plan C">Plan C</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} md={12}>
               <Typography variant="h4" gutterBottom>Features</Typography>
