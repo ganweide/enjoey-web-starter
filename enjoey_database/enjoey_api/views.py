@@ -1,8 +1,10 @@
 # from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.generics import CreateAPIView
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable, TenantPlan, TenantPlanFeatures
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer, AttendanceTableSerializer, TenantPlanSerializer, TenantPlanFeaturesSerializer
+
+from .jobs import send_email_template
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable, TenantPlan, TenantPlanFeatures, PublishSurveyTable, UserAnswerTable
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer, AttendanceTableSerializer, TenantPlanSerializer, TenantPlanFeaturesSerializer, PublishSurveySerializer, UserAnswerSerializer
 from rest_framework.response import Response
 from django.views import View
 from django.conf import settings
@@ -33,6 +35,16 @@ from bs4 import BeautifulSoup, Comment
 import csv
 import datetime
 from datetime import datetime
+
+from django.middleware.csrf import get_token
+
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrfToken': csrf_token})
+
+class EmailTemplate(viewsets.ModelViewSet):
+    def create(self, request):
+        return send_email_template(request)
 
 class TenantPlanView(viewsets.ModelViewSet):
     queryset = TenantPlan.objects.all().order_by('-createdAt')
@@ -254,35 +266,92 @@ class CSVImportView(APIView):
                 else:
                     raise Exception(serializer.errors)
                 
-            def is_duplicate_data(self, row):
-                # Check for duplication based on specified criteria
-                existing_data = CoreServiceChildren.objects.filter(
-                    branchId=row.get('branchId'),
-                    fullName=row.get('fullName'),
-                    birthIC=row['birthIC']
-                )
+            # def is_duplicate_data(self, row):
+            #     # Check for duplication based on specified criteria
+            #     existing_data = CoreServiceChildren.objects.filter(
+            #         branchId=row.get('branchId'),
+            #         fullName=row.get('fullName'),
+            #         birthIC=row['birthIC']
+            #     )
 
-                return existing_data.exists()
+            #     # Additionally, check for duplicate based on family relationship
+            #     existing_family_data = CoreServiceFamily.objects.filter(
+            #         relationshipFamily=row.get('relationshipFamily'),
+            #         birthICFamily=row.get('birthICFamily')
+            #     )
+
+            #     return existing_data.exists() or existing_family_data.exists()
 
             def populate_other_tables(row):
-                if not is_duplicate_data(self, row):
-                    children_serializer = CoreServiceChildrenSerializer(data=row)
-                    medical_contact_serializer = CoreServiceChildrenMedicalContactSerializer(data=row)
-                    family_serializer = CoreServiceFamilySerializer(data=row)
-                    allergies_serializer = CoreServiceChildrenAllergiesSerializer(data=row)
+                existing_child = CoreServiceChildren.objects.filter(
+                    branchId=row.get('branchId'),
+                    fullName=row.get('fullName'),
+                    birthIC=row.get('birthIC')
+                ).first()
 
-                    if all([serializer.is_valid() for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]]):
-                        children_serializer.save()
-                        medical_contact_serializer.save()
-                        family_serializer.save()
-                        allergies_serializer.save()
+                if existing_child:
+                    # Check if the child's existing family entry has the same relationship
+                    existing_family = CoreServiceFamily.objects.filter(
+                        birthICFamily=row.get('birthICFamily'),
+                        relationshipFamily=row.get('relationshipFamily')
+                    ).first()
+
+                    if existing_family:
+                        # If the family with the same relationship exists, ignore
+                        nonlocal total_ignored
+                        total_ignored += 1
+                        return False
                     else:
-                        raise Exception([serializer.errors for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]])
-                    
+                        # Save new family entry
+                        family_serializer = CoreServiceFamilySerializer(data=row)
+                        if family_serializer.is_valid():
+                            family_instance = family_serializer.save()
+                        else:
+                            raise Exception(family_serializer.errors)
                 else:
-                    nonlocal total_ignored
-                    total_ignored += 1
-                    return False
+                    # Save new child entry
+                    children_serializer = CoreServiceChildrenSerializer(data=row)
+                    if children_serializer.is_valid():
+                        child_instance = children_serializer.save()
+                    else:
+                        raise Exception(children_serializer.errors)
+
+                    # Save new family entry
+                    family_serializer = CoreServiceFamilySerializer(data=row)
+                    if family_serializer.is_valid():
+                        family_instance = family_serializer.save()
+                    else:
+                        raise Exception(family_serializer.errors)
+
+                # Save medical contact and allergies
+                medical_contact_serializer = CoreServiceChildrenMedicalContactSerializer(data=row)
+                allergies_serializer = CoreServiceChildrenAllergiesSerializer(data=row)
+
+                if all([serializer.is_valid() for serializer in [medical_contact_serializer, allergies_serializer]]):
+                    medical_contact_serializer.save()
+                    allergies_serializer.save()
+                else:
+                    raise Exception([serializer.errors for serializer in [medical_contact_serializer, allergies_serializer]])
+
+                return True
+                # if not is_duplicate_data(self, row):
+                #     children_serializer = CoreServiceChildrenSerializer(data=row)
+                #     medical_contact_serializer = CoreServiceChildrenMedicalContactSerializer(data=row)
+                #     family_serializer = CoreServiceFamilySerializer(data=row)
+                #     allergies_serializer = CoreServiceChildrenAllergiesSerializer(data=row)
+
+                #     if all([serializer.is_valid() for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]]):
+                #         children_serializer.save()
+                #         medical_contact_serializer.save()
+                #         family_serializer.save()
+                #         allergies_serializer.save()
+                #     else:
+                #         raise Exception([serializer.errors for serializer in [children_serializer, medical_contact_serializer, family_serializer, allergies_serializer]])
+                    
+                # else:
+                #     nonlocal total_ignored
+                #     total_ignored += 1
+                #     return False
 
             temp_table_instances = [insert_temp_table(row) for row in csv_data]
 
@@ -311,7 +380,7 @@ class HtmlImageUploadView(APIView):
                         image_content = response.content
 
                         storage = S3Boto3Storage()
-                        image_name = f"{name}.jpg"  # Modify as needed
+                        image_name = f"{name}_{index}.jpg"  # Modify as needed
                         image_path = f"{settings.IMG_LOCATION}/{image_name}"
                         storage.save(image_path, ContentFile(image_content))
 
@@ -997,4 +1066,48 @@ class SurveySettingsView(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class PublishSurveyView(viewsets.ModelViewSet):
+    queryset = PublishSurveyTable.objects.all().order_by('-createdAt')
+    serializer_class = PublishSurveySerializer
+    #all
+    def list(self, request):
+        queryset = PublishSurveyTable.objects.all().order_by('id')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = PublishSurveySerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = PublishSurveySerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = PublishSurveySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class UserAnswerView(viewsets.ModelViewSet):
+    queryset = UserAnswerTable.objects.all().order_by('-createdAt')
+    serializer_class = UserAnswerSerializer
+    #all
+    def list(self, request):
+        queryset = UserAnswerTable.objects.all().order_by('id')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = UserAnswerSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = UserAnswerSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = UserAnswerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 

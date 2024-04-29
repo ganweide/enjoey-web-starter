@@ -33,6 +33,13 @@ PDF_STORAGE = 'enjoey_api.storagebackend.PDFStorage'
 PDF_LOCATION = 'pdf'
 IMG_LOCATION = 'images'
 DOC_LOCATION = 'documents'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.visualogic.com.my'
+EMAIL_USE_TLS = False
+EMAIL_PORT = 28
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'enjoey@visualogic.com.my'
+EMAIL_HOST_PASSWORD = '123456'
 
 PAYMENT_GATEWAY_MODE = (
     ("Test", "Test"),
@@ -100,7 +107,9 @@ TEMPLATES = [
     },
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 

@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView, AttendanceView, TenantPlanView, TenantPlanFeaturesView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView, AttendanceView, TenantPlanView, TenantPlanFeaturesView, get_csrf_token, EmailTemplate, PublishSurveyView, UserAnswerView
 from . import views
 from rest_framework import routers
 
@@ -63,6 +63,15 @@ route19.register("", TenantPlanView, basename='tenantplanview')
 route20 = routers.DefaultRouter()
 route20.register("", TenantPlanFeaturesView, basename='tenantplanfeaturesview')
 
+route21 = routers.DefaultRouter()
+route21.register("", EmailTemplate, basename='emailtemplate')
+
+route22 = routers.DefaultRouter()
+route22.register("", PublishSurveyView, basename='publishsurvey')
+
+route23 = routers.DefaultRouter()
+route23.register("", UserAnswerView, basename='useranswer')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -99,5 +108,9 @@ urlpatterns = [
     path('attendance/', include(route18.urls)),
     path('tenant-plan/', include(route19.urls)),
     path('plan-features/', include(route20.urls)),
+    path('send-email-template/', include(route21.urls)),
+    path('get-csrf-token/', get_csrf_token),
+    path('publish-survey/', include(route22.urls)),
+    path('user-answer/', include(route23.urls)),
 ]
 

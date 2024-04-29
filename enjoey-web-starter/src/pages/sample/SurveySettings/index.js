@@ -8,6 +8,7 @@ import Axios from "axios";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // Material UI Imports
+import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
   Dialog,
@@ -27,12 +28,16 @@ import {
   Typography,
   Card,
   IconButton,
-  FormLabel,
   RadioGroup,
   Radio,
   ToggleButton,
   ToggleButtonGroup,
-  ListSubheader,
+  Table,
+  TableHead,
+  TableCell,
+  TableBody,
+  TableRow,
+  Menu,
 } from "@mui/material";
 
 // Material UI Icons
@@ -42,10 +47,18 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 // Global Constants
-const childUrl  = "http://127.0.0.1:8000/api/child/";
-const surveyUrl = "http://127.0.0.1:8000/api/surveysettings/";
+const childUrl    = "http://127.0.0.1:8000/api/child/";
+const surveyUrl   = "http://127.0.0.1:8000/api/surveysettings/";
+const publishUrl  = "http://127.0.0.1:8000/api/publish-survey/";
+const answerUrl   = "http://127.0.0.1:8000/api/user-answer/";
+
+import Styles from "./style";
+
+const useStyles = makeStyles(Styles);
 
 const Page2 = () => {
+  const classes   = useStyles();
+  const tableHead = ["Id", "Name", "Survey", ""];
   const [child, setChild]                     = useState([]);
   const [previousSurvey, setPreviousSurvey]   = useState([]);
   const [open, setOpen]                       = useState(false);
@@ -90,6 +103,16 @@ const Page2 = () => {
   const [previewDate, setPreviewDate]                 = useState([]);
   const [previewTime, setPreviewTime]                 = useState([]);
   const [previewRating, setPreviewRating]             = useState([]);
+  const [publishSurveyData, setPublishSurveyData]     = useState([]);
+  const [publishStartDate, setPublishStartDate]       = useState([]);
+  const [publishEndDate, setPublishEndDate]           = useState([]);
+  const [publishSurvey, setPublishSurvey]             = useState([]);
+  const [userName, setUserName]                       = useState([]);
+  const [userSelectSurvey, setUserSelectSurvey]       = useState([]);
+  const [submitting, setSubmitting]                   = useState(false);
+  const [surveyAnswerData, setSurveyAnswerData]       = useState([]);
+  const [openAnswerDialog, setOpenAnswerDialog]       = useState(false);
+
   const shortAnswerUI = (question) => {
     return (
       <Grid item xs={12} md={12}>
@@ -490,12 +513,25 @@ const Page2 = () => {
     }
     try {
       Axios.get(surveyUrl).then((response) => {
-        console.log(response);
         const parsedSurveys = response.data.map((survey) => ({
           ...survey,
           questions: JSON.parse(survey.questions),
         }));
         setPreviousSurvey(parsedSurveys);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      Axios.get(publishUrl).then((response) => {
+        setPublishSurveyData(response.data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      Axios.get(answerUrl).then((response) => {
+        setSurveyAnswerData(response.data);
       });
     } catch (error) {
       console.log(error);
@@ -959,6 +995,7 @@ const Page2 = () => {
             },
           }
         );
+        console.log("updatedFormData", updatedFormData);
         console.log("response", response);
       } else {
         const response = await Axios.post(
@@ -973,6 +1010,7 @@ const Page2 = () => {
             },
           }
         );
+        console.log("updatedFormData", updatedFormData);
         console.log("response", response);
       }
     } catch (error) {
@@ -1144,11 +1182,158 @@ const Page2 = () => {
     setPreview(false);
   }
 
+  const handlePublishSurveyChange = (value) => {
+    console.log("value", value);
+    setPublishSurvey(value);
+  };
+
+  const handlePublish = async () => {
+    const currentDate = new Date();
+    const startDate = new Date(publishStartDate);
+    const endDate = new Date(publishEndDate);
+    let status = '';
+
+    if (currentDate < startDate) {
+      status = 'Coming Soon';
+    } else if (currentDate > endDate) {
+      status = 'Expired';
+    } else {
+      status = 'Ongoing';
+    }
+
+    try {
+      const response = await Axios.post(
+        publishUrl,
+        {
+          surveyId: publishSurvey, // Assuming surveyId and surveyTitle are the same
+          startDate: publishStartDate,
+          endDate: publishEndDate,
+          status: status,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log('Response:', response.data);
+      setPublishEndDate([]);
+      setPublishStartDate([]);
+      setPublishSurvey([]);
+      // Add any additional logic here
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleUserSelectSurveyChange = (value) => {
+    setUserSelectSurvey(value);
+    setPreview(true);
+    const selectedSurveyTitle = previousSurvey.find((survey) => survey.surveyId === value);
+
+    if (selectedSurveyTitle) {
+      setQuestions(selectedSurveyTitle.questions);
+      setSurveyTitle(selectedSurveyTitle.surveyTitle);
+      setDescription(selectedSurveyTitle.description);
+    } else {
+      setQuestions([]);
+      setSurveyTitle("");
+      setDescription("");
+    }
+  };
+
+  const handleSubmitSurvey = async () => {
+    try {
+      setSubmitting(true); // Set submitting state to true to provide feedback to the user
+      // Prepare data to be sent to the server
+      const submitData = {
+        name: userName, // Assuming userName is the name entered by the user
+        publishSurveyId: userSelectSurvey, // Assuming userSelectSurvey is the selected surveyId
+        answer: questions.map(question => ({
+          questionId: question.id,
+          answer: getAnswerForQuestion(question),
+        })), // Fill this with the actual answers
+      };
+      const answersJson = JSON.stringify(submitData.answer);
+
+      // Make the HTTP POST request to submit the survey answers
+      await Axios.post(
+        answerUrl,
+        {
+          ...submitData,
+          answer: answersJson,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json"
+          },
+        });
+  
+      // Optionally, perform any additional actions after successful submission
+      console.log('Survey submitted successfully!');
+    } catch (error) {
+      // Handle errors here
+      console.error('Error submitting survey:', error);
+    } finally {
+      setSubmitting(false); // Reset submitting state
+      setPreview(false); // Close the preview dialog
+      setUserName([]);
+      setUserSelectSurvey([]);
+    }
+  };
+
+  const getAnswerForQuestion = (question) => {
+    switch (question.type) {
+      case 'short answers':
+        return previewShortAnswers.find(answer => answer.text === question.text)?.answer || '';
+      case 'paragraph':
+        return previewParagraph.find(answer => answer.text === question.text)?.answer || '';
+      case 'radio button group':
+        return previewRadio.find(answer => answer.text === question.text)?.answer || '';
+      case 'checkboxes':
+        return previewCheckbox.find(answer => answer.text === question.text)?.answer || [];
+      case 'rating scale':
+        return previewRating.find(answer => answer.text === question.text)?.answer || '';
+      case 'date':
+        return previewDate.find(answer => answer.text === question.text)?.answer || '';
+      case 'time':
+        return previewTime.find(answer => answer.text === question.text)?.answer || '';
+      case 'dropdown':
+        return previewSingleSelect.find(answer => answer.text === question.text)?.answer || '';
+      case 'multi-select dropdown':
+        return previewMultiSelect.find(answer => answer.text === question.text)?.answer || [];
+      case 'yes/no boolean':
+        return previewBoolean.find(answer => answer.text === question.text)?.answer || '';
+      default:
+        return '';
+    }
+  };
+
+  const handleOpenAnswerDialog = () => {
+    setOpenAnswerDialog(true);
+    const selectedSurveyTitle = previousSurvey.find((survey) => survey.surveyId === value);
+
+    if (selectedSurveyTitle) {
+      setQuestions(selectedSurveyTitle.questions);
+      setSurveyTitle(selectedSurveyTitle.surveyTitle);
+      setDescription(selectedSurveyTitle.description);
+    } else {
+      setQuestions([]);
+      setSurveyTitle("");
+      setDescription("");
+    }
+  }
+
+  const handleCloseAnswerDialog = () => {
+    setOpenAnswerDialog(false);
+  }
+
   return (
-    <div>
-      <Box 
+    <Box>
+      {/* Survey Creation */}
+      <Card 
         sx={{
-          p: 2,
+          p: 5,
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
@@ -1163,8 +1348,151 @@ const Page2 = () => {
             + Compose
           </Typography>
         </Button>
-      </Box>
-      {/* Initialise Survey */}
+      </Card>
+      {/* Publish Survery */}
+      <Card 
+        sx={{
+          p: 5,
+          mt: 2,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Typography variant="h1" component="div" gutterBottom>
+          Publish a Survey
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setPublishStartDate(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="Start Date"
+                type            ="date"
+                fullWidth
+                variant         ="outlined"
+                value           ={publishStartDate}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <TextField
+                onChange        ={(e) => setPublishEndDate(e.target.value)}
+                InputLabelProps ={{ shrink: true }}
+                margin          ="dense"
+                label           ="End Date"
+                type            ="date"
+                fullWidth
+                variant         ="outlined"
+                value           ={publishEndDate}
+              />
+            </Grid>
+          <Grid item xs={12} md={12}>
+            <FormControl fullWidth>
+              <InputLabel id={"survey-title-select"}>Select a Survey</InputLabel>
+              <Select
+                labelId={'survey-title-select'}
+                id={'survey-title-select'}
+                value={publishSurvey}
+                label="Select a Survey"
+                onChange={(e) => handlePublishSurveyChange(e.target.value)}
+              >
+                <MenuItem value=''><em>None</em></MenuItem>
+                {previousSurvey.map((pre) => (
+                  <MenuItem key={pre.surveyId} value={pre.surveyId}>{pre.surveyTitle}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Button
+          variant ="contained"
+          onClick ={handlePublish}
+          sx={{ mt: 2 }}
+        >
+          <Typography variant="button" component="div">
+            Publish
+          </Typography>
+        </Button>
+      </Card>
+      {/* User Select Survey */}
+      <Card 
+        sx={{
+          p: 5,
+          mt: 2,
+        }}
+      >
+        <Typography variant="h1" component="div" gutterBottom>
+          Do a Survey
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={12}>
+            <TextField
+              onChange  ={(e) => setUserName(e.target.value)}
+              margin    ="dense"
+              label     ="Name"
+              type      ="string"
+              fullWidth
+              variant   ="outlined"
+              value     ={userName}
+            />
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <FormControl fullWidth>
+              <InputLabel id={"survey-title-select"}>Select a Survey</InputLabel>
+              <Select
+                labelId={'survey-title-select'}
+                id={'survey-title-select'}
+                value={userSelectSurvey}
+                label="Select a Survey"
+                onChange={(e) => handleUserSelectSurveyChange(e.target.value)}
+              >
+                <MenuItem value=''><em>None</em></MenuItem>
+                {publishSurveyData.map((data) => data.status === "Ongoing" && (
+                  <MenuItem key={data.surveyId} value={data.surveyId}>{previousSurvey.find(pre => data.surveyId === pre.surveyId)?.surveyTitle}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </Card>
+      {/* User Answer Table */}
+      <Card
+         sx={{
+          p: 5,
+          mt: 2,
+        }}
+      >
+        <Table>
+          <TableHead>
+            <TableRow className={classes.tableHeadRow}>
+              {tableHead.map((prop) => (
+                  <TableCell
+                    className={classes.tableCell + classes.tableHeadCell}
+                    key={prop}
+                    style={{
+                      textAlign: 'center'
+                    }}
+                  >
+                    {prop}
+                  </TableCell>
+                ))
+              }
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {surveyAnswerData.map((prop) => (
+                <TableRow key={prop.id}>
+                  <TableCell style={{textAlign: "center"}}>{prop.id}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{prop.name}</TableCell>
+                  <TableCell style={{textAlign: "center"}}>{previousSurvey.find(pre => prop.publishSurveyId === pre.surveyId)?.surveyTitle}</TableCell>
+                  <TableCell style={{textAlign: "center"}}><Button>View</Button></TableCell>
+                </TableRow>
+              ))
+            }
+          </TableBody>
+        </Table>
+      </Card>
+      {/* Initialise Survey Dialog */}
       <Dialog
         fullWidth
         open              ={open}
@@ -1285,7 +1613,7 @@ const Page2 = () => {
           <Button onClick={openCreate}>Next</Button>
         </DialogActions>
       </Dialog>
-      {/* Survey Settings */}
+      {/* Survey Settings Dialog */}
       <Dialog
         fullWidth
         open              ={settings}
@@ -1336,7 +1664,7 @@ const Page2 = () => {
           <Button onClick={closeSettings}>Save</Button>
         </DialogActions>
       </Dialog>
-      {/* Survey Questions */}
+      {/* Survey Questions Dialog */}
       <Dialog
         fullWidth
         maxWidth          ="xl"
@@ -1951,7 +2279,7 @@ const Page2 = () => {
           </Grid>
         </DialogActions>
       </Dialog>
-      {/* Survey Preview */}
+      {/* Survey Preview Dialog */}
       <Dialog
         fullWidth
         maxWidth          ="md"
@@ -1961,7 +2289,7 @@ const Page2 = () => {
         aria-describedby  ="alert-dialog-description"
       >
         <DialogTitle>
-          <Typography variant="h2" gutterBottom>{`${surveyTitle}'s Preview`}</Typography>
+          <Typography variant="h2" gutterBottom>{userSelectSurvey ? surveyTitle : `${surveyTitle}'s Preview`}</Typography>
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
@@ -1974,8 +2302,15 @@ const Page2 = () => {
             })}
           </Grid>
         </DialogContent>
+        {userSelectSurvey && (
+          <DialogActions>
+            <Button onClick={handleSubmitSurvey} color="primary" disabled={submitting}>
+              {submitting ? 'Submitting...' : 'Submit'}
+            </Button>
+          </DialogActions>
+        )}
       </Dialog>
-    </div>
+    </Box>
   );
 };
 

@@ -18,7 +18,6 @@ class TenantPlan(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True, editable=False)
     updatedAt = models.DateTimeField(auto_now=True)
 
-
 class TenantPlanFeatures(models.Model):
     type = models.CharField(max_length=20)
     title = models.CharField(max_length=200)
@@ -470,3 +469,20 @@ class SurveySettingsTable(models.Model):
         if not self.surveyId:
             self.surveyId = slugify(self.surveyTitle)
         super().save(*args, **kwargs)
+
+class PublishSurveyTable(models.Model):
+    surveyId            = models.CharField(max_length=250)
+    startDate           = models.CharField(max_length=250)
+    endDate             = models.CharField(max_length=250)
+    status              = models.CharField(max_length=250)
+    createdAt          = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt          = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt          = models.DateTimeField("deleted_at", null=True, blank=True)
+
+class UserAnswerTable(models.Model):
+    name                = models.CharField(max_length=250)
+    publishSurveyId     = models.CharField(max_length=250)
+    answer              = models.CharField()
+    createdAt          = models.DateTimeField("created_at", auto_now_add=True)
+    updatedAt          = models.DateTimeField("updated_at", auto_now=True)
+    deletedAt          = models.DateTimeField("deleted_at", null=True, blank=True)
