@@ -15,9 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from enjoey_api.views import ChildView
 from django.urls import path, include
+from rest_framework import routers
+
+route1 = routers.DefaultRouter()
+route1.register("", ChildView, basename='childview')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('enjoey_api.urls')),
+    path('test/', include(route1.urls)),
 ]

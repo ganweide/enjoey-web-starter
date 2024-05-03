@@ -9,6 +9,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // Material UI Imports
 import { makeStyles } from "@material-ui/core/styles";
+import { styled } from '@mui/material/styles';
 import {
   Button,
   Dialog,
@@ -37,7 +38,9 @@ import {
   TableCell,
   TableBody,
   TableRow,
-  Menu,
+  ListSubheader,
+  Stack,
+  Paper,
 } from "@mui/material";
 
 // Material UI Icons
@@ -53,6 +56,14 @@ const publishUrl  = "http://127.0.0.1:8000/api/publish-survey/";
 const answerUrl   = "http://127.0.0.1:8000/api/user-answer/";
 
 import Styles from "./style";
+import CustomActiveShapePieChart from "./statisticChart";
+
+const Item = styled(Paper)(({ theme }) => ({
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
 const useStyles = makeStyles(Styles);
 
@@ -92,28 +103,35 @@ const Page2 = () => {
     description: '',
     questions: [],
   });
-  const [preview, setPreview]                         = useState(false);
-  const [previewSingleSelect, setPreviewSingleSelect] = useState([]);
-  const [previewMultiSelect, setPreviewMultiSelect]   = useState([]);
-  const [previewShortAnswers, setPreviewShortAnswers] = useState([]);
-  const [previewParagraph, setPreviewParagraph]       = useState([]);
-  const [previewBoolean, setPreviewBoolean]           = useState([]);
-  const [previewRadio, setPreviewRadio]               = useState([]);
-  const [previewCheckbox, setPreviewCheckbox]         = useState([]);
-  const [previewDate, setPreviewDate]                 = useState([]);
-  const [previewTime, setPreviewTime]                 = useState([]);
-  const [previewRating, setPreviewRating]             = useState([]);
-  const [publishSurveyData, setPublishSurveyData]     = useState([]);
-  const [publishStartDate, setPublishStartDate]       = useState([]);
-  const [publishEndDate, setPublishEndDate]           = useState([]);
-  const [publishSurvey, setPublishSurvey]             = useState([]);
-  const [userName, setUserName]                       = useState([]);
-  const [userSelectSurvey, setUserSelectSurvey]       = useState([]);
-  const [submitting, setSubmitting]                   = useState(false);
-  const [surveyAnswerData, setSurveyAnswerData]       = useState([]);
-  const [openAnswerDialog, setOpenAnswerDialog]       = useState(false);
+  const [preview, setPreview]                                         = useState(false);
+  const [previewSingleSelect, setPreviewSingleSelect]                 = useState([]);
+  const [previewMultiSelect, setPreviewMultiSelect]                   = useState([]);
+  const [previewShortAnswers, setPreviewShortAnswers]                 = useState([]);
+  const [previewParagraph, setPreviewParagraph]                       = useState([]);
+  const [previewBoolean, setPreviewBoolean]                           = useState([]);
+  const [previewRadio, setPreviewRadio]                               = useState([]);
+  const [previewCheckbox, setPreviewCheckbox]                         = useState([]);
+  const [previewDate, setPreviewDate]                                 = useState([]);
+  const [previewTime, setPreviewTime]                                 = useState([]);
+  const [previewRating, setPreviewRating]                             = useState([]);
+  const [publishSurveyData, setPublishSurveyData]                     = useState([]);
+  const [publishStartDate, setPublishStartDate]                       = useState([]);
+  const [publishEndDate, setPublishEndDate]                           = useState([]);
+  const [publishSurvey, setPublishSurvey]                             = useState([]);
+  const [userName, setUserName]                                       = useState([]);
+  const [userSelectSurvey, setUserSelectSurvey]                       = useState([]);
+  const [submitting, setSubmitting]                                   = useState(false);
+  const [surveyAnswerData, setSurveyAnswerData]                       = useState([]);
+  const [answers, setAnswers]                                         = useState([]);
+  const [openAnswerDialog, setOpenAnswerDialog]                       = useState(false);
+  const [statisticQuestion, setStatisticQuestion]                     = useState([]);
+  const [totalSurveySubmission, setTotalSurveySubmission]             = useState([]);
+  const [questionText, setQuestionText]                               = useState([]);
+  const [item, setItem]                                               = useState([]);
+  const [answerCount, setAnswerCount]                                 = useState([]);             
+  const [openQuestionStatisticDialog, setOpenQuestionStatisticDialog] = useState(false);
 
-  const shortAnswerUI = (question) => {
+  const shortAnswerUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.text}</Typography>
@@ -123,12 +141,12 @@ const Page2 = () => {
           fullWidth
           variant   ="outlined"
           onChange  ={(e) => handlePreviewShortAnswersChange(question.id, question.text, e.target.value)}
-          value     ={previewShortAnswers.find(answer => answer.text === question.text)?.answer || ''}
+          value     ={answer || previewShortAnswers.find(answer => answer.text === question.text)?.answer || ''}
         />
       </Grid>
     );
   };
-  const paragraphUI = (question) => {
+  const paragraphUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.text}</Typography>
@@ -140,17 +158,17 @@ const Page2 = () => {
           type      ="text"
           variant   ="outlined"
           onChange  ={(e) => handlePreviewParagraphChange(question.id, question.text, e.target.value)}
-          value     ={previewParagraph.find(answer => answer.text === question.text)?.answer || ''}
+          value     ={answer || previewParagraph.find(answer => answer.text === question.text)?.answer || ''}
         />
       </Grid>
     );
   };
-  const radioButtonGroupUI = (question) => {
+  const radioButtonGroupUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.text}</Typography>
         <FormControl component="fieldset" fullWidth>
-          <RadioGroup>
+          <RadioGroup value={answer || ""}>
             {question.more.map((more) => (
               <Grid key={more.id} item xs={12} md={12}>
                 <FormControlLabel
@@ -166,14 +184,14 @@ const Page2 = () => {
       </Grid>
     );
   };
-  const checkboxUI = (question) => {
+  const checkboxUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.text}</Typography>
         <FormGroup>
           {question.more.map((more) => (
             <FormControlLabel
-              key     ={more.id}
+              key     ={answer || more.id}
               control ={<Checkbox />}
               label   ={more.item}
               onChange={(e) => {
@@ -191,7 +209,7 @@ const Page2 = () => {
       </Grid>
     );
   };
-  const booleanUI = (question) => {
+  const booleanUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.text}</Typography>
@@ -215,7 +233,7 @@ const Page2 = () => {
       </Grid>
     );
   };
-  const dateUI = (question) => {
+  const dateUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.text}</Typography>
@@ -225,12 +243,12 @@ const Page2 = () => {
           type      ="date"
           variant   ="outlined"
           onChange  ={(e) => handlePreviewDateChange(question.id, question.text, e.target.value)}
-          value     ={previewDate.find(answer => answer.text === question.text)?.answer || ''}
+          value     ={answer || previewDate.find(answer => answer.text === question.text)?.answer || ''}
         />
       </Grid>
     );
   };
-  const timeUI = (question) => {
+  const timeUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.text}</Typography>
@@ -240,19 +258,19 @@ const Page2 = () => {
           type      ="time"
           variant   ="outlined"
           onChange  ={(e) => handlePreviewTimeChange(question.id, question.text, e.target.value)}
-          value     ={previewTime.find(answer => answer.text === question.text)?.answer || ''}
+          value     ={answer || previewTime.find(answer => answer.text === question.text)?.answer || ''}
         />
       </Grid>
     );
   };
-  const singleSelectUI = (question) => {
+  const singleSelectUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.text}</Typography>
         <FormControl fullWidth>
           <Select
             id="dropdown"
-            value={previewSingleSelect.find(answer => answer.text === question.text)?.answer || ''}
+            value={answer || previewSingleSelect.find(answer => answer.text === question.text)?.answer || ''}
             onChange={(e) => handlePreviewSingleSelectChange(question.id, question.text, e.target.value)}
           >
             {question.more.map((more) => (
@@ -263,7 +281,7 @@ const Page2 = () => {
       </Grid>
     );
   };
-  const multiSelectUI = (question) => {
+  const multiSelectUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.title}</Typography>
@@ -271,7 +289,7 @@ const Page2 = () => {
           <Select
             multiple
             id="multi-select-dropdown"
-            value={previewMultiSelect.find(answer => answer.text === question.text)?.answer || []}
+            value={answer || previewMultiSelect.find(answer => answer.text === question.text)?.answer || []}
             onChange={(e) => handlePreviewMultiSelectChange(question.id, question.text, e.target.value)}
           >
             {question.more.map((more) => (
@@ -282,7 +300,7 @@ const Page2 = () => {
       </Grid>
     );
   };
-  const ratingUI = (question) => {
+  const ratingUI = (question, answer) => {
     return (
       <Grid item xs={12} md={12}>
         <Typography variant="h3" gutterBottom>{question.title}</Typography>
@@ -298,28 +316,28 @@ const Page2 = () => {
       </Grid>
     );
   };
-  const generateQuestionUI = (question) => {
+  const generateQuestionUI = (question, answer) => {
     switch(question.type) {
       case "short answers":
-        return shortAnswerUI(question);
+        return shortAnswerUI(question, answer);
       case "paragraph":
-        return paragraphUI(question);
+        return paragraphUI(question, answer);
       case "radio button group":
-        return radioButtonGroupUI(question);
+        return radioButtonGroupUI(question, answer);
       case "checkboxes":
-        return checkboxUI(question);
+        return checkboxUI(question, answer);
       case "rating scale":
-        return ratingUI(question);
+        return ratingUI(question, answer);
       case "date":
-        return dateUI(question);
+        return dateUI(question, answer);
       case "time":
-        return timeUI(question);
+        return timeUI(question, answer);
       case "dropdown":
-        return singleSelectUI(question);
+        return singleSelectUI(question, answer);
       case "multi-select dropdown":
-        return multiSelectUI(question);
+        return multiSelectUI(question, answer);
       case "yes/no boolean":
-        return booleanUI(question);
+        return booleanUI(question, answer);
       default:
         return null;
     }
@@ -518,6 +536,7 @@ const Page2 = () => {
           questions: JSON.parse(survey.questions),
         }));
         setPreviousSurvey(parsedSurveys);
+        console.log("previousSurvey", parsedSurveys);
       });
     } catch (error) {
       console.log(error);
@@ -531,7 +550,12 @@ const Page2 = () => {
     }
     try {
       Axios.get(answerUrl).then((response) => {
-        setSurveyAnswerData(response.data);
+        const parsedAnswers = response.data.map((ans) => ({
+          ...ans,
+          answer: JSON.parse(ans.answer),
+        }));
+        setSurveyAnswerData(parsedAnswers);
+        console.log("answer", parsedAnswers);
       });
     } catch (error) {
       console.log(error);
@@ -1182,11 +1206,11 @@ const Page2 = () => {
     setPreview(false);
   }
 
+  // Publish Survey
   const handlePublishSurveyChange = (value) => {
     console.log("value", value);
     setPublishSurvey(value);
   };
-
   const handlePublish = async () => {
     const currentDate = new Date();
     const startDate = new Date(publishStartDate);
@@ -1226,6 +1250,7 @@ const Page2 = () => {
     }
   };
 
+  // Answer Survey
   const handleUserSelectSurveyChange = (value) => {
     setUserSelectSurvey(value);
     setPreview(true);
@@ -1241,7 +1266,6 @@ const Page2 = () => {
       setDescription("");
     }
   };
-
   const handleSubmitSurvey = async () => {
     try {
       setSubmitting(true); // Set submitting state to true to provide feedback to the user
@@ -1281,7 +1305,6 @@ const Page2 = () => {
       setUserSelectSurvey([]);
     }
   };
-
   const getAnswerForQuestion = (question) => {
     switch (question.type) {
       case 'short answers':
@@ -1309,23 +1332,55 @@ const Page2 = () => {
     }
   };
 
-  const handleOpenAnswerDialog = () => {
+  // View User Answers
+  const handleOpenAnswerDialog = (id) => {
     setOpenAnswerDialog(true);
-    const selectedSurveyTitle = previousSurvey.find((survey) => survey.surveyId === value);
-
-    if (selectedSurveyTitle) {
-      setQuestions(selectedSurveyTitle.questions);
-      setSurveyTitle(selectedSurveyTitle.surveyTitle);
-      setDescription(selectedSurveyTitle.description);
-    } else {
-      setQuestions([]);
-      setSurveyTitle("");
-      setDescription("");
-    }
+    const answer = surveyAnswerData.find((answer) => answer.id === id);
+    const selectedSurveyTitle = previousSurvey.find((survey) => survey.surveyId === answer.publishSurveyId);
+    setQuestions(selectedSurveyTitle.questions);
+    setSurveyTitle(selectedSurveyTitle.surveyTitle);
+    setDescription(selectedSurveyTitle.description);
+    setAnswers(answer.answer);
+  }
+  const handleCloseAnswerDialog = async () => {
+    setOpenAnswerDialog(false);
   }
 
-  const handleCloseAnswerDialog = () => {
-    setOpenAnswerDialog(false);
+  // View Question Statistics
+  const handleQuestionStatisticChange = (e) => {
+    setStatisticQuestion(e.target.value);
+    console.log("e.target.value", e.target.value);
+    const [surveyId, questionId, questionText] = e.target.value.split('.');
+    const surveyFilter = surveyAnswerData.filter((ans) => ans.publishSurveyId === surveyId)
+    const survey = previousSurvey.find((survey) => survey.surveyId === surveyId);
+    console.log("survey", survey);
+    const question = survey.questions.find((question) => question.id === parseInt(questionId));
+    console.log("question", question);
+    const moreItems = question.more.map((item) => item.item);
+    console.log("item", moreItems);
+    const count = [];
+    console.log("surveyFilter", surveyFilter);
+    moreItems.forEach((item) => {
+      count[item] = 0;
+      surveyFilter.forEach((survey) => {
+        survey.answer.forEach((answer) => {
+          if (answer.questionId === parseInt(questionId) && answer.answer === item) {
+            count[item]++;
+          }
+        });
+      });
+    });
+    setTotalSurveySubmission(surveyFilter.length);
+    setQuestionText(questionText);
+    setItem(moreItems);
+    setAnswerCount(count);
+    console.log("count", count);
+    setOpenQuestionStatisticDialog(true);
+  }
+
+  const handleCloseQuestionStatisticDialog = async () => {
+    setOpenQuestionStatisticDialog(false);
+    setStatisticQuestion([]);
   }
 
   return (
@@ -1462,6 +1517,71 @@ const Page2 = () => {
           mt: 2,
         }}
       >
+        <Grid container spacing={2}>
+          <Grid item xs={5} md={5}>
+            <FormControl fullWidth>
+              <InputLabel id="question-select">Show question statistics</InputLabel>
+              <Select
+                labelId="question-select"
+                id="question-select"
+                value={statisticQuestion}
+                label="Show question statistics"
+                onChange={(e) => handleQuestionStatisticChange(e)}
+              >
+                <MenuItem value=''><em>None</em></MenuItem>
+                {previousSurvey.map((prop) => {
+                  const survey = surveyAnswerData.find((answer) => answer.publishSurveyId === prop.surveyId);
+                  if (survey) {
+                    return [
+                      <ListSubheader key={prop.surveyId}>{prop.surveyTitle}</ListSubheader>,
+                      prop.questions.map((question) => (
+                        <MenuItem value={`${prop.surveyId}.${question.id}.${question.text}`} key={`${prop.surveyId}.${question.id}`}>
+                          {question.text}
+                        </MenuItem >
+                      ))
+                    ]
+                  };
+                  return;
+                })}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={5} md={5}>
+            <FormControl fullWidth>
+              <InputLabel id="question-select">Select Question</InputLabel>
+              <Select
+                labelId="question-select"
+                id="question-select"
+                value={statisticQuestion}
+                label="Show question statistics"
+                onChange={(e) => handleQuestionStatisticChange(e)}
+              >
+                <MenuItem value=''><em>None</em></MenuItem>
+                {previousSurvey.map((prop) => {
+                  const survey = surveyAnswerData.find((answer) => answer.publishSurveyId === prop.surveyId);
+                  if (survey) {
+                    return [
+                      <ListSubheader key={prop.surveyId}>{prop.surveyTitle}</ListSubheader>,
+                      prop.questions.map((question) => (
+                        <MenuItem value={`${prop.surveyId}-${question.id}-${question.text}`} key={`${prop.surveyId}-${question.id}`}>
+                          {question.text}
+                        </MenuItem >
+                      ))
+                    ]
+                  };
+                  return;
+                })}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={1} md={1}>
+            <Button variant="outlined" fullWidth style={{ height: "100%" }}>
+              <Typography variant="button">
+                Statistics
+              </Typography>
+            </Button>
+          </Grid>
+        </Grid>
         <Table>
           <TableHead>
             <TableRow className={classes.tableHeadRow}>
@@ -1481,14 +1601,13 @@ const Page2 = () => {
           </TableHead>
           <TableBody>
             {surveyAnswerData.map((prop) => (
-                <TableRow key={prop.id}>
-                  <TableCell style={{textAlign: "center"}}>{prop.id}</TableCell>
-                  <TableCell style={{textAlign: "center"}}>{prop.name}</TableCell>
-                  <TableCell style={{textAlign: "center"}}>{previousSurvey.find(pre => prop.publishSurveyId === pre.surveyId)?.surveyTitle}</TableCell>
-                  <TableCell style={{textAlign: "center"}}><Button>View</Button></TableCell>
-                </TableRow>
-              ))
-            }
+              <TableRow key={prop.id}>
+                <TableCell style={{textAlign: "center"}}>{prop.id}</TableCell>
+                <TableCell style={{textAlign: "center"}}>{prop.name}</TableCell>
+                <TableCell style={{textAlign: "center"}}>{previousSurvey.find(pre => prop.publishSurveyId === pre.surveyId)?.surveyTitle}</TableCell>
+                <TableCell style={{textAlign: "center"}}><Button onClick={() => handleOpenAnswerDialog(prop.id)}>View</Button></TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </Card>
@@ -2309,6 +2428,49 @@ const Page2 = () => {
             </Button>
           </DialogActions>
         )}
+      </Dialog>
+      {/* Answer Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="md"
+        open              ={openAnswerDialog}
+        onClose           ={handleCloseAnswerDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2" gutterBottom>{userSelectSurvey ? surveyTitle : `${surveyTitle}'s Preview`}</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            {questions.map((question) => {
+              return generateQuestionUI(question, answers[question.id]?.answer || null);
+            })}
+          </Grid>
+        </DialogContent>
+      </Dialog>
+      {/* Statistic Dialog */}
+      <Dialog
+        fullWidth
+        maxWidth          ="md"
+        open              ={openQuestionStatisticDialog}
+        onClose           ={handleCloseQuestionStatisticDialog}
+        aria-labelledby   ="alert-dialog-title"
+        aria-describedby  ="alert-dialog-description"
+      >
+        <DialogTitle>
+          <Typography variant="h2" gutterBottom>{questionText}</Typography>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Grid container spacing={2}>
+            <Grid item xs={6} md={6}>
+              <CustomActiveShapePieChart questionText={questionText} statisticQuestion={statisticQuestion} totalSurveySubmissions={totalSurveySubmission} questionItem={item} answerCount={answerCount} />
+            </Grid>
+            {/* <Grid item xs={6} md={6}>
+              <CustomActiveShapePieChart questionText={questionText} statisticQuestion={statisticQuestion} totalSurveySubmissions={totalSurveySubmission} />
+            </Grid> */}
+          </Grid>
+        </DialogContent>
       </Dialog>
     </Box>
   );
