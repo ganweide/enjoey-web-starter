@@ -56,7 +56,7 @@ const publishUrl  = "http://127.0.0.1:8000/api/publish-survey/";
 const answerUrl   = "http://127.0.0.1:8000/api/user-answer/";
 
 import Styles from "./style";
-import CustomActiveShapePieChart from "./statisticChart";
+import CustomActiveShapePieChart from "./totalStatisticChart";
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -124,12 +124,14 @@ const Page2 = () => {
   const [surveyAnswerData, setSurveyAnswerData]                       = useState([]);
   const [answers, setAnswers]                                         = useState([]);
   const [openAnswerDialog, setOpenAnswerDialog]                       = useState(false);
+  const [statisticSurvey, setStatisticSurvey]                         = useState([]);
   const [statisticQuestion, setStatisticQuestion]                     = useState([]);
   const [totalSurveySubmission, setTotalSurveySubmission]             = useState([]);
   const [questionText, setQuestionText]                               = useState([]);
   const [item, setItem]                                               = useState([]);
   const [answerCount, setAnswerCount]                                 = useState([]);             
-  const [openQuestionStatisticDialog, setOpenQuestionStatisticDialog] = useState(false);
+  // const [openQuestionStatisticDialog, setOpenQuestionStatisticDialog] = useState(false);
+  const [openStatisticDialog, setOpenStatisticDialog]                 = useState(false);
 
   const shortAnswerUI = (question, answer) => {
     return (
@@ -1346,20 +1348,22 @@ const Page2 = () => {
     setOpenAnswerDialog(false);
   }
 
-  // View Question Statistics
-  const handleQuestionStatisticChange = (e) => {
+  const handleSurveyStatisticChange = (e) => {
+    setStatisticSurvey(e.target.value);
+  }
+
+  const handleQuestStatisticChange = (e) => {
     setStatisticQuestion(e.target.value);
-    console.log("e.target.value", e.target.value);
-    const [surveyId, questionId, questionText] = e.target.value.split('.');
+  }
+
+  const handleOpenStatisticDialog = (e) => {
+    setOpenStatisticDialog(true);
+    const [surveyId, questionId, questionText] = statisticQuestion.split('.');
     const surveyFilter = surveyAnswerData.filter((ans) => ans.publishSurveyId === surveyId)
     const survey = previousSurvey.find((survey) => survey.surveyId === surveyId);
-    console.log("survey", survey);
     const question = survey.questions.find((question) => question.id === parseInt(questionId));
-    console.log("question", question);
     const moreItems = question.more.map((item) => item.item);
-    console.log("item", moreItems);
     const count = [];
-    console.log("surveyFilter", surveyFilter);
     moreItems.forEach((item) => {
       count[item] = 0;
       surveyFilter.forEach((survey) => {
@@ -1374,14 +1378,48 @@ const Page2 = () => {
     setQuestionText(questionText);
     setItem(moreItems);
     setAnswerCount(count);
-    console.log("count", count);
-    setOpenQuestionStatisticDialog(true);
   }
 
-  const handleCloseQuestionStatisticDialog = async () => {
-    setOpenQuestionStatisticDialog(false);
-    setStatisticQuestion([]);
+  const handleCloseStatisticDialog = (e) => {
+    setOpenStatisticDialog(false);
   }
+
+  // View Question Statistics
+  // const handleQuestionStatisticChange = (e) => {
+  //   setStatisticQuestion(e.target.value);
+  //   console.log("e.target.value", e.target.value);
+  //   const [surveyId, questionId, questionText] = e.target.value.split('.');
+  //   const surveyFilter = surveyAnswerData.filter((ans) => ans.publishSurveyId === surveyId)
+  //   const survey = previousSurvey.find((survey) => survey.surveyId === surveyId);
+  //   console.log("survey", survey);
+  //   const question = survey.questions.find((question) => question.id === parseInt(questionId));
+  //   console.log("question", question);
+  //   const moreItems = question.more.map((item) => item.item);
+  //   console.log("item", moreItems);
+  //   const count = [];
+  //   console.log("surveyFilter", surveyFilter);
+  //   moreItems.forEach((item) => {
+  //     count[item] = 0;
+  //     surveyFilter.forEach((survey) => {
+  //       survey.answer.forEach((answer) => {
+  //         if (answer.questionId === parseInt(questionId) && answer.answer === item) {
+  //           count[item]++;
+  //         }
+  //       });
+  //     });
+  //   });
+  //   setTotalSurveySubmission(surveyFilter.length);
+  //   setQuestionText(questionText);
+  //   setItem(moreItems);
+  //   setAnswerCount(count);
+  //   console.log("count", count);
+  //   setOpenQuestionStatisticDialog(true);
+  // }
+
+  // const handleCloseQuestionStatisticDialog = async () => {
+  //   setOpenQuestionStatisticDialog(false);
+  //   setStatisticQuestion([]);
+  // }
 
   return (
     <Box>
@@ -1518,7 +1556,60 @@ const Page2 = () => {
         }}
       >
         <Grid container spacing={2}>
-          <Grid item xs={5} md={5}>
+          <Grid item xs={5.25} md={5.25}>
+            <FormControl fullWidth>
+              <InputLabel id="survey-select">Select Survey</InputLabel>
+              <Select
+                labelId="survey-select"
+                id="survey-select"
+                value={statisticSurvey}
+                label="Select Survey"
+                onChange={(e) => handleSurveyStatisticChange(e)}
+              >
+                <MenuItem value=''><em>None</em></MenuItem>
+                {previousSurvey.map((prop) => {
+                  const survey = surveyAnswerData.find((answer) => answer.publishSurveyId === prop.surveyId);
+                  if (survey) {
+                    return (
+                      <MenuItem key={prop.surveyId} value={prop.surveyId}>{prop.surveyTitle}</MenuItem>
+                    )
+                  };
+                  return;
+                })}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={5.25} md={5.25}>
+            <FormControl fullWidth>
+              <InputLabel id="question-select">Select Question</InputLabel>
+              <Select
+                labelId="question-select"
+                id="question-select"
+                value={statisticQuestion}
+                label="Select Question"
+                onChange={(e) => handleQuestStatisticChange(e)}
+              >
+                <MenuItem value=''><em>None</em></MenuItem>
+                {previousSurvey
+                  .filter((survey) => survey.surveyId === statisticSurvey)
+                  .map((survey) => (
+                    survey.questions.map((question) => (
+                      <MenuItem value={`${survey.surveyId}.${question.id}.${question.text}`} key={`${survey.surveyId}.${question.id}`}>
+                        {question.text}
+                      </MenuItem >
+                    ))
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={1.5} md={1.5}>
+            <Button variant="outlined" fullWidth style={{ height: "100%" }} onClick={handleOpenStatisticDialog}>
+              <Typography variant="button">
+                Statistics
+              </Typography>
+            </Button>
+          </Grid>
+          {/* <Grid item xs={5.25} md={5.25}>
             <FormControl fullWidth>
               <InputLabel id="question-select">Show question statistics</InputLabel>
               <Select
@@ -1545,42 +1636,7 @@ const Page2 = () => {
                 })}
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={5} md={5}>
-            <FormControl fullWidth>
-              <InputLabel id="question-select">Select Question</InputLabel>
-              <Select
-                labelId="question-select"
-                id="question-select"
-                value={statisticQuestion}
-                label="Show question statistics"
-                onChange={(e) => handleQuestionStatisticChange(e)}
-              >
-                <MenuItem value=''><em>None</em></MenuItem>
-                {previousSurvey.map((prop) => {
-                  const survey = surveyAnswerData.find((answer) => answer.publishSurveyId === prop.surveyId);
-                  if (survey) {
-                    return [
-                      <ListSubheader key={prop.surveyId}>{prop.surveyTitle}</ListSubheader>,
-                      prop.questions.map((question) => (
-                        <MenuItem value={`${prop.surveyId}-${question.id}-${question.text}`} key={`${prop.surveyId}-${question.id}`}>
-                          {question.text}
-                        </MenuItem >
-                      ))
-                    ]
-                  };
-                  return;
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={1} md={1}>
-            <Button variant="outlined" fullWidth style={{ height: "100%" }}>
-              <Typography variant="button">
-                Statistics
-              </Typography>
-            </Button>
-          </Grid>
+          </Grid> */}
         </Grid>
         <Table>
           <TableHead>
@@ -2453,8 +2509,8 @@ const Page2 = () => {
       <Dialog
         fullWidth
         maxWidth          ="md"
-        open              ={openQuestionStatisticDialog}
-        onClose           ={handleCloseQuestionStatisticDialog}
+        open              ={openStatisticDialog}
+        onClose           ={handleCloseStatisticDialog}
         aria-labelledby   ="alert-dialog-title"
         aria-describedby  ="alert-dialog-description"
       >
@@ -2466,9 +2522,9 @@ const Page2 = () => {
             <Grid item xs={6} md={6}>
               <CustomActiveShapePieChart questionText={questionText} statisticQuestion={statisticQuestion} totalSurveySubmissions={totalSurveySubmission} questionItem={item} answerCount={answerCount} />
             </Grid>
-            {/* <Grid item xs={6} md={6}>
-              <CustomActiveShapePieChart questionText={questionText} statisticQuestion={statisticQuestion} totalSurveySubmissions={totalSurveySubmission} />
-            </Grid> */}
+            <Grid item xs={6} md={6}>
+              <CustomActiveShapePieChart questionText={questionText} statisticQuestion={statisticQuestion} questionItem={item} answerCount={answerCount} />
+            </Grid>
           </Grid>
         </DialogContent>
       </Dialog>

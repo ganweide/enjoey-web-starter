@@ -89,21 +89,28 @@ class CustomActiveShapePieChart extends Component {
 
   render() {
     const { totalSurveySubmissions, questionItem, answerCount } = this.props;
-    const totalSubmissionData = [
-      {
-        name: "Total",
-        value: totalSurveySubmissions || 0, // If there's no value, default to 0
-      },
-    ];
+    let data = [];
 
-    console.log("questionItem", questionItem);
+    if (totalSurveySubmissions !== undefined) {
+      const totalSubmissionData = [
+        {
+          name: "Total",
+          value: totalSurveySubmissions || 0, // If there's no value, default to 0
+        },
+      ];
 
-    const questionItemData = questionItem.map((item) => ({
-      name: item,
-      value: answerCount[item] || 0,
-    }));
-  
-    const data = totalSubmissionData.concat(questionItemData);
+      const questionItemData = questionItem.map((item) => ({
+        name: item,
+        value: answerCount[item] || 0,
+      }));
+
+      data = totalSubmissionData.concat(questionItemData);
+    } else {
+      data = questionItem.map((item) => ({
+        name: item,
+        value: answerCount[item] || 0,
+      }));
+    }
 
     return (
       <ResponsiveContainer width='100%' height={300}>
