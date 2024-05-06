@@ -2520,6 +2520,12 @@ const Page2 = () => {
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid item xs={6} md={6}>
+              <Typography variant="h3">Total Submissions</Typography>
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <Typography variant="h3">Answers Statistics</Typography>
+            </Grid>
+            <Grid item xs={6} md={6}>
               <CustomActiveShapePieChart questionText={questionText} statisticQuestion={statisticQuestion} totalSurveySubmissions={totalSurveySubmission} questionItem={item} answerCount={answerCount} />
             </Grid>
             <Grid item xs={6} md={6}>
