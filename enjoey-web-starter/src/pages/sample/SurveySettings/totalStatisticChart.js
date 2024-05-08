@@ -22,22 +22,22 @@ class CustomActiveShapePieChart extends Component {
     if (questionItem.length === 0) {
       data.push({
         name: questionText,
-        value: answerCount[questionText] === 0 ? 0.05 : answerCount[questionText], // Set value to 0.05 if undefined
-        originalValue: answerCount[questionText] || 0, // Store the original value separately
+        value: answerCount[questionText] === 0 ? 0.05 : answerCount[questionText],
+        originalValue: answerCount[questionText] || 0,
       });
     } else {
       data = questionItem.map((item) => ({
         name: item,
-        value: answerCount[item] === 0 ? 0.05 : answerCount[item], // Set value to 0 if undefined
-        originalValue: answerCount[item] || 0, // Store the original value separately
+        value: answerCount[item] === 0 ? 0.05 : answerCount[item],
+        originalValue: answerCount[item] || 0,
       }));
     }
 
     if (totalSurveySubmissions !== undefined) {
       data.unshift({
         name: "Total",
-        value: totalSurveySubmissions || 0, // Set value to 0 if undefined
-        originalValue: totalSurveySubmissions || 0, // Store the original value separately
+        value: totalSurveySubmissions || 0,
+        originalValue: totalSurveySubmissions || 0,
       });
     }
 
