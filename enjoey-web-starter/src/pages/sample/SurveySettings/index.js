@@ -1364,16 +1364,27 @@ const Page2 = () => {
     const question = survey.questions.find((question) => question.id === parseInt(questionId));
     const moreItems = question.more.map((item) => item.item);
     const count = [];
-    moreItems.forEach((item) => {
-      count[item] = 0;
+    if (moreItems.length === 0) {
       surveyFilter.forEach((survey) => {
         survey.answer.forEach((answer) => {
-          if (answer.questionId === parseInt(questionId) && answer.answer === item) {
-            count[item]++;
+          if (answer.questionId === parseInt(questionId)) {
+            count[questionText] = (count[questionText] || 0) + 1;
           }
         });
       });
-    });
+    } else {
+      moreItems.forEach((item) => {
+        count[item] = 0;
+        surveyFilter.forEach((survey) => {
+          survey.answer.forEach((answer) => {
+            if (answer.questionId === parseInt(questionId) && answer.answer === item) {
+              count[item]++;
+            }
+          });
+        });
+      });
+    }
+    console.log("count", count);
     setTotalSurveySubmission(surveyFilter.length);
     setQuestionText(questionText);
     setItem(moreItems);

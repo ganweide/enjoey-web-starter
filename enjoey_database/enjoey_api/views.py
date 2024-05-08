@@ -1088,7 +1088,6 @@ class PublishSurveyView(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
 class UserAnswerView(viewsets.ModelViewSet):
     queryset = UserAnswerTable.objects.all().order_by('-createdAt')
     serializer_class = UserAnswerSerializer
