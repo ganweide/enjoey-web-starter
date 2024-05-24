@@ -17,6 +17,10 @@ import {
   TextField,
   Checkbox,
   CardContent,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  Select,
 } from "@mui/material";
 
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -112,6 +116,10 @@ const Page2 = () => {
   });
   const [html, setHtml]         = useState(null);
   const [csrfToken, setCsrfToken] = useState('');
+  const [academicYear, setAcademicYear]     = useState('');
+  const [enrollmentDate, setEnrollmentDate] = useState('');
+  const [minDate, setMinDate]               = useState('');
+  const [maxDate, setMaxDate]               = useState('');
 
   const handleCardSelect = () => {
     setSelectedItems((prev) => ({ ...prev, card: !prev.card }));
@@ -187,6 +195,19 @@ const Page2 = () => {
     fetchCsrfToken();
   }, []);
 
+  const handleAcademicYearChange = (e) => {
+    const value = e.target.value;
+    setAcademicYear(value);
+
+    // Extract the min and max dates from the selected value and format them as yyyy-MM-dd
+    const [min, max] = value.split('-');
+    const formattedMinDate = `${min.substring(0, 4)}-${min.substring(4, 6)}-${min.substring(6, 8)}`;
+    const formattedMaxDate = `${max.substring(0, 4)}-${max.substring(4, 6)}-${max.substring(6, 8)}`;
+
+    setMinDate(formattedMinDate);
+    setMaxDate(formattedMaxDate);
+  };
+
   return (
     <div>
       {/* Payment Method */}
@@ -231,6 +252,48 @@ const Page2 = () => {
             <Button variant="outlined" onClick={handleOpenMessageTemplateInputDialog}>
               Input
             </Button>
+          </Grid>
+        </Grid>
+      </Card>
+      {/* Calendar Settings */}
+      <Card sx={{ mt: 2, p: 5 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={12}>
+            <Typography variant="h1">Calendar Settings</Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <FormControl fullWidth margin="dense">
+              <InputLabel id="academic-year-select">Academic Year</InputLabel>
+              <Select
+                labelId ="academic-year-select"
+                id      ="academic-year-select"
+                value   ={academicYear}
+                label   ="Academic Year"
+                onChange={handleAcademicYearChange}
+              >
+                <MenuItem value="20240301-20250228">(2024) 20240301-20250228</MenuItem>
+                <MenuItem value="20250301-20260228">(2025) 20250301-20260228</MenuItem>
+                <MenuItem value="20260301-20270228">(2026) 20260301-20270228</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <TextField
+              onChange={(e) => setEnrollmentDate(e.target.value)}
+              InputLabelProps ={{ shrink: true }}
+              margin="dense"
+              label="EnrollmentDate"
+              type="date"
+              fullWidth
+              variant="outlined"
+              value={enrollmentDate}
+              InputProps={{
+                inputProps: {
+                  min: minDate,
+                  max: maxDate
+                }
+              }}
+            />
           </Grid>
         </Grid>
       </Card>
