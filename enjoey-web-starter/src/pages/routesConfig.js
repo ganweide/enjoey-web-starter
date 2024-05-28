@@ -222,6 +222,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/AppointmentForm',
       },
+      {
+        id: 'tax-form',
+        title: 'Tax Form',
+        messageId: 'Tax Form',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/TaxForm',
+      },
     ]
   },
   {

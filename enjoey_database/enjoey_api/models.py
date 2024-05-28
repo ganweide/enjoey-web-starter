@@ -9,6 +9,16 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
+class TaxTable(models.Model):
+    dateAdded = models.DateField(auto_now_add=True)
+    taxCategory = models.CharField(max_length=40)
+    taxCode = models.CharField(max_length=40)
+    taxRate = models.CharField(max_length=40)
+    startDate = models.CharField(max_length=40)
+    endDate = models.CharField(max_length=40, null=True)
+    createdAt = models.DateTimeField(auto_now_add=True, editable=False)
+    updatedAt = models.DateTimeField(auto_now=True)
+
 class TenantPlan(models.Model):
     termsInMonth = models.IntegerField()
     title = models.CharField(max_length=100)
