@@ -67,7 +67,7 @@ const Page2 = () => {
     const ongoingData = data.filter(d => {
       const startDate = new Date(d.startDate);
       const endDate = d.endDate ? new Date(d.endDate) : null;
-      return startDate <= currentDate && !endDate && d.taxCategory !== taxType;
+      return startDate <= currentDate && !endDate && d.taxCategory === tax;
     });
 
     if (ongoingData.length > 0) {
@@ -96,9 +96,11 @@ const Page2 = () => {
       // Fetch the existing data to determine if there's a previous rate to update
       const existingDataResponse = await Axios.get(taxFormUrl);
       const existingData = existingDataResponse.data;
-  
+      
+      const filteredData = existingData.filter(d => d.taxCategory === taxType);
+
       // Sort the existing data by startDate in descending order to find the most recent one
-      const sortedData = existingData.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+      const sortedData = filteredData.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
       const mostRecentEntry = sortedData.length > 0 ? sortedData[0] : null;
   
       const newStartDate = new Date(effectiveDate);
