@@ -26,7 +26,10 @@ import {
   Grid,
   Box,
   Typography,
+  IconButton,
 } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // Local Imports
 import Styles from "./style";
@@ -44,6 +47,7 @@ const Page2 = () => {
   const [taxType, setTaxType]               = useState([]);
   const [taxRate, setTaxRate]               = useState([]);
   const [effectiveDate, setEffectiveDate]   = useState([]);
+  const [minEffectiveDate, setMinEffectiveDate] = useState("");
   const [refreshData, setRefreshData]       = useState([]);
 
   useEffect(() => {
@@ -55,6 +59,26 @@ const Page2 = () => {
       console.log(error);
     }
   }, [refreshData]);
+
+  const handleSelectTaxType = async (tax) => {
+    setTaxType(tax);
+
+    // Determine the minimum effective date based on the ongoing data
+    const ongoingData = data.filter(d => {
+      const startDate = new Date(d.startDate);
+      const endDate = d.endDate ? new Date(d.endDate) : null;
+      return startDate <= currentDate && !endDate && d.taxCategory !== taxType;
+    });
+
+    if (ongoingData.length > 0) {
+      const ongoingStartDate = new Date(ongoingData[0].startDate);
+      const minDate = new Date(ongoingStartDate);
+      minDate.setDate(minDate.getDate() + 1);
+      setMinEffectiveDate(minDate.toISOString().split('T')[0]);
+    } else {
+      setMinEffectiveDate('');
+    }
+  }
 
   const handleOpenDialog = async () => {
     setOpenDialog   (true);
@@ -68,30 +92,56 @@ const Page2 = () => {
   }
 
   const handleAddTaxRate = async () => {
-    const data = new FormData();
-    data.append("taxCategory", taxType);
-    data.append("taxCode", taxType);
-    data.append("taxRate", taxRate);
-    data.append("startDate", effectiveDate);
-
     try {
-      const response = await Axios({
-        method  : "POST",
-        url     : taxFormUrl,
-        data    : data,
-        headers : {"Content-Type": "multipart/form-data"},
-      });
-      setRefreshData(response.data)
+      // Fetch the existing data to determine if there's a previous rate to update
+      const existingDataResponse = await Axios.get(taxFormUrl);
+      const existingData = existingDataResponse.data;
+  
+      // Sort the existing data by startDate in descending order to find the most recent one
+      const sortedData = existingData.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+      const mostRecentEntry = sortedData.length > 0 ? sortedData[0] : null;
+  
+      const newStartDate = new Date(effectiveDate);
+      let previousEndDate = null;
+  
+      // If there is a most recent entry, update its endDate
+      if (mostRecentEntry && new Date(mostRecentEntry.startDate) < newStartDate) {
+        previousEndDate = new Date(newStartDate);
+        previousEndDate.setDate(previousEndDate.getDate() - 1); // Set endDate to one day before the new startDate
+        
+        await Axios({
+          method: "PUT",
+          url: `${taxFormUrl}${mostRecentEntry.id}/`,
+          data: {
+            ...mostRecentEntry,
+            endDate: previousEndDate.toISOString().split('T')[0] // Format to YYYY-MM-DD
+          },
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      const data = new FormData();
+      data.append("taxCategory", taxType);
+      data.append("taxCode", taxType);
+      data.append("taxRate", taxRate);
+      data.append("startDate", effectiveDate);
+
+      try {
+        const response = await Axios({
+          method  : "POST",
+          url     : taxFormUrl,
+          data    : data,
+          headers : {"Content-Type": "multipart/form-data"},
+        });
+        setRefreshData(response.data)
+      } catch (error) {
+        console.log("error", error);
+      }
+      setOpenDialog(false);
     } catch (error) {
       console.log("error", error);
     }
-    setOpenDialog(false);
   };
-
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  }
   
   return (
     <div>
@@ -136,7 +186,7 @@ const Page2 = () => {
                   id="tax-type-select"
                   value={taxType || []}
                   label="Your Tax Type"
-                  onChange={(e) => setTaxType(e.target.value)}
+                  onChange={(e) => handleSelectTaxType(e.target.value)}
                 >
                   <MenuItem value="SST">SST</MenuItem>
                   <MenuItem value="GST">GST</MenuItem>
@@ -158,6 +208,7 @@ const Page2 = () => {
               <TextField
                 onChange        ={(e) => setEffectiveDate(e.target.value)}
                 InputLabelProps ={{ shrink: true }}
+                inputProps      ={{ min: minEffectiveDate }}
                 margin          ="dense"
                 label           ="Effective From"
                 type            ="date"
@@ -213,7 +264,18 @@ const Page2 = () => {
                   <TableCell style={{textAlign: "center"}}>{datas.startDate}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{datas.endDate || 'N/A'}</TableCell>
                   <TableCell style={{textAlign: "center"}}>{status}</TableCell>
-                  <TableCell style={{textAlign: "center"}}></TableCell>
+                  <TableCell style={{ textAlign: 'center' }}>
+                    {status === 'Upcoming' && (
+                      <>
+                        <IconButton aria-label="edit">
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton aria-label="delete">
+                          <DeleteIcon />
+                        </IconButton>
+                      </>
+                    )}
+                  </TableCell>
                 </TableRow>
               )
             })}

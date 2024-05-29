@@ -39,11 +39,11 @@ from datetime import datetime
 from django.middleware.csrf import get_token
 
 class TaxFormView(viewsets.ModelViewSet):
-    queryset = TaxTable.objects.all().order_by('-createdAt')
+    queryset = TaxTable.objects.all().order_by('createdAt')
     serializer_class = TaxTableSerializer
     #all
     def list(self, request):
-        queryset = TaxTable.objects.all().order_by('id')
+        queryset = TaxTable.objects.all().order_by('-createdAt')
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = TaxTableSerializer(page, many=True)
