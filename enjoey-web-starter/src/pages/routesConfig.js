@@ -30,6 +30,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/PaymentSetup',
       },
+      {
+        id: 'payment-details',
+        title: 'Payment Details',
+        messageId: 'Payment Details',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/PaymentDetails',
+      },
     ],
   },
   {

@@ -33,6 +33,7 @@ const Page29 = React.lazy(() => import('./ButtonTest'));
 const Page30 = React.lazy(() => import('./HtmlEditors'));
 const Page31 = React.lazy(() => import('./TenantPlan'));
 const Page32 = React.lazy(() => import('./TaxForm'));
+const Page33 = React.lazy(() => import('./PaymentDetails'));
 
 export const samplePagesConfigs = [
   {
@@ -163,5 +164,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/TaxForm',
     element: <Page32 />,
+  },
+  {
+    path: '/sample/PaymentDetails',
+    element: <Page33 />,
   },
 ];
