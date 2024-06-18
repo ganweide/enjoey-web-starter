@@ -112,9 +112,9 @@ const Page2 = () => {
               <Typography variant="h3" gutterBottom>Paid On</Typography>
               <Typography variant="body1" gutterBottom>2024-06-13 11:32:AM</Typography>
             </Grid>
-            <Grid item container xs={12} md={12}>
+            <Grid item container xs={12} md={12} alignItems="center">
               <Grid item xs={11} md={11}>
-                <Typography variant="h3" gutterBottom>Fees, Method Description</Typography>
+                <Typography variant="h3">Fees, Method Description</Typography>
               </Grid>
               <Grid item xs={1} md={1} style={{ cursor: 'pointer' }}>
                 <Tooltip title={drop ? "Click to collapse" : "Click to expand"}>
