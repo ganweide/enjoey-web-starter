@@ -88,6 +88,12 @@ const tableStyle = (theme) => ({
     outline: "none",
     verticalAlign: "middle",
   },
+  clickableRow: {
+    cursor: "pointer",
+    "&:hover": {
+      background: "#f5f5f5",
+    }
+  }
 });
 
 export default tableStyle;

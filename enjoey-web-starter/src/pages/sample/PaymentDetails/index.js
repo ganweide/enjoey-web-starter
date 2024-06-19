@@ -33,7 +33,7 @@ const useStyles = makeStyles(Styles);
 
 const Page2 = () => {
   const classes   = useStyles();
-  const tableHead = ["Children", "Paid by", "Date", "Amount Paid", "Actions"];
+  const tableHead = ["Children", "Paid by", "Date", "Amount Paid"];
   const [openPaymentDetailDialog, setOpenPaymentDetailDialog] = useState(false);
   const [drop, setDrop] = useState(true);
 
@@ -57,7 +57,7 @@ const Page2 = () => {
         </Typography>
       </Box>
       <Card>
-        <div style={{ overflowX: 'auto', maxHeight: '400px' }}>
+        <Box style={{ overflowX: 'auto', maxHeight: '400px' }}>
           <Table>
             <TableHead>
               <TableRow className={classes.tableHeadRow}>
@@ -75,18 +75,42 @@ const Page2 = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                <TableCell style={{textAlign: "center"}}>Test Children 1</TableCell>
-                <TableCell style={{textAlign: "center"}}>Test Father 1</TableCell>
-                <TableCell style={{textAlign: "center"}}>2024-06-04</TableCell>
-                <TableCell style={{textAlign: "center"}}>RM20.00</TableCell>
-                <TableCell style={{textAlign: "center"}}>
-                  <Button id="basic-button" onClick={handleOpenPaymentDetailDialog}>View Details</Button>
-                </TableCell>
-              </TableRow>
+              <Tooltip title="View Details">
+                <TableRow
+                  className={classes.clickableRow}
+                  onClick={handleOpenPaymentDetailDialog}
+                >
+                  <TableCell style={{textAlign: "center"}}>Test Children 1</TableCell>
+                  <TableCell style={{textAlign: "center"}}>Test Father 1</TableCell>
+                  <TableCell style={{textAlign: "center"}}>2024-06-04</TableCell>
+                  <TableCell style={{textAlign: "center"}}>RM20.00</TableCell>
+                </TableRow>
+              </Tooltip>
+              <Tooltip title="View Details">
+                <TableRow
+                  className={classes.clickableRow}
+                  onClick={handleOpenPaymentDetailDialog}
+                >
+                  <TableCell style={{textAlign: "center"}}>Test Children 2</TableCell>
+                  <TableCell style={{textAlign: "center"}}>Test Father 2</TableCell>
+                  <TableCell style={{textAlign: "center"}}>2024-06-05</TableCell>
+                  <TableCell style={{textAlign: "center"}}>RM120.00</TableCell>
+                </TableRow>
+              </Tooltip>
+              <Tooltip title="View Details">
+                <TableRow
+                  className={classes.clickableRow}
+                  onClick={handleOpenPaymentDetailDialog}
+                >
+                  <TableCell style={{textAlign: "center"}}>Test Children 3</TableCell>
+                  <TableCell style={{textAlign: "center"}}>Test Father 3</TableCell>
+                  <TableCell style={{textAlign: "center"}}>2024-06-06</TableCell>
+                  <TableCell style={{textAlign: "center"}}>RM60.00</TableCell>
+                </TableRow>
+              </Tooltip>
             </TableBody>
           </Table>
-        </div>
+        </Box>
       </Card>
       <Dialog
         fullWidth
