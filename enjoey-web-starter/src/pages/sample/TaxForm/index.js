@@ -1,6 +1,6 @@
 // React Imports
 import React, { useEffect, useState } from "react";
-
+import {useAuthUser} from '@enjoey/utility/AuthHooks';
 // Axios Import
 import Axios from "axios";
 
@@ -49,6 +49,9 @@ const Page2 = () => {
   const [effectiveDate, setEffectiveDate]   = useState([]);
   const [minEffectiveDate, setMinEffectiveDate] = useState("");
   const [refreshData, setRefreshData]       = useState([]);
+  const {user} = useAuthUser();
+
+  console.log(user);
 
   useEffect(() => {
     try {

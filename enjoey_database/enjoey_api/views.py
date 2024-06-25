@@ -4,7 +4,7 @@ from rest_framework.generics import CreateAPIView
 
 from .jobs import send_email_template
 from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable, TenantPlan, TenantPlanFeatures, PublishSurveyTable, UserAnswerTable, TaxTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer, AttendanceTableSerializer, TenantPlanSerializer, TenantPlanFeaturesSerializer, PublishSurveySerializer, UserAnswerSerializer, TaxTableSerializer
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer, AttendanceTableSerializer, TenantPlanSerializer, TenantPlanFeaturesSerializer, PublishSurveySerializer, UserAnswerSerializer, TaxTableSerializer, LogEntrySerializer
 from rest_framework.response import Response
 from django.views import View
 from django.conf import settings
@@ -35,8 +35,22 @@ from bs4 import BeautifulSoup, Comment
 import csv
 import datetime
 from datetime import datetime
+from auditlog.models import LogEntry
 
 from django.middleware.csrf import get_token
+
+class AuditLogView(viewsets.ModelViewSet):
+    queryset = LogEntry.objects.all().order_by('-timestamp')
+    serializer_class = LogEntrySerializer
+    def list(self, request):
+        queryset = LogEntry.objects.all().order_by('-timestamp')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = LogEntrySerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = LogEntrySerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class TaxFormView(viewsets.ModelViewSet):
     queryset = TaxTable.objects.all().order_by('createdAt')

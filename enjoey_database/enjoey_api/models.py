@@ -8,6 +8,8 @@ from django.conf import settings
 import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
+from auditlog.registry import auditlog
+from auditlog.models import AuditlogHistoryField
 
 class TaxTable(models.Model):
     dateAdded = models.DateField(auto_now_add=True)
@@ -18,6 +20,9 @@ class TaxTable(models.Model):
     endDate = models.CharField(max_length=40, null=True)
     createdAt = models.DateTimeField(auto_now_add=True, editable=False)
     updatedAt = models.DateTimeField(auto_now=True)
+    history = AuditlogHistoryField()
+
+auditlog.register(TaxTable)
 
 class TenantPlan(models.Model):
     termsInMonth = models.IntegerField()
@@ -55,6 +60,9 @@ class TenantPaymentKeySettings(models.Model):
     creator = models.CharField(max_length=250)
     createdAt = models.DateTimeField(auto_now_add=True, editable=False)
     updatedAt = models.DateTimeField(auto_now=True)
+    history = AuditlogHistoryField()
+
+auditlog.register(TenantPaymentKeySettings)
 
 class DocumentsTable(models.Model):
     documentName = models.CharField(max_length=250)

@@ -334,6 +334,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/ButtonTest',
       },
+      {
+        id: 'audit-log',
+        title: 'Audit Log',
+        messageId: 'Audit Log',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/AuditLog',
+      },
     ]
   },
 ];

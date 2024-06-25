@@ -1,5 +1,11 @@
 from rest_framework import serializers
 from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityTagsTable, ActivityAreaTagsTable, AppointmentTimeSlotsTable, AppointmentTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable, TenantPlan, TenantPlanFeatures, PublishSurveyTable, UserAnswerTable, TaxTable
+from auditlog.models import LogEntry
+
+class LogEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LogEntry
+        fields = ['id', 'action', 'timestamp', 'actor', 'changes', 'object_repr']
 
 class TaxTableSerializer(serializers.ModelSerializer):
     class Meta:
