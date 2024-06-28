@@ -5,7 +5,7 @@ from auditlog.models import LogEntry
 class LogEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = LogEntry
-        fields = ['id', 'action', 'timestamp', 'actor', 'changes', 'object_repr']
+        fields = ['id', 'action', 'timestamp', 'actor', 'changes', 'object_repr', 'remote_addr']
 
 class TaxTableSerializer(serializers.ModelSerializer):
     class Meta:
