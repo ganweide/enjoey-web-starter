@@ -87,32 +87,26 @@ const Page2 = () => {
   };
 
   const applyFilters = () => {
-    // Step 1: Filter by Table
     const filteredTableData = selectedFilterTable === 'All' ? data : data.filter(entry => {
       const match = entry.object_repr.match(/([A-Za-z]+) object/);
       const modelName = match ? match[1] : 'Unknown';
       return modelName === selectedFilterTable;
     });
-  
-    // Step 2: Filter by Actor
+
     const filteredActorData = selectedFilterActor === 'All' ? filteredTableData : filteredTableData.filter(entry => {
       const actor = entry.actor === null ? 'null' : entry.actor;
       return actor === selectedFilterActor;
     });
-  
-    // Step 3: Filter by Source
+
   const filteredSourceData = selectedFilterSource === 'All' ? filteredActorData : filteredActorData.filter(entry => {
-    const source = entry.remote_addr || 'null'; // handle null or undefined remote_addr
+    const source = entry.remote_addr || 'null';
     return source === selectedFilterSource;
   });
-  
-    // Step 4: Filter by Start Date
+
     const filteredStartDateData = filterStartDate ? filteredSourceData.filter(entry => new Date(entry.timestamp) >= new Date(filterStartDate)) : filteredSourceData;
-  
-    // Step 5: Filter by End Date
+
     const filteredEndDateData = filterEndDate ? filteredStartDateData.filter(entry => new Date(entry.timestamp) <= new Date(filterEndDate)) : filteredStartDateData;
-  
-    // Return the final filtered data
+
     return filteredEndDateData;
   };
   
