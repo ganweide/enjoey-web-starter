@@ -42,8 +42,8 @@ const Page2 = () => {
   const [sourceFilterOptions, setSourceFilterOptions] = useState([]);
   const [actorFilterOptions, setActorFilterOptions] = useState([]);
   // filtering constants
-  const [filterStartDate, setFilterStartDate] = useState([]);
-  const [filterEndDate, setFilterEndDate] = useState([]);
+  const [filterStartDate, setFilterStartDate] = useState('');
+  const [filterEndDate, setFilterEndDate] = useState('');
   const [selectedFilterTable, setSelectedFilterTable] = useState('All');
   const [selectedFilterActor, setSelectedFilterActor] = useState('All');
   const [selectedFilterSource, setSelectedFilterSource] = useState('All');
@@ -57,7 +57,7 @@ const Page2 = () => {
         const response = await Axios.get(auditLogUrl);
         setData(response.data);
         console.log(response.data);
-        const models = response.data.map(entry => {
+        const tables = response.data.map(entry => {
           const match = entry.object_repr.match(/([A-Za-z]+) object/);
           return match ? match[1] : 'Unknown';
         });
@@ -65,9 +65,9 @@ const Page2 = () => {
         const actors = response.data.map(entry => entry.actor || 'null');
         // Create filter options from unique models
         const uniqueSource = [...new Set(source)];
-        const uniqueModels = [...new Set(models)];
+        const uniqueTables = [...new Set(tables)];
         const uniqueActors = [...new Set(actors)];
-        setModelFilterOptions(['All', ...uniqueModels]);
+        setModelFilterOptions(['All', ...uniqueTables]);
         setSourceFilterOptions(['All', ...uniqueSource]);
         setActorFilterOptions(['All', ...uniqueActors]);
       } catch (error) {
@@ -86,11 +86,37 @@ const Page2 = () => {
     return format(new Date(timestamp), 'PPpp'); // 'PPpp' is a date-fns format string for a full date and time
   };
 
-  const filteredData = selectedFilterTable === 'All' ? data : data.filter(entry => {
-    const match = entry.object_repr.match(/([A-Za-z]+) object/);
-    const modelName = match ? match[1] : 'Unknown';
-    return modelName === selectedFilterTable;
+  const applyFilters = () => {
+    // Step 1: Filter by Table
+    const filteredTableData = selectedFilterTable === 'All' ? data : data.filter(entry => {
+      const match = entry.object_repr.match(/([A-Za-z]+) object/);
+      const modelName = match ? match[1] : 'Unknown';
+      return modelName === selectedFilterTable;
+    });
+  
+    // Step 2: Filter by Actor
+    const filteredActorData = selectedFilterActor === 'All' ? filteredTableData : filteredTableData.filter(entry => {
+      const actor = entry.actor === null ? 'null' : entry.actor;
+      return actor === selectedFilterActor;
+    });
+  
+    // Step 3: Filter by Source
+  const filteredSourceData = selectedFilterSource === 'All' ? filteredActorData : filteredActorData.filter(entry => {
+    const source = entry.remote_addr || 'null'; // handle null or undefined remote_addr
+    return source === selectedFilterSource;
   });
+  
+    // Step 4: Filter by Start Date
+    const filteredStartDateData = filterStartDate ? filteredSourceData.filter(entry => new Date(entry.timestamp) >= new Date(filterStartDate)) : filteredSourceData;
+  
+    // Step 5: Filter by End Date
+    const filteredEndDateData = filterEndDate ? filteredStartDateData.filter(entry => new Date(entry.timestamp) <= new Date(filterEndDate)) : filteredStartDateData;
+  
+    // Return the final filtered data
+    return filteredEndDateData;
+  };
+  
+  const filteredData = applyFilters();
 
   const handleClearFilters = () => {
     setSelectedFilterTable('All');
@@ -224,7 +250,7 @@ const Page2 = () => {
                     {entry.action === 0 ? <>create<br />{entry.object_repr}</> : entry.action === 1 ? <>update<br />{entry.object_repr}</> : entry.action === 2 ? <>delete<br />{entry.object_repr}</> : entry.action}
                   </TableCell>
                   <TableCell style={{ textAlign: "center" }}>{entry.actor === null ? "null" : entry.actor}</TableCell>
-                  <TableCell style={{ textAlign: "center" }}>{entry.remote_addr}</TableCell>
+                  <TableCell style={{ textAlign: "center" }}>{entry.remote_addr === null ? "null" : entry.remote_addr}</TableCell>
                   <TableCell style={{ textAlign: "left" }}>{JSON.stringify(entry.changes)}</TableCell>
                 </TableRow>
               ))}
