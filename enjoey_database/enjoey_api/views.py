@@ -35,6 +35,7 @@ from bs4 import BeautifulSoup, Comment
 import csv
 import datetime
 from datetime import datetime
+from datetime import date
 from auditlog.models import LogEntry
 
 from django.middleware.csrf import get_token
@@ -704,7 +705,7 @@ def check_scheduler_status(request):
 class PDFGenerationAndUploadView(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            today = datetime.date.today().strftime("%Y-%m-%d")
+            today = date.today().strftime("%Y-%m-%d")
             data = {
                 'receipt_date': today,
                 'birth_certificate': '003928-93-2674',
@@ -724,7 +725,7 @@ class PDFGenerationAndUploadView(APIView):
             serializer = EmailTemplateHtmlTableSerializer(template_instance)
             html_code = serializer.data.get('htmlFormat', '')
 
-             # Parse HTML content using BeautifulSoup
+            # Parse HTML content using BeautifulSoup
             soup = BeautifulSoup(html_code, 'html.parser')
 
             # Remove comments from the HTML
