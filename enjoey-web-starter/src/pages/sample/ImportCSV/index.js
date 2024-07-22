@@ -8,10 +8,12 @@ import {
   Typography,
   Box,
   Button,
+  Grid,
 } from "@mui/material";
 
 const Page2 = () => {
   const [file, setFile] = useState(null);
+  const [childrenCSV, setChildrenCSV] = useState(null);
   const [status, setStatus] = useState('');
   const [success, setSuccess] = useState([]);
   const [skipped, setSkipped] = useState([]);
@@ -76,23 +78,82 @@ const Page2 = () => {
     });
   };
 
+  const handleChildrenCSVChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setChildrenCSV(selectedFile);
+  };
+
+  const handleChildrenCSVUpload = async () => {
+    try {
+      if(!childrenCSV) {
+        console.error('No File Selected');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('file', childrenCSV);
+
+      // Read the contents of the file before uploading
+      const fileContents = await readFileContents(childrenCSV);
+      
+      // Log the data to the console
+      console.log('CSV File Contents:', fileContents);
+
+      // Replace 'YOUR_DJANGO_UPLOAD_API_URL' with your actual Django API endpoint for file upload
+      setStatus('Status: Populating');
+      const response = await Axios.post('http://127.0.0.1:8000/api/data_migration/childrencsvupload/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setStatus('Status: Completed');
+      setTimeout(() => {
+        setStatus('');
+      }, 3000);
+      console.log(response.data);
+    } catch (error) {
+      setStatus('Status: Failed');
+      console.error('Error uploading file', error);
+    }
+  };
+
   return (
-    <div>
-      <Card sx={{ p: 5, mb: 5 }}>
-        <Typography variant="h3" component="div">
-          Import CSV
-        </Typography>
-        <Box>
-          <input type="file" onChange={handleFileChange} />
-          <Button onClick={handleUpload} disabled={!file}>
-            <Typography>Upload CSV</Typography>
-          </Button>
-          <div>{status}</div>
-          <div>{success}</div>
-          <div>{skipped}</div>
-        </Box>
-      </Card>
-    </div>
+    <Box>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={12}>
+          <Card sx={{ p: 5, mb: 5 }}>
+            <Typography variant="h3" component="div">
+              Import CSV
+            </Typography>
+            <Box>
+              <input type="file" onChange={handleFileChange} />
+              <Button onClick={handleUpload} disabled={!file}>
+                <Typography>Upload CSV</Typography>
+              </Button>
+              <div>{status}</div>
+              <div>{success}</div>
+              <div>{skipped}</div>
+            </Box>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Card sx={{ p: 5, mb: 5 }}>
+            <Typography variant="h3" component="div">
+              Import Children CSV
+            </Typography>
+            <Box>
+              <input type="file" onChange={handleChildrenCSVChange} />
+              <Button onClick={handleChildrenCSVUpload} disabled={!childrenCSV}>
+                <Typography>Select CSV</Typography>
+              </Button>
+              <div>{status}</div>
+              <div>{success}</div>
+              <div>{skipped}</div>
+            </Box>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

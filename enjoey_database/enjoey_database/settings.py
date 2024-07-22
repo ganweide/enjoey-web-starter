@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'django_apscheduler',
     'apscheduler',
     'auditlog',
+    'data_migration_api',
 ]
 
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"

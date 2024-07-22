@@ -25,5 +25,6 @@ route1.register("", ChildView, basename='childview')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('enjoey_api.urls')),
+    path('api/data_migration/', include('data_migration_api.urls')),
     path('test/', include(route1.urls)),
 ]
