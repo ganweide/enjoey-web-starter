@@ -35,6 +35,7 @@ const Page31 = React.lazy(() => import('./TenantPlan'));
 const Page32 = React.lazy(() => import('./TaxForm'));
 const Page33 = React.lazy(() => import('./PaymentDetails'));
 const Page34 = React.lazy(() => import('./AuditLog'));
+const Page35 = React.lazy(() => import('./ReactDataGridReport'));
 
 export const samplePagesConfigs = [
   {
@@ -173,5 +174,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/AuditLog',
     element: <Page34 />,
+  },
+  {
+    path: '/sample/ReactDataGridReport',
+    element: <Page35 />,
   },
 ];

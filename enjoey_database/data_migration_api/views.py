@@ -221,6 +221,23 @@ class UploadChildrenCSVData(APIView):
                     serializer.save()
                 else:
                     raise Exception(serializer.errors)
+                
+            def populate_core_service_children_table(temp_record):
+                core_service_children_data = {
+                    'fullName': temp_record.name,
+                    'birthCertNo': temp_record.studentID,
+                    'birthDate': temp_record.dob,
+                    'birthCountry': temp_record.citizenship,
+                    'ethnicity': temp_record.race,
+                    'religion': temp_record.religion,
+                    'gender': temp_record.gender,
+                    'age': temp_record.age
+                }
+                serializer = CoreServiceChildrenTableSerializer(data=core_service_children_data)
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    raise Exception(serializer.errors)
 
             for row in csv_data:
                 temp_record = insert_temp_table(row)

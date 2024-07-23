@@ -278,6 +278,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/Immunization',
       },
+      {
+        id: 'react-data-grid-report',
+        title: 'React Data Grid Report',
+        messageId: 'React Data Grid Report',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/ReactDataGridReport',
+      },
     ]
   },
   {
