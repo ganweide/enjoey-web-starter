@@ -238,6 +238,14 @@ const routesConfig = [
         icon: <BiAlignLeft />,
         url: '/sample/TaxForm',
       },
+      {
+        id: 'leave-application-form',
+        title: 'Leave Application Form',
+        messageId: 'Leave Application Form',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/LeaveApplicationForm',
+      },
     ]
   },
   {
