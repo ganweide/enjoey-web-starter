@@ -1,8 +1,6 @@
 // React Imports
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {useAuthUser} from '@enjoey/utility/AuthHooks';
-// Axios Import
-import Axios from "axios";
 
 // Material UI Imports
 import { makeStyles } from "@material-ui/core/styles";
