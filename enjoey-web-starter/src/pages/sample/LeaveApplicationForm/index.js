@@ -27,6 +27,10 @@ import {
   Box,
   Typography,
   Divider,
+  ListItem,
+  ListItemText,
+  Menu,
+  List,
 } from "@mui/material";
 
 // Local Imports
@@ -64,6 +68,18 @@ const Page2 = () => {
   const handleCloseDialog = async () => {
     setOpenDialog(false);
   }
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleOpenCheckBalance = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseCheckBalance = () => {
+    setAnchorEl(null);
+  };
+
   
   return (
     <Box>
@@ -84,12 +100,39 @@ const Page2 = () => {
             User: {user.displayName}
           </Typography>
         </Box>
-        <Button variant ="contained" onClick ={handleOpenDialog}>
-          <Typography variant="button" component="div">
-            + Create
-          </Typography>
-        </Button>
+        <Box>
+          <Button variant ="outlined" onClick={handleOpenCheckBalance} sx={{ mr:2 }}>
+            <Typography variant="button" component="div">
+              Check Balance
+            </Typography>
+          </Button>
+          <Button variant ="contained" onClick ={handleOpenDialog}>
+            <Typography variant="button" component="div">
+              + Create
+            </Typography>
+          </Button>
+        </Box>
       </Box>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleCloseCheckBalance}
+      >
+        <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+          <ListItem>
+            <ListItemText primary='AL Balance: 14' />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary='SL Balance: 7' />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary='HL Balance: 7' />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary='UL Balance: 10' />
+          </ListItem>
+        </List>
+      </Menu>
       <Dialog
         maxWidth          ="md"
         open              ={openDialog}
@@ -230,11 +273,6 @@ const Page2 = () => {
           <TableBody>
           </TableBody>
         </Table>
-        <Box sx={{px: 5}}>
-          <Typography variant="subtitle2" component="div">
-            AL Balance: 14  SL Balance: 7  HL Balance: 7  UL Balance: 10
-          </Typography>
-        </Box>
       </Card>
     </Box>
   );
