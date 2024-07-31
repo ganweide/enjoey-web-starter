@@ -298,6 +298,30 @@ const routesConfig = [
   },
   {
     id: 'app',
+    title: 'Data Migration',
+    messageId: 'Data Migration',
+    type: 'collapse',
+    children: [
+      {
+        id: 'import-csv',
+        title: 'Import CSV',
+        messageId: 'Import CSV',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/ImportCSV',
+      },
+      {
+        id: 'data-migration',
+        title: 'Data Migration',
+        messageId: 'Data Migration',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/Migration',
+      },
+    ]
+  },
+  {
+    id: 'app',
     title: 'Sample',
     messageId: 'Others',
     type: 'collapse',
@@ -333,14 +357,6 @@ const routesConfig = [
         type: 'item',
         icon: <BiAlignLeft />,
         url: '/sample/HtmlEditors',
-      },
-      {
-        id: 'import-csv',
-        title: 'Import CSV',
-        messageId: 'Import CSV',
-        type: 'item',
-        icon: <BiAlignLeft />,
-        url: '/sample/ImportCSV',
       },
       {
         id: 'button-test',

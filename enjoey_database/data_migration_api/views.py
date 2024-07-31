@@ -179,6 +179,10 @@ class UploadChildrenCSVData(APIView):
                 'Residential Address 1', 'Emergency contact 1'
             ]
 
+            errors = []
+            successful_uploads = 0
+            failed_uploads = 0
+
             def insert_temp_table(row):
                 row = {key: value for key, value in row.items() if key not in columns_to_remove}
                 row = {csv_to_model_mapping.get(key, key): value for key, value in row.items()}
@@ -203,7 +207,8 @@ class UploadChildrenCSVData(APIView):
                     serializer.save()
                     return serializer.instance  # Return the model instance
                 else:
-                    raise Exception(serializer.errors)
+                    errors.append(serializer.errors)
+                    return None
 
             def populate_core_service_children_table(temp_record):
                 core_service_children_data = {
@@ -220,31 +225,23 @@ class UploadChildrenCSVData(APIView):
                 if serializer.is_valid():
                     serializer.save()
                 else:
-                    raise Exception(serializer.errors)
-                
-            def populate_core_service_children_table(temp_record):
-                core_service_children_data = {
-                    'fullName': temp_record.name,
-                    'birthCertNo': temp_record.studentID,
-                    'birthDate': temp_record.dob,
-                    'birthCountry': temp_record.citizenship,
-                    'ethnicity': temp_record.race,
-                    'religion': temp_record.religion,
-                    'gender': temp_record.gender,
-                    'age': temp_record.age
-                }
-                serializer = CoreServiceChildrenTableSerializer(data=core_service_children_data)
-                if serializer.is_valid():
-                    serializer.save()
-                else:
-                    raise Exception(serializer.errors)
+                    errors.append(serializer.errors)
 
             for row in csv_data:
                 temp_record = insert_temp_table(row)
-                populate_core_service_children_table(temp_record)
+                if temp_record:
+                    successful_uploads += 1
+                else:
+                    failed_uploads += 1
+                # populate_core_service_children_table(temp_record)
 
-            return Response({'message': 'CSV data imported successfully'}, status=status.HTTP_200_OK)
-
+            return Response({
+                'message': 'CSV data imported successfully',
+                'successful_uploads': successful_uploads,
+                'failed_uploads': failed_uploads,
+                'errors': errors
+            }, status=status.HTTP_200_OK)
+        
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

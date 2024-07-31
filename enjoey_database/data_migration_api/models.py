@@ -126,6 +126,9 @@ class ChildrenTempTable(models.Model):
     mobileNumber1EC = models.CharField(max_length=250, null=True)
     phoneNumber1EC = models.CharField(max_length=250, null=True)
     email1EC = models.CharField(max_length=250, null=True)
+    badgeNo = models.CharField(max_length=250, null=True)
+    migrationStatus = models.CharField(max_length=250, null=True)
+    migrationRemark = models.CharField(max_length=250, null=True)
 
 class CoreServiceChildren(models.Model):
     createdAt = models.DateTimeField("createdAt", auto_now_add=True)
