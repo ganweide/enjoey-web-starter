@@ -8,8 +8,17 @@ from rest_framework import status
 import csv
 import datetime
 from datetime import datetime
+from django.db.models import Max
 
 class UploadChildrenCSVData(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            records = ChildrenTempTable.objects.all()
+            serializer = ChildrenTempTableSerializer(records, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def post(self, request, *args, **kwargs):
         file = request.FILES.get('file')
 
@@ -169,6 +178,12 @@ class UploadChildrenCSVData(APIView):
                 "Email 1": "email1EC",
             }
 
+            max_badge_no = ChildrenTempTable.objects.aggregate(Max('badgeNo')).get('badgeNo__max')
+            if max_badge_no:
+                next_badge_no = int(max_badge_no) + 1
+            else:
+                next_badge_no = 10001  # Start from 10001 if no badge number exists
+
             # List of columns to remove
             columns_to_remove = [
                 'School name', 'PT10 B6', 'Export date',
@@ -202,6 +217,7 @@ class UploadChildrenCSVData(APIView):
                 row['authorisedPickUpPerson3'] = convert_bool(row.get('authorisedPickUpPerson1', 'No'))
                 row['emailInvoiceReceipt3'] = convert_bool(row.get('emailInvoiceReceipt1', 'No'))
                 row['emailCheckin3'] = convert_bool(row.get('emailCheckin1', 'No'))
+                row['badgeNo'] = next_badge_no
                 serializer = ChildrenTempTableSerializer(data=row)
                 if serializer.is_valid():
                     serializer.save()
@@ -209,23 +225,6 @@ class UploadChildrenCSVData(APIView):
                 else:
                     errors.append(serializer.errors)
                     return None
-
-            def populate_core_service_children_table(temp_record):
-                core_service_children_data = {
-                    'fullName': temp_record.name,
-                    'birthCertNo': temp_record.studentID,
-                    'birthDate': temp_record.dob,
-                    'birthCountry': temp_record.citizenship,
-                    'ethnicity': temp_record.race,
-                    'religion': temp_record.religion,
-                    'gender': temp_record.gender,
-                    'age': temp_record.age
-                }
-                serializer = CoreServiceChildrenTableSerializer(data=core_service_children_data)
-                if serializer.is_valid():
-                    serializer.save()
-                else:
-                    errors.append(serializer.errors)
 
             for row in csv_data:
                 temp_record = insert_temp_table(row)
