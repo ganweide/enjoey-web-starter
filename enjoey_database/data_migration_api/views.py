@@ -1,3 +1,4 @@
+import time
 from rest_framework import status
 from .models import ChildrenTempTable, CoreServiceChildren, CoreServiceFamily, CoreServiceChildrenMedicalContact, CoreServiceChildrenAllergies, CoreServiceClassrooms, CoreServiceChildrenEnrollment
 from .serializers import ChildrenTempTableSerializer, CoreServiceChildrenTableSerializer, CoreServiceChildrenMedicalContactTableSerializer, CoreServiceChildrenAllergiesTableSerializer, CoreServiceChildrenEnrollmentTableSerializer, CoreServiceFamilyTableSerializer, CoreServiceClassroomsTableSerializer
@@ -9,6 +10,7 @@ import csv
 import datetime
 from datetime import datetime
 from django.db.models import Max
+from django.core.cache import cache
 
 class UploadChildrenCSVData(APIView):
     def get(self, request, *args, **kwargs):
@@ -244,3 +246,63 @@ class UploadChildrenCSVData(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class MigrateIntoCoreServiceChildrenTable(APIView):
+    def get(self, request, *args, **kwargs):
+        cache_key = f'migrated_ids_{request.user.id}'
+        migrated_ids = cache.get(cache_key, [])
+        total_migrated = len(migrated_ids)
+        return Response({'migrated_records': total_migrated})
+    
+    def post(self, request, *args, **kwargs):
+        badgeNo = request.data.get('badgeNo')
+        className = request.data.get('className')
+        filters = {}
+        if badgeNo != "All": filters['badgeNo'] = badgeNo
+        if className != "All": filters['className'] = className
+        records = ChildrenTempTable.objects.filter(**filters)
+        total_records = records.count()
+        print(total_records)
+        migrated_records = 0
+        errors = []
+
+        if total_records == 0:
+            return Response({"message": "No records to migrate"}, status=status.HTTP_200_OK)
+        
+        cache_key = f'migrated_ids_{request.user.id}'
+
+        try:
+            cache.set(cache_key, [], timeout=3600)
+            migrated_ids = cache.get(cache_key, [])
+            errors = []
+            for record in records:
+                core_service_children_data = {
+                    'fullName': record.name,
+                    'birthCertNo': record.studentID,
+                    'birthDate': record.dob,
+                    'birthCountry': record.citizenship,
+                    'ethnicity': record.race,
+                    'religion': record.religion,
+                    'gender': record.gender,
+                    'age': record.age
+                }
+                serializer = CoreServiceChildrenTableSerializer(data=core_service_children_data)
+                if serializer.is_valid():
+                    saved_record = serializer.save()
+                    migrated_records += 1
+                    migrated_ids.append(saved_record.id)
+                else:
+                    errors.append(serializer.errors)
+            
+            cache.set(cache_key, migrated_ids, timeout=3600)
+
+            if errors:
+                return Response({"message": "Migration completed with errors", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'total_records': total_records,
+                'migrated_records': migrated_records,
+                'migrated_ids': migrated_ids,
+                'errors': errors
+            }, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
