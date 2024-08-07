@@ -1,4 +1,4 @@
-import time
+from time import sleep
 from rest_framework import status
 from .models import ChildrenTempTable, CoreServiceChildren, CoreServiceFamily, CoreServiceChildrenMedicalContact, CoreServiceChildrenAllergies, CoreServiceClassrooms, CoreServiceChildrenEnrollment
 from .serializers import ChildrenTempTableSerializer, CoreServiceChildrenTableSerializer, CoreServiceChildrenMedicalContactTableSerializer, CoreServiceChildrenAllergiesTableSerializer, CoreServiceChildrenEnrollmentTableSerializer, CoreServiceFamilyTableSerializer, CoreServiceClassroomsTableSerializer
@@ -247,11 +247,11 @@ class UploadChildrenCSVData(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class MigrateIntoCoreServiceChildrenTable(APIView):
-    def get(self, request, *args, **kwargs):
-        cache_key = f'migrated_ids_{request.user.id}'
-        migrated_ids = cache.get(cache_key, [])
-        total_migrated = len(migrated_ids)
-        return Response({'migrated_records': total_migrated})
+    # def get(self, request, *args, **kwargs):
+    #     cache_key = f'migrated_ids_{request.user.id}'
+    #     migrated_ids = cache.get(cache_key, [])
+    #     total_migrated = len(migrated_ids)
+    #     return Response({'migrated_records': total_migrated})
     
     def post(self, request, *args, **kwargs):
         badgeNo = request.data.get('badgeNo')
@@ -261,8 +261,10 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
         if className != "All": filters['className'] = className
         records = ChildrenTempTable.objects.filter(**filters)
         total_records = records.count()
-        print(total_records)
         migrated_records = 0
+        failed_records = 0
+        duplicated_records = 0
+        progress_updates = []
         errors = []
 
         if total_records == 0:
@@ -274,7 +276,16 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
             cache.set(cache_key, [], timeout=3600)
             migrated_ids = cache.get(cache_key, [])
             errors = []
-            for record in records:
+            for index, record in enumerate(records):
+                if CoreServiceChildren.objects.filter(birthCertNo=record.studentID).exists():
+                    duplicated_records += 1
+                    progress_updates.append({
+                        'migrated_records': migrated_records,
+                        'duplicated_records': duplicated_records,
+                        'failed_records': failed_records,
+                        'progress': ((index + 1) / total_records) * 100
+                    })
+                    continue
                 core_service_children_data = {
                     'fullName': record.name,
                     'birthCertNo': record.studentID,
@@ -291,16 +302,24 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
                     migrated_records += 1
                     migrated_ids.append(saved_record.id)
                 else:
+                    failed_records += 1
                     errors.append(serializer.errors)
+
+                progress_updates.append({
+                    'migrated_records': migrated_records,
+                    'duplicated_records': duplicated_records,
+                    'failed_records': failed_records,
+                    'progress': ((index + 1) / total_records) * 100
+                })
             
             cache.set(cache_key, migrated_ids, timeout=3600)
 
-            if errors:
-                return Response({"message": "Migration completed with errors", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
             return Response({
                 'total_records': total_records,
                 'migrated_records': migrated_records,
-                'migrated_ids': migrated_ids,
+                'failed_records': failed_records,
+                'duplicated_records': duplicated_records,
+                'progress_updates': progress_updates,
                 'errors': errors
             }, status=status.HTTP_200_OK)
         
