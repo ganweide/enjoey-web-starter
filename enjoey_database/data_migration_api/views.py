@@ -1,4 +1,3 @@
-from time import sleep
 from rest_framework import status
 from .models import ChildrenTempTable, CoreServiceChildren, CoreServiceFamily, CoreServiceChildrenMedicalContact, CoreServiceChildrenAllergies, CoreServiceClassrooms, CoreServiceChildrenEnrollment
 from .serializers import ChildrenTempTableSerializer, CoreServiceChildrenTableSerializer, CoreServiceChildrenMedicalContactTableSerializer, CoreServiceChildrenAllergiesTableSerializer, CoreServiceChildrenEnrollmentTableSerializer, CoreServiceFamilyTableSerializer, CoreServiceClassroomsTableSerializer
@@ -10,7 +9,6 @@ import csv
 import datetime
 from datetime import datetime
 from django.db.models import Max
-from django.core.cache import cache
 
 class UploadChildrenCSVData(APIView):
     def get(self, request, *args, **kwargs):
@@ -246,13 +244,7 @@ class UploadChildrenCSVData(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class MigrateIntoCoreServiceChildrenTable(APIView):
-    # def get(self, request, *args, **kwargs):
-    #     cache_key = f'migrated_ids_{request.user.id}'
-    #     migrated_ids = cache.get(cache_key, [])
-    #     total_migrated = len(migrated_ids)
-    #     return Response({'migrated_records': total_migrated})
-    
+class MigrateIntoCoreServiceChildrenTable(APIView):    
     def post(self, request, *args, **kwargs):
         badgeNo = request.data.get('badgeNo')
         className = request.data.get('className')
@@ -269,13 +261,8 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
 
         if total_records == 0:
             return Response({"message": "No records to migrate"}, status=status.HTTP_200_OK)
-        
-        cache_key = f'migrated_ids_{request.user.id}'
 
         try:
-            cache.set(cache_key, [], timeout=3600)
-            migrated_ids = cache.get(cache_key, [])
-            errors = []
             for index, record in enumerate(records):
                 if CoreServiceChildren.objects.filter(birthCertNo=record.studentID).exists():
                     duplicated_records += 1
@@ -298,9 +285,8 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
                 }
                 serializer = CoreServiceChildrenTableSerializer(data=core_service_children_data)
                 if serializer.is_valid():
-                    saved_record = serializer.save()
+                    serializer.save()
                     migrated_records += 1
-                    migrated_ids.append(saved_record.id)
                 else:
                     failed_records += 1
                     errors.append(serializer.errors)
@@ -311,9 +297,6 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
                     'failed_records': failed_records,
                     'progress': ((index + 1) / total_records) * 100
                 })
-            
-            cache.set(cache_key, migrated_ids, timeout=3600)
-
             return Response({
                 'total_records': total_records,
                 'migrated_records': migrated_records,

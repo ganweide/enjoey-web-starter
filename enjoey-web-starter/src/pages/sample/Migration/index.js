@@ -141,7 +141,7 @@ const Page2 = () => {
             </FormControl>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Button variant="outlined" onClick={handleStartMigration} disabled={!badgeNo || !className}>
+            <Button variant="contained" onClick={handleStartMigration} disabled={!badgeNo || !className}>
               <Typography variant="button">Start Migration</Typography>
             </Button>
           </Grid>
