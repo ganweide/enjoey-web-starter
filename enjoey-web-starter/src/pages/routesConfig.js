@@ -71,6 +71,14 @@ const routesConfig = [
     type: 'collapse',
     children: [
       {
+        id: 'create-appointment',
+        title: 'Create Appointment',
+        messageId: 'Create Appointment',
+        type: 'item',
+        icon: <BiAlignLeft />,
+        url: '/sample/CreateAppointment',
+      },
+      {
         id: 'menu-planning',
         title: 'Menu Planning',
         messageId: 'Menu Planning',

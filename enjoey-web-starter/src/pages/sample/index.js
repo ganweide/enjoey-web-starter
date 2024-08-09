@@ -38,6 +38,7 @@ const Page34 = React.lazy(() => import('./AuditLog'));
 const Page35 = React.lazy(() => import('./ReactDataGridReport'));
 const Page36 = React.lazy(() => import('./LeaveApplicationForm'));
 const Page37 = React.lazy(() => import('./Migration'));
+const Page38 = React.lazy(() => import('./CreateAppointment'));
 
 export const samplePagesConfigs = [
   {
@@ -188,5 +189,9 @@ export const samplePagesConfigs = [
   {
     path: '/sample/Migration',
     element: <Page37 />,
+  },
+  {
+    path: '/sample/CreateAppointment',
+    element: <Page38 />,
   },
 ];
