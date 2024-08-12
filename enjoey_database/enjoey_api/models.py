@@ -11,6 +11,9 @@ from django.utils import timezone
 from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
 
+class EventCalendarTable(models.Model):
+    
+
 class TaxTable(models.Model):
     dateAdded = models.DateField(auto_now_add=True)
     taxCategory = models.CharField(max_length=40)

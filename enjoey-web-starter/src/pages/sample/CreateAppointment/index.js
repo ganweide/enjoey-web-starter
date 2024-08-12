@@ -31,11 +31,14 @@ import otherIcon from "./other.png";
 
 const Page2 = () => {
   const [meetingName, setMeetingName] = useState("");
+  const [allowOptions, setAllowOptions] = useState(true);
   const [duration, setDuration] = useState(30);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [time, setTime] = useState("");
+  const [date, setDate] = useState("");
   const [inviteLink, setInviteLink] = useState("");
   const [selectedMeetingMethods, setSelectedMeetingMethods] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -48,7 +51,7 @@ const Page2 = () => {
   return (
     <Box>
       <Grid container spacing={2}>
-        <Grid item xs={4} md={4}>
+        <Grid item xs={12} md={12}>
           <Card sx={{ p: 5 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} md={12}>
@@ -62,7 +65,10 @@ const Page2 = () => {
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-                <FormControlLabel control={<Switch defaultChecked />} label='Allow Options'/>
+                <FormControlLabel
+                  control={<Switch checked={allowOptions} onChange={(e) => setAllowOptions(e.target.checked)} />}
+                  label='Allow Options'
+                />
               </Grid>
               <Grid item xs={12} md={12}>
                 <FormControl fullWidth margin="dense">
@@ -79,54 +85,85 @@ const Page2 = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  label="Start Time"
-                  variant="outlined"
-                  fullWidth
-                  margin="dense"
-                  type="time"
-                  InputLabelProps ={{ shrink: true }}
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  fullWidth
-                  label="End Time"
-                  variant="outlined"
-                  margin="dense"
-                  type="time"
-                  InputLabelProps ={{ shrink: true }}
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  fullWidth
-                  label="Start Date"
-                  margin="dense"
-                  variant="outlined"
-                  type="date"
-                  InputLabelProps ={{ shrink: true }}
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                <TextField
-                  fullWidth
-                  label="End Date"
-                  margin="dense"
-                  variant="outlined"
-                  type="date"
-                  InputLabelProps ={{ shrink: true }}
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </Grid>
+              {allowOptions ? (
+                <>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      label="Start Time"
+                      variant="outlined"
+                      fullWidth
+                      margin="dense"
+                      type="time"
+                      InputLabelProps ={{ shrink: true }}
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      label="End Time"
+                      variant="outlined"
+                      margin="dense"
+                      type="time"
+                      InputLabelProps ={{ shrink: true }}
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Start Date"
+                      margin="dense"
+                      variant="outlined"
+                      type="date"
+                      InputLabelProps ={{ shrink: true }}
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      label="End Date"
+                      margin="dense"
+                      variant="outlined"
+                      type="date"
+                      InputLabelProps ={{ shrink: true }}
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                    />
+                  </Grid>
+                </>
+              ) : (
+                <>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      label="Time"
+                      variant="outlined"
+                      fullWidth
+                      margin="dense"
+                      type="time"
+                      InputLabelProps={{ shrink: true }}
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Date"
+                      margin="dense"
+                      variant="outlined"
+                      type="date"
+                      InputLabelProps={{ shrink: true }}
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                    />
+                  </Grid>
+                </>
+              )}
               <Grid container item xs={12} md={12} spacing={2}>
                 {meetingMethods.map((option) => (
                   <Grid item md={3} xs={3} key={option.name}>
@@ -180,69 +217,6 @@ const Page2 = () => {
                 >
                   Create
                 </Button>
-              </Grid>
-            </Grid>
-          </Card>
-        </Grid>
-        <Grid item xs={8} md={8}>
-          <Card sx={{ p: 5 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={12}>
-                <Typography variant="h2">Preview</Typography>
-              </Grid>
-              <Grid item xs={4} md={4}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h5" component="div">
-                      {meetingName || "No Event Name"}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" gutterBottom>
-                      Duration: {duration ? `${duration} Min` : "No Duration"}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Method: {selectedMeetingMethods || "No Location Type"}
-                    </Typography>
-                    {inviteLink && (
-                      <Typography variant="body2" color="textSecondary">
-                        Location URL: <a href={inviteLink}>{inviteLink}</a>
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={4} md={4}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" component="div" gutterBottom>
-                      Calendar
-                    </Typography>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          height: "300px",
-                        }}
-                      >
-                        <CalendarPicker
-                          date={selectedDate}
-                          onChange={(newDate) => setSelectedDate(newDate)}
-                          minDate={startOfDay(new Date())}
-                          disableHighlightToday
-                          sx={{
-                            "& .MuiPickersCalendarHeader-label": {
-                              fontSize: "0.5rem", // Adjust the size as needed
-                            },
-                            "& .MuiPickersCalendarHeader-switchViewButton": {
-                              fontSize: "1rem", // Adjust the size as needed
-                            },
-                          }}
-                        />
-                      </div>
-                    </LocalizationProvider>
-                  </CardContent>
-                </Card>
               </Grid>
             </Grid>
           </Card>
