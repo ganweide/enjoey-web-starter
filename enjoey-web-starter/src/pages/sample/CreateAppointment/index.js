@@ -19,15 +19,12 @@ import {
   CardContent,
 } from "@mui/material";
 
-import { CalendarPicker } from "@mui/x-date-pickers/CalendarPicker";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { format, startOfDay, addMinutes } from "date-fns";
-
 import zoomIcon from "./zoom.png";
 import meetIcon from "./meet.png";
 import phoneIcon from "./phone.png";
 import otherIcon from "./other.png";
+
+const eventCalendarURL  = "http://127.0.0.1:8000/api/event-calendar/";
 
 const Page2 = () => {
   const [meetingName, setMeetingName] = useState("");
@@ -41,13 +38,49 @@ const Page2 = () => {
   const [date, setDate] = useState("");
   const [inviteLink, setInviteLink] = useState("");
   const [selectedMeetingMethods, setSelectedMeetingMethods] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const meetingMethods = [
     { name: "Zoom", icon: zoomIcon },
     { name: "Meet", icon: meetIcon },
     { name: "Phone", icon: phoneIcon },
     { name: "Direct", icon: otherIcon },
   ];
+
+  const handleCreateMeeting = async () => {
+    const formData = new FormData();
+    formData.append('title', meetingName);
+    formData.append('category', selectedMeetingMethods);
+    formData.append('startDate', startDate);
+    formData.append('endDate', endDate);
+    formData.append('startTime', startTime);
+    formData.append('endTime', endTime);
+    formData.append('duration', duration);
+    formData.append('date', date);
+    formData.append('time', time);
+    formData.append('inviteLink', inviteLink);
+    formData.append('allowOptions', allowOptions);
+
+    try {
+      const response = await Axios.post(eventCalendarURL, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      setMeetingName("");
+      setAllowOptions(true);
+      setDuration(30);
+      setStartTime("");
+      setEndTime("");
+      setStartDate("");
+      setEndDate("");
+      setTime("");
+      setDate("");
+      setInviteLink("");
+      setSelectedMeetingMethods(null);
+    } catch (error) {
+      console.error('Error while saving the new appointment:', error);
+    }
+  };
+
   return (
     <Box>
       <Grid container spacing={2}>
@@ -213,7 +246,8 @@ const Page2 = () => {
                   sx={{
                     color: "#ffffff",
                   }}
-                  disabled={!meetingName || !duration || !selectedMeetingMethods || !locationUrl}
+                  disabled={!meetingName || !duration || !selectedMeetingMethods}
+                  onClick={handleCreateMeeting}
                 >
                   Create
                 </Button>

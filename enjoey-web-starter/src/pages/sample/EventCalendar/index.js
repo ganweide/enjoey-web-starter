@@ -54,6 +54,8 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 const localizer       = momentLocalizer(moment);
 const DnDCalendar     = withDragAndDrop(Calendar);
 
+const eventCalendarURL  = "http://127.0.0.1:8000/api/event-calendar/";
+
 const Page2 = () => {
   const [appointments, setAppointments]                   = useState([]);
   const [openEventDetailDialog, setOpenEventDetailDialog] = useState(false);
@@ -91,6 +93,39 @@ const Page2 = () => {
   const [startTimeError, setStartTimeError] = useState(false);
   const [endTimeError, setEndTimeError]     = useState(false);
 
+  const generateTimeSlots = (startTime, endTime, duration) => {
+    const timeSlots = [];
+    
+    const startMoment = moment(startTime);
+    const endMoment = moment(endTime);
+    
+    const startHourMinute = startMoment.format("HH:mm");
+    const endHourMinute = endMoment.format("HH:mm");
+  
+    const start = moment(startHourMinute, "HH:mm");
+    const end = moment(endHourMinute, "HH:mm");
+  
+    while (start.isBefore(end)) {
+      timeSlots.push(start.format("HH:mm"));
+      start.add(duration, 'minutes');
+    }
+    
+    return timeSlots;
+  };
+  
+  const generateDateSlots = (startDate, endDate) => {
+    const start = moment(startDate, "YYYY-MM-DD");
+    const end = moment(endDate, "YYYY-MM-DD");
+    const dateSlots = [];
+  
+    while (start <= end) {
+      dateSlots.push(start.format("YYYY-MM-DD"));
+      start.add(1, 'days');
+    }
+  
+    return dateSlots;
+  };
+
   const handleDateClick = date => {
     const filteredEvents = events.filter(event =>
       moment(event.start).isSame(moment(date.start), 'day')
@@ -99,7 +134,23 @@ const Page2 = () => {
   };
 
   const handleOpenEventDetailDialog = async (event) => {
-    setSelectedEvent(event);
+    let parsedOptions = [];
+    try {
+      parsedOptions = JSON.parse(event.savedOptions);
+      if (!Array.isArray(parsedOptions)) {
+        parsedOptions = [];
+      }
+    } catch (e) {
+      console.error('Failed to parse savedOptions:', e);
+      parsedOptions = [];
+    }
+    if (event.allowOptions !== "null") {
+      const timeSlots = generateTimeSlots(event.start, event.end, parseInt(event.duration, 10));
+      const dateSlots = generateDateSlots(event.start, event.end);
+      setSelectedEvent({ ...event, savedOptions: parsedOptions, timeSlots, dateSlots });
+    } else {
+      setSelectedEvent({ ...event, savedOptions: parsedOptions });
+    }
     setOpenEventDetailDialog(true);
   };
 
@@ -119,15 +170,26 @@ const Page2 = () => {
   // Dnd Big Calendar
   useEffect(() => {
     const bigCalendarEvents = appointments.map(appointment => {
-      const start = moment(appointment.startDate + appointment.startTime, "YYYY-MM-DD HH:mm").toDate();
-      const end = moment(appointment.endDate + appointment.endTime, "YYYY-MM-DD HH:mm").toDate();
+      const start = appointment.startDate && appointment.startTime
+      ? moment(appointment.startDate + appointment.startTime, "YYYY-MM-DD HH:mm").toDate()
+      : moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").toDate();
+
+    // Check if endDate and endTime are available, otherwise calculate using duration
+    const end = appointment.endDate && appointment.endTime
+      ? moment(appointment.endDate + appointment.endTime, "YYYY-MM-DD HH:mm").toDate()
+      : moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").add(appointment.duration, 'minutes').toDate();
       const title = appointment.title;
       const category = appointment.category;
       const coverImg = appointment.coverImg;
       const savedOptions = appointment.savedOptions;
       const receipt = appointment.receipt;
-
-      return { start, end, title, category, coverImg, savedOptions, receipt };
+      const duration = appointment.duration;
+      const date = appointment.date;
+      const time = appointment.time;
+      const inviteLink = appointment.inviteLink;
+      const allowOptions = appointment.allowOptions;
+      console.log(savedOptions);
+      return { start, end, title, category, coverImg, savedOptions, receipt, duration, date, time, inviteLink, allowOptions };
     })
     setEvents(bigCalendarEvents);
   }, [appointments]);
@@ -138,14 +200,6 @@ const Page2 = () => {
       <div>{event.category}</div>
     </div>
   );
-
-  EventComponent.propTypes = {
-    event: PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      program: PropTypes.string.isRequired,
-      time: PropTypes.string.isRequired,
-    }).isRequired,
-  };
   
   // Dialog Constants
   //// New Event Dialog
@@ -167,7 +221,7 @@ const Page2 = () => {
     setOpenNewEventDialog(false);
   }
 
-  const handleSaveNewEventDialog = () => {
+  const handleSaveNewEventDialog = async () => {
     if (!title) {
       setTitleError(true);
       return;
@@ -210,20 +264,31 @@ const Page2 = () => {
       setEndTimeError(false);
     }
 
-    const newAppointment = {
-      coverImg,
-      title,
-      category,
-      startDate,
-      endDate,
-      startTime,
-      endTime,
-      receipt,
-      savedOptions,
-    };
+    const formattedSavedOptions = Array.isArray(savedOptions) ? JSON.stringify(savedOptions) : savedOptions;
 
-    setAppointments((prevAppointments) => [...prevAppointments, newAppointment]);
+    console.log(coverImg);
 
+    const formData = new FormData();
+    formData.append('coverImg', coverImg);  // Append the file object
+    formData.append('title', title);
+    formData.append('category', category);
+    formData.append('startDate', startDate);
+    formData.append('endDate', endDate);
+    formData.append('startTime', startTime);
+    formData.append('endTime', endTime);
+    formData.append('receipt', receipt);
+    formData.append('savedOptions', formattedSavedOptions);
+    formData.append('allowOptions', 'null');
+
+    try {
+      const response = await Axios.post(eventCalendarURL, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    } catch (error) {
+      console.error('Error while saving the new appointment:', error);
+    }
     setCoverImg("");
     setTitle("");
     setCategory("");
@@ -237,9 +302,22 @@ const Page2 = () => {
     setOpenNewEventDialog(false);
   };
 
+  useEffect(() => {
+    try {
+      Axios.get(eventCalendarURL).then((response) => {
+        const data = response.data;
+        setAppointments(data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   const onDrop = useCallback((acceptedFiles) => {
     const imageFiles = acceptedFiles.filter(file => file.type.startsWith('image/'));
-    setCoverImg(imageFiles[0]);
+    if (imageFiles.length > 0) {
+      setCoverImg(imageFiles[0]);
+    }
   }, []);
 
   const handleDeleteOption = (index) => {
@@ -400,13 +478,13 @@ const Page2 = () => {
               Events List
             </Typography>
           </Card>
-          {eventList.map(event => (
-            <Card key={event.title} sx={{ mt: 2, p: 5, display: "flex", flexDirection: "row", alignItems: "center", cursor: "pointer" }} onClick={() => handleOpenEventDetailDialog(event)} className="eventlistCard">
+          {eventList.map((event, index) => (
+            <Card key={index} sx={{ mt: 2, p: 5, display: "flex", flexDirection: "row", alignItems: "center", cursor: "pointer" }} onClick={() => handleOpenEventDetailDialog(event)} className="eventlistCard">
               <Grid item xs={3} md={3}>
                 {event.coverImg
                 ? 
                   <Card>
-                    <img className="coverImage" src={URL.createObjectURL(event.coverImg)} />
+                    <img className="coverImage" src={event.coverImg} />
                   </Card>
                 :
                   <Card className="dateCard">
@@ -435,19 +513,19 @@ const Page2 = () => {
         aria-describedby  ="alert-dialog-description"
       >
         <DialogTitle>
-          <h2>{selectedEvent.title}</h2>
+          <Typography>{selectedEvent.title}</Typography>
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid item xs={12} md={12}>
               <Box>
-                {selectedEvent.coverImg && <img src={URL.createObjectURL(selectedEvent.coverImg)} alt="Cover Image" className="coverImage" />}
+                {selectedEvent.coverImg && <img src={selectedEvent.coverImg} alt="Cover Image" className="coverImage" />}
               </Box>
             </Grid>
             <Grid item xs={12} md={12}>
               <div>{selectedEvent.title}</div>
-              <div>{moment(selectedEvent.startDate).format('YYYY-MM-DD')} - {moment(selectedEvent.endDate).format('YYYY-MM-DD')}</div>
-              <div>{moment(selectedEvent.startTime).format('HH:mm')} - {moment(selectedEvent.endTime).format('HH:mm')}</div>
+              <div>{moment(selectedEvent.start).format('YYYY-MM-DD')} - {moment(selectedEvent.end).format('YYYY-MM-DD')}</div>
+              <div>{moment(selectedEvent.start).format('HH:mm')} - {moment(selectedEvent.end).format('HH:mm')}</div>
             </Grid>
           </Grid>
         </DialogContent>
@@ -467,7 +545,7 @@ const Page2 = () => {
         aria-describedby  ="alert-dialog-description"
       >
         <DialogTitle>
-          <h2>{selectedEvent.title}</h2>
+          <Typography>{selectedEvent.title}</Typography>
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
@@ -512,6 +590,52 @@ const Page2 = () => {
                 )}
               </Grid>
             ))}
+            {!selectedEvent.allowOptions ? (
+              <Grid item xs={12} md={12}>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">Are you attending?</FormLabel>
+                  <RadioGroup>
+                    <FormControlLabel
+                      value="Attending"
+                      control={<Radio />}
+                      label="Attending"
+                    />
+                    <FormControlLabel
+                      value="Not Attending"
+                      control={<Radio />}
+                      label="Not Attending"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+            ) : (
+              <>
+                <Grid item xs={12} md={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="select-time-slots">Time Slots</InputLabel>
+                    <Select labelId="select-time-slots" id="select-time-slots" label="Time Slots">
+                      {selectedEvent.timeSlots.map((slot, index) => (
+                        <MenuItem key={index} value={slot}>
+                          {slot}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} md={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="select-date">Date</InputLabel>
+                    <Select labelId="select-date" id="select-date" label="Date">
+                      {selectedEvent.dateSlots.map((slot, index) => (
+                        <MenuItem key={index} value={slot}>
+                          {slot}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </>
+            )}
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -533,7 +657,7 @@ const Page2 = () => {
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid item xs={12} md={12}>
-              <Dropzone onDrop={onDrop} accept="image/*">
+              <Dropzone onDrop={onDrop} accept={{"image/*": []}}>
                 {({ getRootProps, getInputProps }) => (
                   // eslint-disable-next-line
                   <div {...getRootProps()} className="dropzone">

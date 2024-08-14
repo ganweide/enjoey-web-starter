@@ -3,8 +3,8 @@ from rest_framework import viewsets, status
 from rest_framework.generics import CreateAPIView
 
 from .jobs import send_email_template
-from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable, TenantPlan, TenantPlanFeatures, PublishSurveyTable, UserAnswerTable, TaxTable
-from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer, AttendanceTableSerializer, TenantPlanSerializer, TenantPlanFeaturesSerializer, PublishSurveySerializer, UserAnswerSerializer, TaxTableSerializer, LogEntrySerializer
+from .models import ChildTable, FamilyTable, AdmissionTable, ProgramTable, ActivityTable, MenuPlanningTable, SleepCheckTable, ImmunizationTable, SurveySettingsTable, PDFFiles, ActivityMediaTable, PaymentTable, ActivityAreaTagsTable, ActivityTagsTable, AppointmentTable, AppointmentTimeSlotsTable, BranchTable, EmailTemplateJsonTable, EmailTemplateHtmlTable, TempTable, CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceFamily, DocumentsTable, TenantPaymentKeySettings, AttendanceTable, TenantPlan, TenantPlanFeatures, PublishSurveyTable, UserAnswerTable, TaxTable, EventCalendarTable
+from .serializers import ChildTableSerializer, FamilyTableSerializer, AdmissionTableSerializer, ProgramTableSerializer, ActivityTableSerializer, MenuPlanningTableSerializer, SleepCheckTableSerializer, ImmunizationTableSerializer, SurveySettingsTableSerializer, PDFFilesSerializer, ActivityMediaSerializer, ActivityTagsTableSerializer, ActivityAreaTagsTableSerializer, AppointmentTableSerializer, AppointmentTimeSlotsTableSerializer, BranchTableSerializer, EmailTemplateJsonTableSerializer, EmailTemplateHtmlTableSerializer, TempTableSerializer, CoreServiceChildrenSerializer, CoreServiceChildrenAllergiesSerializer, CoreServiceChildrenMedicalContactSerializer, CoreServiceFamilySerializer, DocumentsTableSerializer, TenantPaymentKeySettingsSerializer, AttendanceTableSerializer, TenantPlanSerializer, TenantPlanFeaturesSerializer, PublishSurveySerializer, UserAnswerSerializer, TaxTableSerializer, LogEntrySerializer, EventCalendarTableSerializer
 from rest_framework.response import Response
 from django.views import View
 from django.conf import settings
@@ -39,6 +39,27 @@ from datetime import date
 from auditlog.models import LogEntry
 
 from django.middleware.csrf import get_token
+
+class EventCalendarView(viewsets.ModelViewSet):
+    queryset = EventCalendarTable.objects.all().order_by('createdAt')
+    serializer_class = EventCalendarTableSerializer
+    #all
+    def list(self, request):
+        queryset = EventCalendarTable.objects.all().order_by('-createdAt')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = EventCalendarTableSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = EventCalendarTableSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = EventCalendarTableSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AuditLogView(viewsets.ModelViewSet):
     queryset = LogEntry.objects.all().order_by('-timestamp')

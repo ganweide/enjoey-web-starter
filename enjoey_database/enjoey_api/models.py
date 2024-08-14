@@ -12,7 +12,22 @@ from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
 
 class EventCalendarTable(models.Model):
-    
+    coverImg = models.ImageField(storage=ImageStorage(), null=True)
+    allowOptions = models.BooleanField(null=True)
+    duration = models.CharField(max_length=250, null=True)
+    title = models.CharField(max_length=250)
+    category = models.CharField(max_length=250)
+    startDate = models.CharField(max_length=250, null=True)
+    endDate = models.CharField(max_length=250, null=True)
+    startTime = models.CharField(max_length=250, null=True)
+    endTime = models.CharField(max_length=250, null=True)
+    time = models.CharField(max_length=250, null=True)
+    date = models.CharField(max_length=250, null=True)
+    inviteLink = models.CharField(max_length=250, null=True)
+    receipt = models.CharField(max_length=250, null=True)
+    savedOptions = models.CharField(max_length=1000, null=True)
+    createdAt = models.DateTimeField(auto_now_add=True, editable=False)
+    updatedAt = models.DateTimeField(auto_now=True)
 
 class TaxTable(models.Model):
     dateAdded = models.DateField(auto_now_add=True)

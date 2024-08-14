@@ -1,5 +1,5 @@
 from django.urls import path, include, re_path
-from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView, AttendanceView, TenantPlanView, TenantPlanFeaturesView, get_csrf_token, EmailTemplate, PublishSurveyView, UserAnswerView, TaxFormView, AuditLogView
+from .views import ChildView, FamilyView, AdmissionView, ProgramView, ActivityView, MenuPlanningView, SleepCheckView, ImmunizationView, SurveySettingsView, start_scheduler, stop_scheduler, check_scheduler_status, PdfFileApiView, PDFUploadView, get_presigned_url, PDFUploadViewWithDjangoStorages, PDFShowView, ImageUploadView, generate_order_id, payment_success, ActivityTagsView, AppointmentView, AppointmentTimeSlotsView, BranchView, EmailTemplateJsonView, EmailTemplateHtmlView, HtmlImageUploadView, PDFGenerationAndUploadView, CSVImportView, DocumentsView, TenantPaymentKeySettingsView, HandleImageUploadView, AttendanceView, TenantPlanView, TenantPlanFeaturesView, get_csrf_token, EmailTemplate, PublishSurveyView, UserAnswerView, TaxFormView, AuditLogView, EventCalendarView
 from . import views
 from rest_framework import routers
 
@@ -78,6 +78,9 @@ route24.register("", TaxFormView, basename='taxform')
 route25 = routers.DefaultRouter()
 route25.register("", AuditLogView, basename='auditlog')
 
+route26 = routers.DefaultRouter()
+route26.register("", EventCalendarView, basename='eventcalendar')
+
 urlpatterns = [
     path('child/', include(route1.urls)),
     path('family/', include(route2.urls)),
@@ -120,5 +123,6 @@ urlpatterns = [
     path('user-answer/', include(route23.urls)),
     path('tax-form/', include(route24.urls)),
     path('audit-logs/', include(route25.urls)),
+    path('event-calendar/', include(route26.urls)),
 ]
 
