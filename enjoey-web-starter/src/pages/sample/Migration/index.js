@@ -22,6 +22,7 @@ import {
 
 const childrenTempURL       = "http://127.0.0.1:8000/api/data_migration/childrencsvupload/";
 const childrenMigrationURL  = "http://127.0.0.1:8000/api/data_migration/children-migration/"
+const familyMigrationURL  = "http://127.0.0.1:8000/api/data_migration/family-migration/"
 
 const Page2 = () => {
   const[classNameSelectMenuItem, setClassNameSelectMenuItem]  = useState([]);
@@ -36,11 +37,11 @@ const Page2 = () => {
   const[duplicatedRecords, setDuplicatedRecords]              = useState(0);
   const[failedRecords, setFailedRecords]                      = useState(0);
   const[migrationSummary, setMigrationSummary]                = useState({
-                                                                  total_records: 0,
-                                                                  migrated_records: 0,
-                                                                  failed_records: 0,
-                                                                  duplicated_records: 0,
-                                                                });
+    total_records: 0,
+    migrated_records: 0,
+    failed_records: 0,
+    duplicated_records: 0,
+  });
 
   useEffect(() => {
     try {
@@ -51,6 +52,7 @@ const Page2 = () => {
         const uniqueBadgeNo = [...new Set(badgeNo)];
         setClassNameSelectMenuItem(['All', ...uniqueClassName]);
         setBadgeNoSelectMenuItem(['All', ...uniqueBadgeNo]);
+        console.log(response);
       });
     } catch (error) {
       console.log(error);
@@ -99,6 +101,67 @@ const Page2 = () => {
     };
   };
 
+  const handleStartMigrationFamily = () => {
+    try {
+      Axios.post(familyMigrationURL, { badgeNo, className }).then((response) => {
+        console.log('Migration response:', response.data);
+        // Check if the migration was successful
+        if (response.data.migrated_records > 0) {
+          alert(`Migration successful! ${response.data.migrated_records} records migrated.`);
+        } else {
+          alert('No records were migrated.');
+        }
+      }).catch(error => {
+        console.error('Error occurred during migration', error);
+        alert('An error occurred during migration. Please check the console for details.');
+      });
+    } catch (error) {
+      console.error('Unexpected error:', error);
+    }
+  };
+
+  // const handleStartMigrationFamily = () => {
+  //   setProgress(0);
+  //   setMigratedRecords(0);
+  //   setDuplicatedRecords(0);
+  //   setFailedRecords(0);
+  //   try {
+  //     Axios.post(familyMigrationURL, { badgeNo, className }).then((response) => {
+  //       const { total_records, migrated_records, failed_records, duplicated_records, progress_updates } = response.data;
+  //       setOpenStatusDialog(true);
+  //       setTotalRecords(total_records);
+
+  //       let updateIndex = 0;
+  //       const updateInterval = 50;
+  //       const totalUpdates = progress_updates.length;
+
+  //       const updateProgress = () => {
+  //         if (updateIndex < totalUpdates) {
+  //           const update = progress_updates[updateIndex];
+  //           setMigratedRecords(update.migrated_records);
+  //           setFailedRecords(update.failed_records);
+  //           setDuplicatedRecords(update.duplicated_records);
+  //           setProgress(update.progress);
+  //           updateIndex++;
+  //           setTimeout(updateProgress, updateInterval);
+  //         } else {
+  //           setMigrationSummary({
+  //             total_records,
+  //             migrated_records,
+  //             failed_records,
+  //             duplicated_records
+  //           });
+  //           setOpenStatusDialog(false);
+  //           setOpenSummaryDialog(true);
+  //         }
+  //       };
+  //       updateProgress();
+  //     });
+  //   } catch (error) {
+  //     console.error('Error occurred during migration', error);
+  //   };
+  // };
+
   return (
     <Box>
       <Card sx={{ p: 5, mb: 5 }}>
@@ -142,6 +205,52 @@ const Page2 = () => {
           </Grid>
           <Grid item xs={12} md={12}>
             <Button variant="contained" onClick={handleStartMigration} disabled={!badgeNo || !className}>
+              <Typography variant="button">Start Migration</Typography>
+            </Button>
+          </Grid>
+        </Grid>
+      </Card>
+      <Card sx={{ p: 5, mb: 5 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={12}>
+            <Typography variant="h2" component="div">
+              Choose Family Data to Migrate
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={6}>
+            <FormControl fullWidth margin="dense">
+              <InputLabel id="badge-select">Select Badge</InputLabel>
+              <Select
+                labelId="badge-select"
+                id="badge-select"
+                value={badgeNo}
+                label="Select Badge"
+                onChange={(e) => setBadgeNo(e.target.value)}
+              >
+                {badgeNoSelectMenuItem.map((badgeNo, index) => (
+                  <MenuItem key={index} value={badgeNo}>{badgeNo}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6} md={6}>
+            <FormControl fullWidth margin="dense">
+              <InputLabel id="className-select">Select Class</InputLabel>
+              <Select
+                labelId="className-select"
+                id="className-select"
+                value={className}
+                label="Select Class"
+                onChange={(e) => setClassName(e.target.value)}
+              >
+                {classNameSelectMenuItem.map((className, index) => (
+                  <MenuItem key={index} value={className}>{className}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Button variant="contained" onClick={handleStartMigrationFamily} disabled={!badgeNo || !className}>
               <Typography variant="button">Start Migration</Typography>
             </Button>
           </Grid>

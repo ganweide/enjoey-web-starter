@@ -28,7 +28,6 @@ class UploadChildrenCSVData(APIView):
             data_lines = raw_lines[4:]
 
             csv_data = csv.DictReader(data_lines)
-
             def convert_bool(value):
                 if value == 'Yes':
                     return True
@@ -88,33 +87,33 @@ class UploadChildrenCSVData(APIView):
                 "Class Session": "classSession",
                 "Class level": "classLevel",
                 "Transportation Number": "transportationNum",
-                "Payment Method": "paymentMethod",
-                "Bank Name": "bankName",
-                "Bank Account Holder": "bankAccountHolder",
-                "Bank Account Code": "bankAccountCode",
-                "Branch Code": "branchCode",
-                "Bank Account Number": "bankAccountNumber",
-                "Payment Method Approval Date": "paymentMethodApprovalDate",
-                "Attention To": "attentionTo",
+                "Payment Method": "paymentMethod1",
+                "Bank Name": "bankName1",
+                "Bank Account Holder": "bankAccountHolder1",
+                "Bank Account Code": "bankAccountCode1",
+                "Branch Code": "branchCode1",
+                "Bank Account Number": "bankAccountNumber1",
+                "Payment Method Approval Date": "paymentMethodApprovalDate1",
+                "Attention To": "attentionTo1",
                 "Payee ID": "payeeID",
                 "Amount": "amount",
-                "Payment Method": "paymentMethod",
-                "Bank Name": "bankName",
-                "Bank Account Holder": "bankAccountHolder",
-                "Bank Account Code": "bankAccountCode",
-                "Branch Code": "branchCode",
-                "Bank Account Number": "bankAccountNumber",
+                "Payment Method": "paymentMethod2",
+                "Bank Name": "bankName2",
+                "Bank Account Holder": "bankAccountHolder2",
+                "Bank Account Code": "bankAccountCode2",
+                "Branch Code": "branchCode2",
+                "Bank Account Number": "bankAccountNumber2",
                 "Secondary Payee ID": "secondaryPayeeID",
-                "Payment Method Approval Date": "paymentMethodApprovalDate",
-                "Attention To": "attentionTo",
-                "Payment Method": "paymentMethod",
-                "Bank Name": "bankName",
-                "Bank Account Holder": "bankAccountHolder",
-                "Bank Account Code": "bankAccountCode",
-                "Branch Code": "branchCode",
+                "Payment Method Approval Date": "paymentMethodApprovalDate2",
+                "Attention To": "attentionTo2",
+                "Payment Method": "paymentMethod3",
+                "Bank Name": "bankName3",
+                "Bank Account Holder": "bankAccountHolder3",
+                "Bank Account Code": "bankAccountCode3",
+                "Branch Code": "branchCode3",
                 "Bank Account No.": "bankAccountNo",
                 "Payment Method Approval Reference": "paymentMethodApprovalReference",
-                "Payment Method Approval Date": "paymentMethodApprovalDate",
+                "Payment Method Approval Date": "paymentMethodApprovalDate3",
                 "Deposit Option": "depositOption",
                 "Parent Relationship 1": "parentRelationship1",
                 "Name 1": "name1",
@@ -172,10 +171,10 @@ class UploadChildrenCSVData(APIView):
                 "Postal Code": "postalCode",
                 "Transport Option": "transportOption",
                 "Relationship 1": "relationship1EC",
-                "Name 1": "name1EC",
+                "Name 1 EC": "name1EC",
                 "Mobile Number 1": "mobileNumber1EC",
                 "Phone Number 1": "phoneNumber1EC",
-                "Email 1": "email1EC",
+                "Email 1 EC": "email1EC",
             }
 
             max_badge_no = ChildrenTempTable.objects.aggregate(Max('badgeNo')).get('badgeNo__max')
@@ -218,6 +217,7 @@ class UploadChildrenCSVData(APIView):
                 row['emailInvoiceReceipt3'] = convert_bool(row.get('emailInvoiceReceipt1', 'No'))
                 row['emailCheckin3'] = convert_bool(row.get('emailCheckin1', 'No'))
                 row['badgeNo'] = next_badge_no
+
                 serializer = ChildrenTempTableSerializer(data=row)
                 if serializer.is_valid():
                     serializer.save()
@@ -306,5 +306,119 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
                 'errors': errors
             }, status=status.HTTP_200_OK)
         
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class MigrateIntoCoreServiceFamilyTable(APIView):
+    def post(self, request, *args, **kwargs):
+        badgeNo = request.data.get('badgeNo')
+        className = request.data.get('className')
+        filters = {}
+        if badgeNo != "All": filters['badgeNo'] = badgeNo
+        if className != "All": filters['className'] = className
+        records = ChildrenTempTable.objects.filter(**filters)
+        total_records = records.count()
+        migrated_records = 0
+        failed_records = 0
+        duplicated_records = 0
+        progress_updates = []
+        errors = []
+
+        if total_records == 0:
+            return Response({"message": "No records to migrate"}, status=status.HTTP_200_OK)
+        
+        def format_name(name):
+            return ' '.join([part.capitalize() for part in name.split()])
+
+        def get_first_name(full_name):
+            if not full_name:  # Check if full_name is None or empty
+                return None
+            
+            names = full_name.split()
+            formatted_names = [format_name(name) for name in names]
+            
+            if len(formatted_names) == 1:
+                return formatted_names[0]
+            elif len(formatted_names) == 2:
+                return formatted_names[0]
+            elif len(formatted_names) == 3:
+                return ' '.join(formatted_names[1:])
+            elif len(formatted_names) == 4:
+                return ' '.join(formatted_names[2:])
+            return None  # Return None if no condition is met
+
+        def get_last_name(full_name):
+            if not full_name:  # Check if full_name is None or empty
+                return None
+            
+            names = full_name.split()
+            formatted_names = [format_name(name) for name in names]
+            
+            if len(formatted_names) == 1:
+                return None
+            elif len(formatted_names) == 2:
+                return formatted_names[1]
+            elif len(formatted_names) == 3:
+                return formatted_names[0]
+            elif len(formatted_names) == 4:
+                return formatted_names[1]
+            return None  # Return None if no condition is met
+
+        try:
+            for index, record in enumerate(records):
+                for i in range(1, 4):
+                    name_key = f'name{i}'
+                    phone_key = f'mobileNo{i}'
+                    email_key = f'email{i}'
+                    birthIC_key = f'NRIC{i}'
+                    birthCountry_key = f'citizenship{i}'
+                    occupation_key = f'occupation{i}'
+                    relationship_key = f'parentRelationship{i}'
+                    allow_pickup_key = f'authorisedPickUpPerson{i}'
+                    billable_key = f'emailInvoiceReceipt{i}'
+                    primary_key = f'mainContact{i}'
+
+                    full_name = getattr(record, name_key, None)
+
+                    # Get first and last names using the provided functions
+                    first_name = get_first_name(full_name) if full_name else None
+                    last_name = get_last_name(full_name) if full_name else None
+
+                    core_service_family_data = {
+                        'firstName': first_name,
+                        'lastName': last_name,
+                        'phone': getattr(record, phone_key, None),
+                        'email': getattr(record, email_key, None),
+                        'birthIC': getattr(record, birthIC_key, None),
+                        'birthCountry': getattr(record, birthCountry_key, None),
+                        'occupation': getattr(record, occupation_key, None),
+                        'relationship': getattr(record, relationship_key, None),
+                        'isAllowedPickup': getattr(record, allow_pickup_key, None),
+                        'isBillable': getattr(record, billable_key, None),
+                        'isPrimary': getattr(record, primary_key, None),
+                    }
+                    serializer = CoreServiceFamilyTableSerializer(data=core_service_family_data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        migrated_records += 1
+                    else:
+                        failed_records += 1
+                        errors.append(serializer.errors)
+
+                    progress_updates.append({
+                        'migrated_records': migrated_records,
+                        'duplicated_records': duplicated_records,
+                        'failed_records': failed_records,
+                        'progress': ((index + 1) / total_records) * 100
+                    })
+            return Response({
+                'total_records': total_records,
+                'migrated_records': migrated_records,
+                'failed_records': failed_records,
+                'duplicated_records': duplicated_records,
+                'progress_updates': progress_updates,
+                'errors': errors
+            }, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
