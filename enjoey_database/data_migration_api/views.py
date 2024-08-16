@@ -154,22 +154,22 @@ class UploadChildrenCSVData(APIView):
                 "Authorised Pick Up Person 3": "authorisedPickUpPerson3",
                 "Email Invoice Receipt 3": "emailInvoiceReceipt3",
                 "Email checkin 3": "emailCheckin3",
-                "Block no.": "blockno",
-                "Building": "building",
-                "Street": "street",
-                "Unit": "unit",
-                "Postal Code": "postalCode",
-                "Transport Option": "transportOption",
-                "Block no.": "blockno",
-                "Building": "building",
-                "Street": "street",
-                "Unit": "unit",
-                "Postal Code": "postalCode",
-                "Transport Option": "transportOption",
+                "Block no. M": "blocknoM",
+                "Building M": "buildingM",
+                "Street M": "streetM",
+                "Unit M": "unitM",
+                "Postal Code M": "postalCodeM",
+                "Transport Option M": "transportOptionM",
+                "Block no. F": "blocknoF",
+                "Building F": "buildingF",
+                "Street F": "streetF",
+                "Unit F": "unitF",
+                "Postal Code F": "postalCodeF",
+                "Transport Option F": "transportOptionF",
                 "Address Line 1": "addressLine1",
                 "Address Line 2": "addressLine2",
-                "Postal Code": "postalCode",
-                "Transport Option": "transportOption",
+                "Postal Code RA1": "postalCodeRA1",
+                "Transport Option RA1": "transportOptionRA1",
                 "Relationship 1": "relationship1EC",
                 "Name 1 EC": "name1EC",
                 "Mobile Number 1": "mobileNumber1EC",
@@ -327,12 +327,13 @@ class MigrateIntoCoreServiceFamilyTable(APIView):
         if total_records == 0:
             return Response({"message": "No records to migrate"}, status=status.HTTP_200_OK)
         
+        # Name Formatting
         def format_name(name):
             return ' '.join([part.capitalize() for part in name.split()])
 
         def get_first_name(full_name):
-            if not full_name:  # Check if full_name is None or empty
-                return None
+            if full_name == "null" or full_name is None or not full_name.strip():  # Skip records with "null", None or empty full_name
+                return ''
             
             names = full_name.split()
             formatted_names = [format_name(name) for name in names]
@@ -345,11 +346,11 @@ class MigrateIntoCoreServiceFamilyTable(APIView):
                 return ' '.join(formatted_names[1:])
             elif len(formatted_names) == 4:
                 return ' '.join(formatted_names[2:])
-            return None  # Return None if no condition is met
+            return ''  # Return empty if no condition is met
 
         def get_last_name(full_name):
-            if not full_name:  # Check if full_name is None or empty
-                return None
+            if full_name == "null" or full_name is None or not full_name.strip():  # Skip records with "null", None or empty full_name
+                return ''
             
             names = full_name.split()
             formatted_names = [format_name(name) for name in names]
@@ -362,13 +363,50 @@ class MigrateIntoCoreServiceFamilyTable(APIView):
                 return formatted_names[0]
             elif len(formatted_names) == 4:
                 return formatted_names[1]
-            return None  # Return None if no condition is met
+            return ''  # Return empty if no condition is met
+
+        # Phone Formatting
+        def format_phone_number(phone_number, country_code='+60'):
+            clean_number = ''.join(char for char in phone_number if char.isdigit())
+            if not clean_number.startswith('0'):
+                clean_number = '0' + clean_number
+            clean_number = country_code + clean_number[1:]
+            return f'{clean_number[:5]}-{clean_number[5:]}'
+        
+        def get_mobile_phone(mobile, phone):
+            if mobile and mobile != "null":
+                return format_phone_number(mobile)
+            elif phone and phone != "null":
+                return format_phone_number(phone)
+            return "null"
+
+        # Address Formatting
+        def format_address(relationship, record):
+            if relationship == "mother":
+                address = getattr(record, 'streetM', '') or ''
+                state = "Selangor"
+                country = "Malaysia"
+                postcode = getattr(record, 'postalCodeM', '') or ''
+            elif relationship == "father":
+                address = getattr(record, 'streetF', '') or ''
+                state = "Selangor"
+                country = "Malaysia"
+                postcode = getattr(record, 'postalCodeF', '') or ''
+            else:
+                address_line1 = getattr(record, 'addressLine1', '') or ''
+                address_line2 = getattr(record, 'addressLine2', '') or ''
+                address = address_line1 + (' ' if address_line1 and address_line2 else '') + address_line2
+                state = "Selangor"
+                country = "Malaysia"
+                postcode = getattr(record, 'postalCodeRA1', '') or ''
+            return address, state, country, postcode
 
         try:
             for index, record in enumerate(records):
                 for i in range(1, 4):
                     name_key = f'name{i}'
-                    phone_key = f'mobileNo{i}'
+                    mobile_key = f'mobileNo{i}'
+                    phone_key = f'phoneNo{i}'
                     email_key = f'email{i}'
                     birthIC_key = f'NRIC{i}'
                     birthCountry_key = f'citizenship{i}'
@@ -379,20 +417,31 @@ class MigrateIntoCoreServiceFamilyTable(APIView):
                     primary_key = f'mainContact{i}'
 
                     full_name = getattr(record, name_key, None)
+                    get_mobile = getattr(record, mobile_key, None)
+                    get_phone = getattr(record, phone_key, None)
+                    phone_no = get_mobile_phone(get_mobile, get_phone)
+                    relationship = getattr(record, relationship_key, None)
 
-                    # Get first and last names using the provided functions
-                    first_name = get_first_name(full_name) if full_name else None
-                    last_name = get_last_name(full_name) if full_name else None
+                    if not full_name or full_name.strip() == "null":
+                        continue
+
+                    first_name = get_first_name(full_name)
+                    last_name = get_last_name(full_name)
+                    address, state, country, postcode = format_address(relationship, record)
 
                     core_service_family_data = {
                         'firstName': first_name,
                         'lastName': last_name,
-                        'phone': getattr(record, phone_key, None),
+                        'phone': phone_no,
+                        'address': address,
+                        'state': state,
+                        'country': country,
+                        'postcode': postcode,
                         'email': getattr(record, email_key, None),
                         'birthIC': getattr(record, birthIC_key, None),
                         'birthCountry': getattr(record, birthCountry_key, None),
                         'occupation': getattr(record, occupation_key, None),
-                        'relationship': getattr(record, relationship_key, None),
+                        'relationship': relationship,
                         'isAllowedPickup': getattr(record, allow_pickup_key, None),
                         'isBillable': getattr(record, billable_key, None),
                         'isPrimary': getattr(record, primary_key, None),
@@ -422,3 +471,4 @@ class MigrateIntoCoreServiceFamilyTable(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
