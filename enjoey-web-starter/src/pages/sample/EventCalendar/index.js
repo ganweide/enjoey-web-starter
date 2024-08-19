@@ -134,24 +134,14 @@ const Page2 = () => {
   };
 
   const handleOpenEventDetailDialog = async (event) => {
-    let parsedOptions = [];
-    try {
-      parsedOptions = JSON.parse(event.savedOptions);
-      if (!Array.isArray(parsedOptions)) {
-        parsedOptions = [];
-      }
-    } catch (e) {
-      console.error('Failed to parse savedOptions:', e);
-      parsedOptions = [];
-    }
-    if (event.allowOptions !== "null") {
+    setOpenEventDetailDialog(true);
+    if (event.allowOptions === null) {
+      setSelectedEvent(event);
+    } else {
       const timeSlots = generateTimeSlots(event.start, event.end, parseInt(event.duration, 10));
       const dateSlots = generateDateSlots(event.start, event.end);
-      setSelectedEvent({ ...event, savedOptions: parsedOptions, timeSlots, dateSlots });
-    } else {
-      setSelectedEvent({ ...event, savedOptions: parsedOptions });
+      setSelectedEvent({ ...event, timeSlots, dateSlots });
     }
-    setOpenEventDetailDialog(true);
   };
 
   const handleCloseEventDetailDialog = async () => {
@@ -174,24 +164,24 @@ const Page2 = () => {
       ? moment(appointment.startDate + appointment.startTime, "YYYY-MM-DD HH:mm").toDate()
       : moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").toDate();
 
-    // Check if endDate and endTime are available, otherwise calculate using duration
-    const end = appointment.endDate && appointment.endTime
-      ? moment(appointment.endDate + appointment.endTime, "YYYY-MM-DD HH:mm").toDate()
-      : moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").add(appointment.duration, 'minutes').toDate();
+      // Check if endDate and endTime are available, otherwise calculate using duration
+      const end = appointment.endDate && appointment.endTime
+        ? moment(appointment.endDate + appointment.endTime, "YYYY-MM-DD HH:mm").toDate()
+        : moment(appointment.date + appointment.time, "YYYY-MM-DD HH:mm").add(appointment.duration, 'minutes').toDate();
       const title = appointment.title;
       const category = appointment.category;
       const coverImg = appointment.coverImg;
-      const savedOptions = appointment.savedOptions;
+      const savedOptions = JSON.parse(appointment.savedOptions);
       const receipt = appointment.receipt;
       const duration = appointment.duration;
       const date = appointment.date;
       const time = appointment.time;
       const inviteLink = appointment.inviteLink;
       const allowOptions = appointment.allowOptions;
-      console.log(savedOptions);
       return { start, end, title, category, coverImg, savedOptions, receipt, duration, date, time, inviteLink, allowOptions };
     })
     setEvents(bigCalendarEvents);
+    console.log(bigCalendarEvents);
   }, [appointments]);
 
   const EventComponent = ({ event }) => (
@@ -265,9 +255,6 @@ const Page2 = () => {
     }
 
     const formattedSavedOptions = Array.isArray(savedOptions) ? JSON.stringify(savedOptions) : savedOptions;
-
-    console.log(coverImg);
-
     const formData = new FormData();
     formData.append('coverImg', coverImg);  // Append the file object
     formData.append('title', title);
@@ -519,7 +506,14 @@ const Page2 = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} md={12}>
               <Box>
-                {selectedEvent.coverImg && <img src={selectedEvent.coverImg} alt="Cover Image" className="coverImage" />}
+                {selectedEvent.coverImg && (
+                  <img
+                    src={selectedEvent.coverImg}
+                    alt="Cover Image"
+                    className="coverImage"
+                    loading="lazy" // Add lazy loading
+                  />
+                )}
               </Box>
             </Grid>
             <Grid item xs={12} md={12}>
@@ -590,7 +584,7 @@ const Page2 = () => {
                 )}
               </Grid>
             ))}
-            {!selectedEvent.allowOptions ? (
+            {selectedEvent.allowOptions === false && (
               <Grid item xs={12} md={12}>
                 <FormControl component="fieldset">
                   <FormLabel component="legend">Are you attending?</FormLabel>
@@ -608,7 +602,8 @@ const Page2 = () => {
                   </RadioGroup>
                 </FormControl>
               </Grid>
-            ) : (
+            )}
+            {selectedEvent.allowOptions === true && (
               <>
                 <Grid item xs={12} md={12}>
                   <FormControl fullWidth>
