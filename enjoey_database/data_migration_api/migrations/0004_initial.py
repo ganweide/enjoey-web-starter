@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('data_migration_api', '0002_auto_20240719_1153'),
     ]
 
     operations = [

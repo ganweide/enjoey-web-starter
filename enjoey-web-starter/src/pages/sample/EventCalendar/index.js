@@ -85,6 +85,9 @@ const Page2 = () => {
   const [events, setEvents]                               = useState([]);
   const [eventList, setEventList]                         = useState([]);
   const [selectedEvent, setSelectedEvent]                 = useState([]);
+  const [answer1, setAnswer1]                             = useState("");
+  const [answer2, setAnswer2]                             = useState("");
+  const [answer3, setAnswer3]                             = useState("");
 
   const [titleError, setTitleError]         = useState(false);
   const [categoryError, setCategoryError]   = useState(false);
@@ -547,18 +550,19 @@ const Page2 = () => {
               <Grid item xs={12} md={12} key={index}>
                 {event.display === "textfield" && (
                   <TextField
+                    onChange={(e) => setAnswer1(e.target.value)}
                     margin="dense"
                     label={event.question}
                     type="text"
                     fullWidth
                     variant="outlined"
-                    value=""
+                    value={answer1}
                   />
                 )}
                 {event.display === 'radio' && (
                   <FormControl component="fieldset">
                     <FormLabel component="legend">{event.radioTitle}</FormLabel>
-                    <RadioGroup>
+                    <RadioGroup onChange={(e) => setAnswer2(e.target.value)}>
                       {event.radioItems.map((item) => (
                         <FormControlLabel
                           key={item.id}
@@ -573,7 +577,13 @@ const Page2 = () => {
                 {event.display === 'select' && (
                   <FormControl fullWidth>
                     <InputLabel id="select-label">{event.selectTitle}</InputLabel>
-                    <Select labelId="select-label" id="select-label" label="Select Items">
+                    <Select
+                      labelId="select-label"
+                      id="select-label"
+                      label="Select Items"
+                      onChange={(e) => setAnswer3(e.target.value)} // Save selected value to setAnswer3
+                      value={answer3}
+                    >
                       {event.selectItems.map((item) => (
                         <MenuItem key={item.id} value={item.value}>
                           {item.value}

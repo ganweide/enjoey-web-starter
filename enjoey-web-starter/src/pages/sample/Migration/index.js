@@ -67,7 +67,7 @@ const Page2 = () => {
     setDuplicatedRecords(0);
     setFailedRecords(0);
     try {
-      Axios.post(childrenMigrationURL, { badgeNo, className }).then((response) => {
+      Axios.post(childrenMigrationURL, { badgeNoChildren, classNameChildren }).then((response) => {
         const { total_records, migrated_records, failed_records, duplicated_records, progress_updates } = response.data;
         setOpenStatusDialog(true);
         setTotalRecords(total_records);
@@ -105,7 +105,7 @@ const Page2 = () => {
 
   const handleStartMigrationFamily = () => {
     try {
-      Axios.post(familyMigrationURL, { badgeNo, className }).then((response) => {
+      Axios.post(familyMigrationURL, { badgeNoFamily, classNameFamily }).then((response) => {
         console.log('Migration response:', response.data);
         // Check if the migration was successful
         if (response.data.migrated_records > 0) {

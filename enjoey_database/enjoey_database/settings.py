@@ -134,13 +134,24 @@ WSGI_APPLICATION = 'enjoey_database.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'enjoey-web-starter',
+#         'USER': 'postgres',
+#         'PASSWORD': 'ROOT',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'enjoey-web-starter',
+        'NAME': 'enjoey-db-migration',
         'USER': 'postgres',
-        'PASSWORD': 'ROOT',
-        'HOST': '127.0.0.1',
+        'PASSWORD': 'G7O2npbPTeSZM4cQKshv',
+        'HOST': 'enjoey-prod-postgresql-db.cluster-cng6ik0yyq1c.ap-southeast-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
