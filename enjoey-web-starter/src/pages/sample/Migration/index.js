@@ -27,10 +27,8 @@ const familyMigrationURL  = "http://127.0.0.1:8000/api/data_migration/family-mig
 const Page2 = () => {
   const[classNameSelectMenuItem, setClassNameSelectMenuItem]  = useState([]);
   const[badgeNoSelectMenuItem, setBadgeNoSelectMenuItem]      = useState([]);
-  const[classNameChildren, setClassNameChildren]                              = useState("");
-  const[badgeNoChildren, setBadgeNoChildren]                                  = useState("");
-  const[classNameFamily, setClassNameFamily]                              = useState("");
-  const[badgeNoFamily, setBadgeNoFamily]                                  = useState("");
+  const[className, setClassName]                              = useState("");
+  const[badgeNo, setBadgeNo]                                  = useState("");
   const[openStatusDialog, setOpenStatusDialog]                = useState(false);
   const[openSummaryDialog, setOpenSummaryDialog]              = useState(false);
   const[progress, setProgress]                                = useState(0);
@@ -61,7 +59,7 @@ const Page2 = () => {
     }
   }, []);
 
-  const handleStartMigrationChildren = () => {
+  const handleStartMigration = () => {
     setProgress(0);
     setMigratedRecords(0);
     setDuplicatedRecords(0);
@@ -179,9 +177,9 @@ const Page2 = () => {
               <Select
                 labelId="badge-select"
                 id="badge-select"
-                value={badgeNoChildren}
+                value={badgeNo}
                 label="Select Badge"
-                onChange={(e) => setBadgeNoChildren(e.target.value)}
+                onChange={(e) => setBadgeNo(e.target.value)}
               >
                 {badgeNoSelectMenuItem.map((badgeNo, index) => (
                   <MenuItem key={index} value={badgeNo}>{badgeNo}</MenuItem>
@@ -195,9 +193,9 @@ const Page2 = () => {
               <Select
                 labelId="className-select"
                 id="className-select"
-                value={classNameChildren}
+                value={className}
                 label="Select Class"
-                onChange={(e) => setClassNameChildren(e.target.value)}
+                onChange={(e) => setClassName(e.target.value)}
               >
                 {classNameSelectMenuItem.map((className, index) => (
                   <MenuItem key={index} value={className}>{className}</MenuItem>
@@ -206,7 +204,7 @@ const Page2 = () => {
             </FormControl>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Button variant="contained" onClick={handleStartMigrationChildren} disabled={!badgeNoChildren || !classNameChildren}>
+            <Button variant="contained" onClick={handleStartMigration} disabled={!badgeNo || !className}>
               <Typography variant="button">Start Migration</Typography>
             </Button>
           </Grid>
@@ -225,9 +223,9 @@ const Page2 = () => {
               <Select
                 labelId="badge-select"
                 id="badge-select"
-                value={badgeNoFamily}
+                value={badgeNo}
                 label="Select Badge"
-                onChange={(e) => setBadgeNoFamily(e.target.value)}
+                onChange={(e) => setBadgeNo(e.target.value)}
               >
                 {badgeNoSelectMenuItem.map((badgeNo, index) => (
                   <MenuItem key={index} value={badgeNo}>{badgeNo}</MenuItem>
@@ -241,9 +239,9 @@ const Page2 = () => {
               <Select
                 labelId="className-select"
                 id="className-select"
-                value={classNameFamily}
+                value={className}
                 label="Select Class"
-                onChange={(e) => setClassNameFamily(e.target.value)}
+                onChange={(e) => setClassName(e.target.value)}
               >
                 {classNameSelectMenuItem.map((className, index) => (
                   <MenuItem key={index} value={className}>{className}</MenuItem>
@@ -252,7 +250,7 @@ const Page2 = () => {
             </FormControl>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Button variant="contained" onClick={handleStartMigrationFamily} disabled={!badgeNoFamily || !classNameFamily}>
+            <Button variant="contained" onClick={handleStartMigrationFamily} disabled={!badgeNo || !className}>
               <Typography variant="button">Start Migration</Typography>
             </Button>
           </Grid>
