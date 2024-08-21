@@ -59,13 +59,13 @@ const Page2 = () => {
     }
   }, []);
 
-  const handleStartMigration = () => {
+  const handleStartMigrationChildren = () => {
     setProgress(0);
     setMigratedRecords(0);
     setDuplicatedRecords(0);
     setFailedRecords(0);
     try {
-      Axios.post(childrenMigrationURL, { badgeNoChildren, classNameChildren }).then((response) => {
+      Axios.post(childrenMigrationURL, { badgeNo, className }).then((response) => {
         const { total_records, migrated_records, failed_records, duplicated_records, progress_updates } = response.data;
         setOpenStatusDialog(true);
         setTotalRecords(total_records);
@@ -102,65 +102,46 @@ const Page2 = () => {
   };
 
   const handleStartMigrationFamily = () => {
+    setProgress(0);
+    setMigratedRecords(0);
+    setDuplicatedRecords(0);
+    setFailedRecords(0);
     try {
-      Axios.post(familyMigrationURL, { badgeNoFamily, classNameFamily }).then((response) => {
-        console.log('Migration response:', response.data);
-        // Check if the migration was successful
-        if (response.data.migrated_records > 0) {
-          alert(`Migration successful! ${response.data.migrated_records} records migrated.`);
-        } else {
-          alert('No records were migrated.');
-        }
-      }).catch(error => {
-        console.error('Error occurred during migration', error);
-        alert('An error occurred during migration. Please check the console for details.');
+      Axios.post(familyMigrationURL, { badgeNo, className }).then((response) => {
+        const { total_records, migrated_records, failed_records, duplicated_records, progress_updates } = response.data;
+        setOpenStatusDialog(true);
+        setTotalRecords(total_records);
+
+        let updateIndex = 0;
+        const updateInterval = 50;
+        const totalUpdates = progress_updates.length;
+
+        const updateProgress = () => {
+          if (updateIndex < totalUpdates) {
+            const update = progress_updates[updateIndex];
+            setMigratedRecords(update.migrated_records);
+            setFailedRecords(update.failed_records);
+            setDuplicatedRecords(update.duplicated_records);
+            setProgress(update.progress);
+            updateIndex++;
+            setTimeout(updateProgress, updateInterval);
+          } else {
+            setMigrationSummary({
+              total_records,
+              migrated_records,
+              failed_records,
+              duplicated_records
+            });
+            setOpenStatusDialog(false);
+            setOpenSummaryDialog(true);
+          }
+        };
+        updateProgress();
       });
     } catch (error) {
       console.error('Unexpected error:', error);
     }
   };
-
-  // const handleStartMigrationFamily = () => {
-  //   setProgress(0);
-  //   setMigratedRecords(0);
-  //   setDuplicatedRecords(0);
-  //   setFailedRecords(0);
-  //   try {
-  //     Axios.post(familyMigrationURL, { badgeNo, className }).then((response) => {
-  //       const { total_records, migrated_records, failed_records, duplicated_records, progress_updates } = response.data;
-  //       setOpenStatusDialog(true);
-  //       setTotalRecords(total_records);
-
-  //       let updateIndex = 0;
-  //       const updateInterval = 50;
-  //       const totalUpdates = progress_updates.length;
-
-  //       const updateProgress = () => {
-  //         if (updateIndex < totalUpdates) {
-  //           const update = progress_updates[updateIndex];
-  //           setMigratedRecords(update.migrated_records);
-  //           setFailedRecords(update.failed_records);
-  //           setDuplicatedRecords(update.duplicated_records);
-  //           setProgress(update.progress);
-  //           updateIndex++;
-  //           setTimeout(updateProgress, updateInterval);
-  //         } else {
-  //           setMigrationSummary({
-  //             total_records,
-  //             migrated_records,
-  //             failed_records,
-  //             duplicated_records
-  //           });
-  //           setOpenStatusDialog(false);
-  //           setOpenSummaryDialog(true);
-  //         }
-  //       };
-  //       updateProgress();
-  //     });
-  //   } catch (error) {
-  //     console.error('Error occurred during migration', error);
-  //   };
-  // };
 
   return (
     <Box>
@@ -204,7 +185,7 @@ const Page2 = () => {
             </FormControl>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Button variant="contained" onClick={handleStartMigration} disabled={!badgeNo || !className}>
+            <Button variant="contained" onClick={handleStartMigrationChildren} disabled={!badgeNo || !className}>
               <Typography variant="button">Start Migration</Typography>
             </Button>
           </Grid>
