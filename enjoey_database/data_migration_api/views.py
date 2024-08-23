@@ -244,7 +244,7 @@ class UploadChildrenCSVData(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class MigrateIntoCoreServiceChildrenTable(APIView):    
+class MigrateIntoCoreServiceChildrenCoreServiceFamilyTable(APIView):    
     def post(self, request, *args, **kwargs):
         badgeNo = request.data.get('badgeNo')
         className = request.data.get('className')
@@ -262,6 +262,80 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
         if total_records == 0:
             return Response({"message": "No records to migrate"}, status=status.HTTP_200_OK)
 
+        # Family Name Formatting
+        def format_name(name):
+            return ' '.join([part.capitalize() for part in name.split()])
+
+        def get_first_name(full_name):
+            if full_name == "null" or full_name is None or not full_name.strip():  # Skip records with "null", None or empty full_name
+                return ''
+            
+            names = full_name.split()
+            formatted_names = [format_name(name) for name in names]
+            
+            if len(formatted_names) == 1:
+                return formatted_names[0]
+            elif len(formatted_names) == 2:
+                return formatted_names[0]
+            elif len(formatted_names) == 3:
+                return ' '.join(formatted_names[1:])
+            elif len(formatted_names) == 4:
+                return ' '.join(formatted_names[2:])
+            return ''  # Return empty if no condition is met
+
+        def get_last_name(full_name):
+            if full_name == "null" or full_name is None or not full_name.strip():  # Skip records with "null", None or empty full_name
+                return ''
+            
+            names = full_name.split()
+            formatted_names = [format_name(name) for name in names]
+            
+            if len(formatted_names) == 1:
+                return None
+            elif len(formatted_names) == 2:
+                return formatted_names[1]
+            elif len(formatted_names) == 3:
+                return formatted_names[0]
+            elif len(formatted_names) == 4:
+                return formatted_names[1]
+            return ''  # Return empty if no condition is met
+
+        # Family Phone Formatting
+        def format_phone_number(phone_number, country_code='+60'):
+            clean_number = ''.join(char for char in phone_number if char.isdigit())
+            if not clean_number.startswith('0'):
+                clean_number = '0' + clean_number
+            clean_number = country_code + clean_number[1:]
+            return f'{clean_number[:5]}-{clean_number[5:]}'
+        
+        def get_mobile_phone(mobile, phone):
+            if mobile and mobile != "null":
+                return format_phone_number(mobile)
+            elif phone and phone != "null":
+                return format_phone_number(phone)
+            return "null"
+
+        # Family Address Formatting
+        def format_address(relationship, record):
+            if relationship == "mother":
+                address = getattr(record, 'streetM', '') or ''
+                state = "Selangor"
+                country = "Malaysia"
+                postcode = getattr(record, 'postalCodeM', '') or ''
+            elif relationship == "father":
+                address = getattr(record, 'streetF', '') or ''
+                state = "Selangor"
+                country = "Malaysia"
+                postcode = getattr(record, 'postalCodeF', '') or ''
+            else:
+                address_line1 = getattr(record, 'addressLine1', '') or ''
+                address_line2 = getattr(record, 'addressLine2', '') or ''
+                address = address_line1 + (' ' if address_line1 and address_line2 else '') + address_line2
+                state = "Selangor"
+                country = "Malaysia"
+                postcode = getattr(record, 'postalCodeRA1', '') or ''
+            return address, state, country, postcode
+
         try:
             for index, record in enumerate(records):
                 if CoreServiceChildren.objects.filter(birthCertNo=record.studentID).exists():
@@ -272,6 +346,7 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
                         'failed_records': failed_records,
                         'progress': ((index + 1) / total_records) * 100
                     })
+                    print("child", duplicated_records)
                     continue
                 core_service_children_data = {
                     'fullName': record.name,
@@ -290,6 +365,84 @@ class MigrateIntoCoreServiceChildrenTable(APIView):
                 else:
                     failed_records += 1
                     errors.append(serializer.errors)
+
+                for i in range(1, 4):
+                    print("run")
+                    name_key = f'name{i}'
+                    mobile_key = f'mobileNo{i}'
+                    phone_key = f'phoneNo{i}'
+                    email_key = f'email{i}'
+                    birthIC_key = f'NRIC{i}'
+                    birthCountry_key = f'citizenship{i}'
+                    occupation_key = f'occupation{i}'
+                    relationship_key = f'parentRelationship{i}'
+                    allow_pickup_key = f'authorisedPickUpPerson{i}'
+                    billable_key = f'emailInvoiceReceipt{i}'
+                    primary_key = f'mainContact{i}'
+
+                    full_name = getattr(record, name_key, None)
+                    birth_ic = getattr(record, birthIC_key, None)
+                    email = getattr(record, email_key, None)
+                    get_mobile = getattr(record, mobile_key, None)
+                    get_phone = getattr(record, phone_key, None)
+                    phone_no = get_mobile_phone(get_mobile, get_phone)
+                    relationship = getattr(record, relationship_key, None)
+
+                    if not full_name or full_name.strip() == "null":
+                        failed_records += 1
+                        continue
+
+                    if birth_ic:
+                        # Check for duplicate by birthIC if it's available
+                        if CoreServiceFamily.objects.filter(birthIC=birth_ic).exists():
+                            duplicated_records += 1
+                            progress_updates.append({
+                                'migrated_records': migrated_records,
+                                'duplicated_records': duplicated_records,
+                                'failed_records': failed_records,
+                                'progress': ((index + 1) / total_records) * 100
+                            })
+                            continue  # Skip to the next family record if it's a duplicate
+                    else:
+                        # Check for duplicates by name and email if birthIC is null
+                        if CoreServiceFamily.objects.filter(fullName=full_name, email=email).exists():
+                            duplicated_records += 1
+                            progress_updates.append({
+                                'migrated_records': migrated_records,
+                                'duplicated_records': duplicated_records,
+                                'failed_records': failed_records,
+                                'progress': ((index + 1) / total_records) * 100
+                            })
+                            continue  # Skip to the next family record if it's a duplicate
+
+                    first_name = get_first_name(full_name)
+                    last_name = get_last_name(full_name)
+                    address, state, country, postcode = format_address(relationship, record)
+
+                    core_service_family_data = {
+                        'firstName': first_name,
+                        'lastName': last_name,
+                        'phone': phone_no,
+                        'address': address,
+                        'state': state,
+                        'country': country,
+                        'postcode': postcode,
+                        'email': email,
+                        'birthIC': getattr(record, birthIC_key, None),
+                        'birthCountry': getattr(record, birthCountry_key, None),
+                        'occupation': getattr(record, occupation_key, None),
+                        'relationship': relationship,
+                        'isAllowedPickup': getattr(record, allow_pickup_key, None),
+                        'isBillable': getattr(record, billable_key, None),
+                        'isPrimary': getattr(record, primary_key, None),
+                    }
+                    serializer = CoreServiceFamilyTableSerializer(data=core_service_family_data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        migrated_records += 1
+                    else:
+                        failed_records += 1
+                        errors.append(serializer.errors)
 
                 progress_updates.append({
                     'migrated_records': migrated_records,
@@ -417,12 +570,24 @@ class MigrateIntoCoreServiceFamilyTable(APIView):
                     primary_key = f'mainContact{i}'
 
                     full_name = getattr(record, name_key, None)
+                    birth_ic = getattr(record, birthIC_key, None)
                     get_mobile = getattr(record, mobile_key, None)
                     get_phone = getattr(record, phone_key, None)
                     phone_no = get_mobile_phone(get_mobile, get_phone)
                     relationship = getattr(record, relationship_key, None)
 
                     if not full_name or full_name.strip() == "null":
+                        failed_records += 1
+                        continue
+
+                    if CoreServiceFamily.objects.filter(birthIC=birth_ic).exists():
+                        duplicated_records += 1
+                        progress_updates.append({
+                            'migrated_records': migrated_records,
+                            'duplicated_records': duplicated_records,
+                            'failed_records': failed_records,
+                            'progress': ((index + 1) / total_records) * 100
+                        })
                         continue
 
                     first_name = get_first_name(full_name)

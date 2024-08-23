@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 
 const childrenTempURL       = "http://127.0.0.1:8000/api/data_migration/childrencsvupload/";
-const childrenMigrationURL  = "http://127.0.0.1:8000/api/data_migration/children-migration/"
+const childrenMigrationURL  = "http://127.0.0.1:8000/api/data_migration/children-family-migration/"
 const familyMigrationURL  = "http://127.0.0.1:8000/api/data_migration/family-migration/"
 
 const Page2 = () => {
