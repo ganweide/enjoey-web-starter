@@ -178,14 +178,14 @@ class CoreServiceChildrenAllergies(models.Model):
 
 class EmailTemplateJsonTable(models.Model):
     templateName   = models.CharField(max_length=250)
-    jsonFormat     = models.CharField()
+    jsonFormat     = models.CharField(max_length=255)
     createdAt      = models.DateTimeField("created_at", auto_now_add=True)
     updatedAt      = models.DateTimeField("updated_at", auto_now=True)
     deletedAt      = models.DateTimeField("deleted_at", null=True, blank=True)
 
 class EmailTemplateHtmlTable(models.Model):
     templateName   = models.CharField(max_length=250)
-    htmlFormat     = models.CharField()
+    htmlFormat     = models.CharField(max_length=255)
     createdAt      = models.DateTimeField("created_at", auto_now_add=True)
     updatedAt      = models.DateTimeField("updated_at", auto_now=True)
     deletedAt      = models.DateTimeField("deleted_at", null=True, blank=True)
@@ -493,7 +493,7 @@ class SurveySettingsTable(models.Model):
     surveyId            = models.CharField(primary_key=True, db_index=True, max_length=250)
     surveyTitle         = models.CharField(max_length=250)
     description         = models.CharField(max_length=250)
-    questions           = models.CharField()
+    questions           = models.CharField(max_length=255)
     created_at          = models.DateTimeField("created_at", auto_now_add=True)
     updated_at          = models.DateTimeField("updated_at", auto_now=True)
     deleted_at          = models.DateTimeField("deleted_at", null=True, blank=True)
@@ -518,7 +518,7 @@ class PublishSurveyTable(models.Model):
 class UserAnswerTable(models.Model):
     name                = models.CharField(max_length=250)
     publishSurveyId     = models.CharField(max_length=250)
-    answer              = models.CharField()
+    answer              = models.CharField(max_length=255)
     createdAt          = models.DateTimeField("created_at", auto_now_add=True)
     updatedAt          = models.DateTimeField("updated_at", auto_now=True)
     deletedAt          = models.DateTimeField("deleted_at", null=True, blank=True)

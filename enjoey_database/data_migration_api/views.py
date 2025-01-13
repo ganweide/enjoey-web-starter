@@ -1,6 +1,6 @@
 from rest_framework import status
-from .models import ChildrenTempTable, CoreServiceChildren, CoreServiceFamily, CoreServiceChildrenMedicalContact, CoreServiceChildrenAllergies, CoreServiceClassrooms, CoreServiceChildrenEnrollment
-from .serializers import ChildrenTempTableSerializer, CoreServiceChildrenTableSerializer, CoreServiceChildrenMedicalContactTableSerializer, CoreServiceChildrenAllergiesTableSerializer, CoreServiceChildrenEnrollmentTableSerializer, CoreServiceFamilyTableSerializer, CoreServiceClassroomsTableSerializer
+from .models import ChildrenTempTable, CoreServiceChildren, CoreServiceFamily, CoreServiceChildrenMedicalContact, CoreServiceChildrenAllergies, CoreServiceClassrooms, CoreServiceChildrenEnrollment, StaffTempTable
+from .serializers import ChildrenTempTableSerializer, CoreServiceChildrenTableSerializer, CoreServiceChildrenMedicalContactTableSerializer, CoreServiceChildrenAllergiesTableSerializer, CoreServiceChildrenEnrollmentTableSerializer, CoreServiceFamilyTableSerializer, CoreServiceClassroomsTableSerializer, StaffTempTableSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,6 +9,7 @@ import csv
 import datetime
 from datetime import datetime
 from django.db.models import Max
+from openpyxl import load_workbook
 
 class UploadChildrenCSVData(APIView):
     def get(self, request, *args, **kwargs):
@@ -636,4 +637,125 @@ class MigrateIntoCoreServiceFamilyTable(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UploadStaffCSVData(APIView):
+    def post(self, request, *args, **kwargs):
+        file = request.FILES.get('file')
+
+        try:
+            workbook = load_workbook(file)
+            sheet = workbook.active
+            def format_boolean(value):
+                if isinstance(value, bool):  # If it's already a boolean
+                    return value
+                if isinstance(value, str):  # If it's a string
+                    value = value.strip().upper()  # Normalize the input (remove spaces and uppercase)
+                    if value == "TRUE":
+                        return True
+                    elif value == "FALSE":
+                        return False
+                # Handle invalid inputs
+                return None
+            
+            def format_date(date_input):
+                if isinstance(date_input, datetime):  # Check if input is already a datetime object
+                    return date_input.strftime("%Y-%m-%d")
+                elif isinstance(date_input, str):  # If it's a string, try to parse it
+                    formats_to_try = ["%d-%m-%Y", "%Y-%m-%d", "%d/%m/%Y", "%Y-%m-%d", "%d-%b-%y"]
+                    for date_format in formats_to_try:
+                        try:
+                            date_obj = datetime.strptime(date_input, date_format)
+                            return date_obj.strftime("%Y-%m-%d")
+                        except ValueError:
+                            continue
+                # Handle invalid inputs
+                return None
+            
+            headers = [
+                "schoolName", "branchName", "firstName", "lastName", "email",
+                "phone", "gender", "dob", "profileImage", "address", "state",
+                "country", "birthCountry", "postcode", "role", "isWebAccess",
+                "isMobileAccess", "doj", "isExternal", "staffNRIC", "academyYear",
+                "academyMonth", "startDate", "classroomName", "isPrimary",
+                "branches", "isFranchiseStaff"
+            ]
+
+            csv_to_model_mapping = {
+                "schoolName": "schoolName",
+                "branchName": "branchName",
+                "firstName": "firstName",
+                "lastName": "lastName",
+                "email": "email",
+                "phone": "phone",
+                "gender": "gender",
+                "dob": "dob",
+                "profileImage": "profileImage",
+                "address": "address",
+                "state": "state",
+                "country": "country",
+                "birthCountry": "birthCountry",
+                "postcode": "postcode",
+                "role": "role",
+                "isWebAccess": "isWebAccess",
+                "isMobileAccess": "isMobileAccess",
+                "doj": "doj",
+                "isExternal": "isExternal",
+                "staffNRIC": "staffNRIC",
+                "academyYear": "academyYear",
+                "academyMonth": "academyMonth",
+                "startDate": "startDate",
+                "classroomName": "classroomName",
+                "isPrimary": "isPrimary",
+                "Branches": "branches",
+                "IsFranchiseStaff": "isFranchiseStaff",
+            }
+
+            max_badge_no = StaffTempTable.objects.aggregate(Max('badgeNo')).get('badgeNo__max')
+            if max_badge_no:
+                next_badge_no = int(max_badge_no) + 1
+            else:
+                next_badge_no = 10001  # Start from 10001 if no badge number exists
+
+            errors = []
+            successful_uploads = 0
+            failed_uploads = 0
+
+            def insert_temp_table(row):
+                print('hi', row)
+                row = {csv_to_model_mapping.get(headers[i], headers[i]): value for i, value in enumerate(row)}
+                row = {key: (value if value and str(value).strip() else 'null') for key, value in row.items()}
+                row['dob'] = format_date(row.get('dob', ''))
+                row['doj'] = format_date(row.get('doj', ''))
+                row['startDate'] = format_date(row.get('startDate', ''))
+                row['isPrimary'] = format_boolean(row.get('isPrimary', ''))
+                row['badgeNo'] = next_badge_no
+                
+                profile_image = row.get('profileImage')
+                if not profile_image or not hasattr(profile_image, 'read'):
+                    row['profileImage'] = None 
+
+                serializer = StaffTempTableSerializer(data=row)
+                if serializer.is_valid():
+                    serializer.save()
+                    return serializer.instance  # Return the model instance
+                else:
+                    errors.append(serializer.errors)
+                    return None
+
+            for row in sheet.iter_rows(min_row=2):  # Start from the first row
+                row_values = [cell.value for cell in row]  # Extract values
+                temp_record = insert_temp_table(row_values)
+                if temp_record:
+                    successful_uploads += 1
+                else:
+                    failed_uploads += 1
+
+            return Response({
+                'message': 'CSV data imported successfully',
+                'successful_uploads': successful_uploads,
+                'failed_uploads': failed_uploads,
+                'errors': errors
+            }, status=status.HTTP_200_OK)
         
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

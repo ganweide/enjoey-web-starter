@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceChildrenEnrollment, CoreServiceClassrooms, CoreServiceFamily, ChildrenTempTable
+from .models import CoreServiceChildren, CoreServiceChildrenAllergies, CoreServiceChildrenMedicalContact, CoreServiceChildrenEnrollment, CoreServiceClassrooms, CoreServiceFamily, ChildrenTempTable, StaffTempTable, Classroom_staff, Programs, ClassRooms
 
 class ChildrenTempTableSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,5 +34,25 @@ class CoreServiceClassroomsTableSerializer(serializers.ModelSerializer):
 class CoreServiceFamilyTableSerializer(serializers.ModelSerializer):
     class Meta:
         model = CoreServiceFamily
+        fields = '__all__'
+        
+class StaffTempTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StaffTempTable
+        fields = '__all__'
+        
+class ProgramTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Programs
+        fields = '__all__'
+        
+class ClassroomTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassRooms
+        fields = '__all__'
+        
+class ClassroomStaffTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Classroom_staff
         fields = '__all__'
 
